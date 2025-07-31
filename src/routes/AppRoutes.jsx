@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
+import GastosScreen from '../screens/GastosScreen';
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children }) {
@@ -44,6 +45,16 @@ function AppRoutes({ user, onLogin, onLogout }) {
         element={
           <ProtectedRoute>
             <HomeScreen user={user} onLogout={onLogout} />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Nueva ruta de gastos */}
+      <Route 
+        path="/gastos" 
+        element={
+          <ProtectedRoute>
+            <GastosScreen user={user} onLogout={onLogout} />
           </ProtectedRoute>
         } 
       />
