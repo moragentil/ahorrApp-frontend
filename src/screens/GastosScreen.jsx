@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar } from 'lucide-react';
 import Header from '../components/Header';
 
 function GastosScreen({ user, onLogout }) {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todas");
   const [viewMode, setViewMode] = useState("cards");
@@ -39,6 +41,10 @@ function GastosScreen({ user, onLogout }) {
 
   const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
+  const handleNewExpense = () => {
+    navigate('/gastos/nuevo');
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Header user={user} onLogout={onLogout} />
@@ -50,7 +56,10 @@ function GastosScreen({ user, onLogout }) {
             <h1 className="text-3xl font-bold text-gray-900">Mis Gastos</h1>
             <p className="text-gray-600">Gestiona y revisa todos tus gastos</p>
           </div>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+          <button 
+            onClick={handleNewExpense}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
             Nuevo Gasto
           </button>
@@ -198,7 +207,10 @@ function GastosScreen({ user, onLogout }) {
             <div className="text-6xl mb-4">💸</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron gastos</h3>
             <p className="text-gray-600 mb-4">Intenta ajustar los filtros o agregar un nuevo gasto</p>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto">
+            <button 
+              onClick={handleNewExpense}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+            >
               <Plus className="w-4 h-4" />
               Agregar Gasto
             </button>

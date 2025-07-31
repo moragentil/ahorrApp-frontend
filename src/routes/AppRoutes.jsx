@@ -3,6 +3,7 @@ import { authService } from '../services/authService';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import GastosScreen from '../screens/GastosScreen';
+import NuevoGastoScreen from '../screens/NuevoGastoScreen';
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children }) {
@@ -49,12 +50,22 @@ function AppRoutes({ user, onLogin, onLogout }) {
         } 
       />
 
-      {/* Nueva ruta de gastos */}
+      {/* Ruta de gastos */}
       <Route 
         path="/gastos" 
         element={
           <ProtectedRoute>
             <GastosScreen user={user} onLogout={onLogout} />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Nueva ruta para nuevo gasto */}
+      <Route 
+        path="/gastos/nuevo" 
+        element={
+          <ProtectedRoute>
+            <NuevoGastoScreen user={user} onLogout={onLogout} />
           </ProtectedRoute>
         } 
       />
