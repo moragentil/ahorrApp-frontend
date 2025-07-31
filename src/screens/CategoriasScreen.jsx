@@ -1,0 +1,337 @@
+import { useState } from 'react';
+import { Plus, Edit, Trash2, Tag, DollarSign, X } from 'lucide-react';
+import Header from '../components/Header';
+
+function CategoriasScreen({ user, onLogout }) {
+  const [categories, setCategories] = useState([
+    { id: 1, name: "Alimentación", color: "#3b82f6", totalSpent: 1267.8, transactionCount: 15 },
+    { id: 2, name: "Transporte", color: "#10b981", totalSpent: 857.3, transactionCount: 12 },
+    { id: 3, name: "Entretenimiento", color: "#8b5cf6", totalSpent: 640.99, transactionCount: 8 },
+    { id: 4, name: "Salud", color: "#ef4444", totalSpent: 432.75, transactionCount: 5 },
+    { id: 5, name: "Servicios", color: "#f59e0b", totalSpent: 989.5, transactionCount: 6 },
+    { id: 6, name: "Educación", color: "#06b6d4", totalSpent: 299.0, transactionCount: 3 },
+    { id: 7, name: "Ropa", color: "#ec4899", totalSpent: 156.9, transactionCount: 4 },
+    { id: 8, name: "Hogar", color: "#84cc16", totalSpent: 678.45, transactionCount: 9 },
+  ]);
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
+
+  const colorOptions = [
+    "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
+    "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
+  ];
+
+  const handleAddCategory = () => {
+    if (newCategoryName.trim()) {
+      const newCategory = {
+        id: Math.max(...categories.map((c) => c.id)) + 1,
+        name: newCategoryName.trim(),
+        color: newCategoryColor,
+        totalSpent: 0,
+        transactionCount: 0,
+      };
+      setCategories([...categories, newCategory]);
+      setNewCategoryName("");
+      setNewCategoryColor("#3b82f6");
+      setIsAddDialogOpen(false);
+    }
+  };
+
+  const handleEditCategory = () => {
+    if (editingCategory && newCategoryName.trim()) {
+      setCategories(
+        categories.map((cat) =>
+          cat.id === editingCategory.id 
+            ? { ...cat, name: newCategoryName.trim(), color: newCategoryColor } 
+            : cat
+        )
+      );
+      setIsEditDialogOpen(false);
+      setEditingCategory(null);
+      setNewCategoryName("");
+      setNewCategoryColor("#3b82f6");
+    }
+  };
+
+  const handleDeleteCategory = (id) => {
+    setCategories(categories.filter((cat) => cat.id !== id));
+  };
+
+  const openEditDialog = (category) => {
+    setEditingCategory(category);
+    setNewCategoryName(category.name);
+    setNewCategoryColor(category.color);
+    setIsEditDialogOpen(true);
+  };
+
+  const totalSpent = categories.reduce((sum, cat) => sum + cat.totalSpent, 0);
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <Header user={user} onLogout={onLogout} />
+      
+      <main className="max-w-6xl mx-auto p-4 lg:p-8 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
+            <p className="text-gray-600">Organiza y personaliza tus categorías de gastos</p>
+          </div>
+          <button 
+            onClick={() => setIsAddDialogOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Nueva Categoría
+          </button>
+        </div>
+
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-gray-900">{categories.length}</div>
+            <p className="text-sm text-gray-600">Categorías activas</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-gray-900">${totalSpent.toFixed(2)}</div>
+            <p className="text-sm text-gray-600">Total gastado</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="text-2xl font-bold text-gray-900">
+              {categories.reduce((sum, cat) => sum + cat.transactionCount, 0)}
+            </div>
+            <p className="text-sm text-gray-600">Total transacciones</p>
+          </div>
+        </div>
+
+        {/* Categories Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="w-4 h-4 rounded-full" 
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                </div>
+                <div className="flex gap-1">
+                  <button 
+                    onClick={() => openEditDialog(category)}
+                    className="p-1 text-gray-400 hover:text-gray-600"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleDeleteCategory(category.id)}
+                    className="p-1 text-red-400 hover:text-red-600"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Total gastado</span>
+                  </div>
+                  <span className="font-bold text-gray-900">${category.totalSpent.toFixed(2)}</span>
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Transacciones</span>
+                  </div>
+                  <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                    {category.transactionCount}
+                  </span>
+                </div>
+                
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{
+                      backgroundColor: category.color,
+                      width: `${totalSpent > 0 ? (category.totalSpent / totalSpent) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
+                
+                <p className="text-xs text-gray-600 text-center">
+                  {totalSpent > 0 ? ((category.totalSpent / totalSpent) * 100).toFixed(1) : 0}% del total
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {categories.length === 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+            <div className="text-6xl mb-4">🏷️</div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay categorías</h3>
+            <p className="text-gray-600 mb-4">
+              Crea tu primera categoría para comenzar a organizar tus gastos
+            </p>
+            <button 
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+            >
+              <Plus className="w-4 h-4" />
+              Crear Primera Categoría
+            </button>
+          </div>
+        )}
+
+        {/* Add Category Modal */}
+        {isAddDialogOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Crear Nueva Categoría</h2>
+                <button 
+                  onClick={() => setIsAddDialogOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <p className="text-gray-600 mb-4">Agrega una nueva categoría para organizar mejor tus gastos</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre de la categoría
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ej: Mascotas, Viajes, etc."
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Color de la categoría
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {colorOptions.map((color) => (
+                      <button
+                        key={color}
+                        className={`w-8 h-8 rounded-full border-2 ${
+                          newCategoryColor === color ? "border-gray-900" : "border-gray-300"
+                        }`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setNewCategoryColor(color)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsAddDialogOpen(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleAddCategory}
+                  disabled={!newCategoryName.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Crear Categoría
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Category Modal */}
+        {isEditDialogOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">Editar Categoría</h2>
+                <button 
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <p className="text-gray-600 mb-4">Modifica el nombre y color de la categoría</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nombre de la categoría
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Nombre de la categoría"
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Color de la categoría
+                  </label>
+                  <div className="flex gap-2 flex-wrap">
+                    {colorOptions.map((color) => (
+                      <button
+                        key={color}
+                        className={`w-8 h-8 rounded-full border-2 ${
+                          newCategoryColor === color ? "border-gray-900" : "border-gray-300"
+                        }`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setNewCategoryColor(color)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleEditCategory}
+                  disabled={!newCategoryName.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Guardar Cambios
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default CategoriasScreen;

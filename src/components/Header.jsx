@@ -1,4 +1,4 @@
-import { PiggyBank, Home, CreditCard } from 'lucide-react';
+import { PiggyBank, Home, CreditCard, Tag } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Header({ user, onLogout }) {
@@ -33,13 +33,24 @@ function Header({ user, onLogout }) {
             <button
               onClick={() => navigate('/gastos')}
               className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
-                isActive('/gastos') 
+                isActive('/gastos') || isActive('/gastos/nuevo')
                   ? 'bg-blue-100 text-blue-700 font-medium' 
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <CreditCard className="w-4 h-4 mr-2" />
               Gastos
+            </button>
+            <button
+              onClick={() => navigate('/categorias')}
+              className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+                isActive('/categorias') 
+                  ? 'bg-blue-100 text-blue-700 font-medium' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Tag className="w-4 h-4 mr-2" />
+              Categorías
             </button>
           </nav>
 
@@ -72,13 +83,24 @@ function Header({ user, onLogout }) {
             <button
               onClick={() => navigate('/gastos')}
               className={`flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
-                isActive('/gastos') 
+                isActive('/gastos') || isActive('/gastos/nuevo')
                   ? 'bg-blue-100 text-blue-700 font-medium' 
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
               }`}
             >
               <CreditCard className="w-4 h-4 mr-2" />
               Gastos
+            </button>
+            <button
+              onClick={() => navigate('/categorias')}
+              className={`flex items-center px-3 py-2 rounded-lg transition-colors text-sm ${
+                isActive('/categorias') 
+                  ? 'bg-blue-100 text-blue-700 font-medium' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              <Tag className="w-4 h-4 mr-2" />
+              Categorías
             </button>
           </div>
         </nav>
