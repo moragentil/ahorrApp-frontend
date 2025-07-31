@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { authService } from './services/authService';
-import './App.css';
 
 function App() {
   const [user, setUser] = useState(null);

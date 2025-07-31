@@ -1,5 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Header from '../components/Header';
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -10,30 +12,51 @@ function HomeScreen({ user, onLogout }) {
     navigate('/login');
   };
 
+  // Obtener el mes actual
+  const getCurrentMonth = () => {
+    const months = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    const currentDate = new Date();
+    return `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+  };
+
+  // Datos para el gráfico de torta
+  const expenseData = [
+    { name: "Alimentación", value: 1200, color: "#8884d8" },
+    { name: "Transporte", value: 800, color: "#82ca9d" },
+    { name: "Entretenimiento", value: 600, color: "#ffc658" },
+    { name: "Servicios", value: 900, color: "#ff7300" },
+    { name: "Otros", value: 400, color: "#00ff88" },
+  ];
+
+  // Datos para el gráfico de barras
+  const monthlyData = [
+    { month: "Ene", gastos: 2800, ingresos: 4000 },
+    { month: "Feb", gastos: 3200, ingresos: 4000 },
+    { month: "Mar", gastos: 2900, ingresos: 4000 },
+    { month: "Abr", gastos: 3900, ingresos: 4000 },
+    { month: "May", gastos: 3100, ingresos: 4000 },
+    { month: "Jun", gastos: 3500, ingresos: 4000 },
+  ];
+
+  const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88'];
+
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <h1 className="text-2xl font-bold text-blue-600">AhorrApp</h1>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-gray-700">Hola, {user?.name}</span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              >
-                Cerrar Sesión
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+      {/* Header Component */}
+      <Header user={user} onLogout={handleLogout} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <main className="w-full mx-auto px-12 py-6">
+        {/* Título del mes */}
+        <div className="mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Resumen de {getCurrentMonth()}</h2>
+          <p className="text-gray-600">Tu estado financiero del mes actual</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {/* Tarjetas de resumen */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center">
@@ -43,7 +66,7 @@ function HomeScreen({ user, onLogout }) {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Total Ahorrado</h3>
+                <h3 className="text-sm font-medium text-gray-500">Dinero Restante</h3>
                 <p className="text-2xl font-semibold text-gray-900">$25,430</p>
               </div>
             </div>
@@ -57,7 +80,7 @@ function HomeScreen({ user, onLogout }) {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Gastos del Mes</h3>
+                <h3 className="text-sm font-medium text-gray-500">Total Gastado</h3>
                 <p className="text-2xl font-semibold text-gray-900">$3,240</p>
               </div>
             </div>
@@ -71,8 +94,8 @@ function HomeScreen({ user, onLogout }) {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Objetivos</h3>
-                <p className="text-2xl font-semibold text-gray-900">3/5</p>
+                <h3 className="text-sm font-medium text-gray-500">Ingresos</h3>
+                <p className="text-2xl font-semibold text-gray-900">$1.200.000</p>
               </div>
             </div>
           </div>
@@ -85,9 +108,57 @@ function HomeScreen({ user, onLogout }) {
                 </svg>
               </div>
               <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Días Restantes</h3>
-                <p className="text-2xl font-semibold text-gray-900">15</p>
+                <h3 className="text-sm font-medium text-gray-500">Objetivos</h3>
+                <p className="text-2xl font-semibold text-gray-900">75%</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          {/* Gráfico de Torta */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribución por Categoría</h2>
+            <p className="text-sm text-gray-600 mb-4">Gastos del mes actual</p>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={expenseData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {expenseData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [`$${value}`, "Gasto"]} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Gráfico de Barras */}
+          <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tendencia Mensual</h2>
+            <p className="text-sm text-gray-600 mb-4">Ingresos vs Gastos últimos 6 meses</p>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`$${value}`, ""]} />
+                  <Bar dataKey="ingresos" fill="#82ca9d" name="Ingresos" />
+                  <Bar dataKey="gastos" fill="#8884d8" name="Gastos" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
