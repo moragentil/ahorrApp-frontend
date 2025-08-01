@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, FileText, Tag, Save, X, CalendarIcon } from 'lucide-react';
-import Header from '../components/Header';
+
 
 function NuevoGastoScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -52,8 +52,7 @@ function NuevoGastoScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header user={user} onLogout={onLogout} />
-      
+
       <main className="max-w-2xl mx-auto p-4 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

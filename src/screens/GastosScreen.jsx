@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar } from 'lucide-react';
-import Header from '../components/Header';
 
 function GastosScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -47,7 +46,6 @@ function GastosScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header user={user} onLogout={onLogout} />
       
       <main className="max-w-7xl mx-auto p-4 lg:p-8 space-y-6">
         {/* Header */}

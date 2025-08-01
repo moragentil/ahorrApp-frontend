@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { authService } from './services/authService';
+import Navbar from './components/Navbar';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -34,11 +35,16 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AppRoutes 
-        user={user} 
-        onLogin={handleLogin} 
-        onLogout={handleLogout} 
-      />
+      <div className="flex min-h-screen bg-gray-100">
+        {user && <Navbar user={user} onLogout={handleLogout} />}
+        <main className={`flex-1 ${user ? 'ml-0 lg:ml-64' : ''}`}>
+          <AppRoutes 
+            user={user} 
+            onLogin={handleLogin} 
+            onLogout={handleLogout} 
+          />
+        </main>
+      </div>
     </BrowserRouter>
   );
 }

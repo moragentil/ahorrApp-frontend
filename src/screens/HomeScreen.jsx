@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import Header from '../components/Header';
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -45,8 +44,6 @@ function HomeScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      {/* Header Component */}
-      <Header user={user} onLogout={handleLogout} />
 
       {/* Main Content */}
       <main className="w-full mx-auto px-12 py-6">

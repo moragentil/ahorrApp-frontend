@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Tag, DollarSign, X } from 'lucide-react';
-import Header from '../components/Header';
 
 function CategoriasScreen({ user, onLogout }) {
   const [categories, setCategories] = useState([
@@ -72,8 +71,7 @@ function CategoriasScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Header user={user} onLogout={onLogout} />
-      
+
       <main className="max-w-6xl mx-auto p-4 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
