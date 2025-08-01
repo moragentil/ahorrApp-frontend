@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { RefreshCw } from 'lucide-react'; // Agrega el icono de refresh
+import { RefreshCw, DollarSign, CreditCard, TrendingUp, TrendingDown, Target } from 'lucide-react';
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -48,6 +48,14 @@ function HomeScreen({ user, onLogout }) {
     setSelectedYear(new Date().getFullYear());
   };
 
+  // Ejemplo de datos (ajusta según tu lógica)
+  const balance = 25430;
+  const monthlyIncome = 1200000;
+  const totalExpenses = 3240;
+  const savingsGoalPercent = 75;
+  const savingsCurrent = 600;
+  const savingsTarget = 800;
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="w-full mx-auto px-12 py-6">
@@ -91,60 +99,69 @@ function HomeScreen({ user, onLogout }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {/* Tarjetas de resumen */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-md">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                </svg>
+          {/* Balance Total */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg  p-4 ">
+            <div className="flex flex-row items-center justify-between mb-2">
+              <span className="text-lg font-medium text-gray-600">Balance Total</span>
+              <DollarSign className="h-4 w-4 text-blue-900" />
+            </div>
+            <div className="">
+              <div className={`text-2xl font-bold mb-2 ${balance >= 0 ? "text-green-600" : "text-red-600"}`}>
+                ${balance.toLocaleString()}
               </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Dinero Restante</h3>
-                <p className="text-2xl font-semibold text-gray-900">$25,430</p>
-              </div>
+              <p className="text-sm text-gray-600 flex items-center mt-1">
+                {balance >= 0 ? (
+                  <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
+                ) : (
+                  <TrendingDown className="w-3 h-3 mr-1 text-red-600" />
+                )}
+                {balance >= 0 ? "+" : ""}
+                {((balance / monthlyIncome) * 100).toFixed(1)}% vs mes anterior
+              </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-md">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Total Gastado</h3>
-                <p className="text-2xl font-semibold text-gray-900">$3,240</p>
-              </div>
+          {/* Gastos del Mes */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg  p-4">
+            <div className="flex flex-row items-center justify-between mb-2">
+              <span className="text-lg font-medium text-gray-600">Gastos del Mes</span>
+              <CreditCard className="h-4 w-4 text-blue-900" />
+            </div>
+            <div className="">
+              <div className="text-2xl mb-2 font-bold text-gray-900">${totalExpenses.toLocaleString()}</div>
+              <p className="text-sm text-gray-600 flex items-center mt-1">
+                <TrendingUp className="w-3 h-3 mr-1 text-red-500" />
+                +12.5% vs mes anterior
+              </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-md">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Ingresos</h3>
-                <p className="text-2xl font-semibold text-gray-900">$1.200.000</p>
-              </div>
+          {/* Ingresos */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
+            <div className="flex flex-row items-center justify-between mb-2">
+              <span className="text-lg font-medium text-gray-600">Ingresos</span>
+              <TrendingUp className="h-4 w-4 text-blue-900" />
+            </div>
+            <div className="">
+              <div className="text-2xl font-bold mb-2 text-gray-900">${monthlyIncome.toLocaleString()}</div>
+              <p className="text-sm text-gray-600 flex items-center mt-1">
+                <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
+                Estable
+              </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-100 rounded-md">
-                <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-sm font-medium text-gray-500">Objetivos</h3>
-                <p className="text-2xl font-semibold text-gray-900">75%</p>
-              </div>
+          {/* Meta de Ahorro */}
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
+            <div className="flex flex-row items-center justify-between mb-2">
+              <span className="text-lg font-medium text-gray-600">Meta de Ahorro</span>
+              <Target className="h-4 w-4 text-blue-900" />
+            </div>
+            <div className="">
+              <div className="text-2xl font-bold mb-2 text-gray-900">{savingsGoalPercent}%</div>
+              <p className="text-sm text-gray-600">
+                ${savingsCurrent} de ${savingsTarget} objetivo
+              </p>
             </div>
           </div>
         </div>
