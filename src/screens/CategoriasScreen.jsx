@@ -18,6 +18,7 @@ function CategoriasScreen({ user, onLogout }) {
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
+  const [viewMode, setViewMode] = useState("cards");
 
   const colorOptions = [
     "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
@@ -71,7 +72,6 @@ function CategoriasScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -79,13 +79,27 @@ function CategoriasScreen({ user, onLogout }) {
             <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
             <p className="text-gray-600">Organiza y personaliza tus categorías de gastos</p>
           </div>
-          <button 
-            onClick={() => setIsAddDialogOpen(true)}
-            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Nueva Categoría
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Nueva Categoría
+            </button>
+            <button
+              onClick={() => setViewMode("cards")}
+              className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+            >
+              Tarjetas
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+            >
+              Tabla
+            </button>
+          </div>
         </div>
 
         {/* Summary Stats */}
@@ -106,73 +120,125 @@ function CategoriasScreen({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div 
-                    className="w-4 h-4 rounded-full" 
-                    style={{ backgroundColor: category.color }}
-                  />
-                  <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+        {/* Categories List */}
+        {viewMode === "cards" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-4 h-4 rounded-full" 
+                      style={{ backgroundColor: category.color }}
+                    />
+                    <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                  </div>
+                  <div className="flex gap-1">
+                    <button 
+                      onClick={() => openEditDialog(category)}
+                      className="p-1 text-gray-400 hover:text-gray-600"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteCategory(category.id)}
+                      className="p-1 text-red-400 hover:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-1">
-                  <button 
-                    onClick={() => openEditDialog(category)}
-                    className="p-1 text-gray-400 hover:text-gray-600"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button 
-                    onClick={() => handleDeleteCategory(category.id)}
-                    className="p-1 text-red-400 hover:text-red-600"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Total gastado</span>
+                    </div>
+                    <span className="font-bold text-gray-900">${category.totalSpent.toFixed(2)}</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Tag className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Transacciones</span>
+                    </div>
+                    <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                      {category.transactionCount}
+                    </span>
+                  </div>
+                  
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        backgroundColor: category.color,
+                        width: `${totalSpent > 0 ? (category.totalSpent / totalSpent) * 100 : 0}%`,
+                      }}
+                    />
+                  </div>
+                  
+                  <p className="text-xs text-gray-600 text-center">
+                    {totalSpent > 0 ? ((category.totalSpent / totalSpent) * 100).toFixed(1) : 0}% del total
+                  </p>
                 </div>
               </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Total gastado</span>
-                  </div>
-                  <span className="font-bold text-gray-900">${category.totalSpent.toFixed(2)}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">Transacciones</span>
-                  </div>
-                  <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                    {category.transactionCount}
-                  </span>
-                </div>
-                
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full transition-all duration-300"
-                    style={{
-                      backgroundColor: category.color,
-                      width: `${totalSpent > 0 ? (category.totalSpent / totalSpent) * 100 : 0}%`,
-                    }}
-                  />
-                </div>
-                
-                <p className="text-xs text-gray-600 text-center">
-                  {totalSpent > 0 ? ((category.totalSpent / totalSpent) * 100).toFixed(1) : 0}% del total
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b">
+                <tr>
+                  <th className="text-left p-4 font-semibold text-gray-900">Nombre</th>
+                  <th className="text-left p-4 font-semibold text-gray-900">Color</th>
+                  <th className="text-right p-4 font-semibold text-gray-900">Total gastado</th>
+                  <th className="text-center p-4 font-semibold text-gray-900">Transacciones</th>
+                  <th className="text-center p-4 font-semibold text-gray-900">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map((category) => (
+                  <tr key={category.id} className="border-b hover:bg-gray-50">
+                    <td className="p-4 text-gray-900">{category.name}</td>
+                    <td className="p-4">
+                      <span
+                        className="inline-block w-4 h-4 rounded-full border border-gray-300"
+                        style={{ backgroundColor: category.color }}
+                        title={category.color}
+                      />
+                    </td>
+                    <td className="p-4 text-right font-semibold text-gray-900">${category.totalSpent.toFixed(2)}</td>
+                    <td className="p-4 text-center">
+                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {category.transactionCount}
+                      </span>
+                    </td>
+                    <td className="p-4 text-center">
+                      <div className="flex justify-center gap-1">
+                        <button
+                          onClick={() => openEditDialog(category)}
+                          className="p-1 text-gray-400 hover:text-gray-600"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(category.id)}
+                          className="p-1 text-red-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Empty State */}
         {categories.length === 0 && (
