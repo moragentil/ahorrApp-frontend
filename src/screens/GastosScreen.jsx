@@ -48,6 +48,18 @@ function GastosScreen({ user, onLogout }) {
     navigate('/gastos/nuevo');
   };
 
+  function formatDate(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    // Usar los métodos getUTC* para evitar el desfase local
+    const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    const day = days[date.getUTCDay()];
+    const dd = String(date.getUTCDate()).padStart(2, "0");
+    const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const yyyy = date.getUTCFullYear();
+    return `${day}, ${dd}/${mm}/${yyyy}`;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
       
@@ -138,7 +150,7 @@ function GastosScreen({ user, onLogout }) {
                     <h3 className="font-semibold text-gray-900">{expense.descripcion}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Calendar className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-600">{expense.fecha}</span>
+                      <span className="text-sm text-gray-600">{formatDate(expense.fecha)}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -183,7 +195,7 @@ function GastosScreen({ user, onLogout }) {
                           {expense.categoria?.nombre}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-600">{expense.fecha}</td>
+                      <td className="p-4 text-gray-600">{formatDate(expense.fecha)}</td>
                       <td className="p-4 text-right font-semibold text-gray-900">
                         ${Number(expense.monto ?? 0).toFixed(2)}
                       </td>
