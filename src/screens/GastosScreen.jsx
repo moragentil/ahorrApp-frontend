@@ -47,7 +47,7 @@ function GastosScreen({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-100">
       
-      <main className="max-w-7xl mx-auto p-4 lg:p-8 space-y-6">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -56,7 +56,7 @@ function GastosScreen({ user, onLogout }) {
           </div>
           <button 
             onClick={handleNewExpense}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Nuevo Gasto
@@ -64,7 +64,6 @@ function GastosScreen({ user, onLogout }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -74,7 +73,7 @@ function GastosScreen({ user, onLogout }) {
                   placeholder="Buscar gastos..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none "
                 />
               </div>
             </div>
@@ -92,35 +91,35 @@ function GastosScreen({ user, onLogout }) {
               </select>
               <button
                 onClick={() => setViewMode("cards")}
-                className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
               >
                 Tarjetas
               </button>
               <button
                 onClick={() => setViewMode("table")}
-                className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
               >
                 Tabla
               </button>
             </div>
           </div>
-        </div>
+
 
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">{filteredExpenses.length}</div>
-            <p className="text-sm text-gray-600">Gastos encontrados</p>
+          <div className="bg-white rounded-lg shadow-md px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">{filteredExpenses.length}</div>
+            <p className="text-sm text-gray-700">Gastos encontrados</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">${totalAmount.toFixed(2)}</div>
-            <p className="text-sm text-gray-600">Total filtrado</p>
+          <div className="bg-white rounded-lg shadow-md px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">${totalAmount.toFixed(2)}</div>
+            <p className="text-sm text-gray-700">Total filtrado</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-white rounded-lg shadow-md px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">
               ${(totalAmount / filteredExpenses.length || 0).toFixed(2)}
             </div>
-            <p className="text-sm text-gray-600">Promedio por gasto</p>
+            <p className="text-sm text-gray-700">Promedio por gasto</p>
           </div>
         </div>
 
@@ -130,7 +129,7 @@ function GastosScreen({ user, onLogout }) {
             {filteredExpenses.map((expense) => (
               <div
                 key={expense.id}
-                className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
+                className="bg-white rounded-lg shadow-md p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
