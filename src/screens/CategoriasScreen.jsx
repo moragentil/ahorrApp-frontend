@@ -71,7 +71,7 @@ function CategoriasScreen({ user, onLogout }) {
 
   const openEditDialog = (category) => {
     setEditingCategory(category);
-    setNewCategoryName(category.name);
+    setNewCategoryName(category.nombre);
     setNewCategoryColor(category.color);
     setIsEditDialogOpen(true);
   };
@@ -142,7 +142,7 @@ function CategoriasScreen({ user, onLogout }) {
                       className="w-4 h-4 rounded-full" 
                       style={{ backgroundColor: category.color }}
                     />
-                    <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{category.nombre}</h3>
                   </div>
                   <div className="flex gap-1">
                     <button 
@@ -166,7 +166,9 @@ function CategoriasScreen({ user, onLogout }) {
                       <DollarSign className="w-4 h-4 text-gray-400" />
                       <span className="text-sm text-gray-600">Total gastado</span>
                     </div>
-                    <span className="font-bold text-gray-900">${category.totalSpent.toFixed(2)}</span>
+                    <span className="font-bold text-gray-900">
+                      ${Number(category.totalSpent ?? 0).toFixed(2)}
+                    </span>
                   </div>
                   
                   <div className="flex items-center justify-between">
@@ -175,7 +177,7 @@ function CategoriasScreen({ user, onLogout }) {
                       <span className="text-sm text-gray-600">Transacciones</span>
                     </div>
                     <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {category.transactionCount}
+                      {category.transactionCount ?? 0}
                     </span>
                   </div>
                   
@@ -211,7 +213,7 @@ function CategoriasScreen({ user, onLogout }) {
               <tbody>
                 {categories.map((category) => (
                   <tr key={category.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4 text-gray-900">{category.name}</td>
+                    <td className="p-4 text-gray-900">{category.nombre}</td>
                     <td className="p-4">
                       <span
                         className="inline-block w-4 h-4 rounded-full border border-gray-300"
@@ -219,7 +221,9 @@ function CategoriasScreen({ user, onLogout }) {
                         title={category.color}
                       />
                     </td>
-                    <td className="p-4 text-right font-semibold text-gray-900">${category.totalSpent.toFixed(2)}</td>
+                    <td className="p-4 text-right font-semibold text-gray-900">
+                      ${Number(category.totalSpent ?? 0).toFixed(2)}
+                    </td>
                     <td className="p-4 text-center">
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
                         {category.transactionCount}
