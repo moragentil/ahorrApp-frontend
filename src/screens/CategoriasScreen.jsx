@@ -1,18 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Tag, DollarSign, X } from 'lucide-react';
+import { categoriasService } from '../services/categoriasService';
 
 function CategoriasScreen({ user, onLogout }) {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Alimentación", color: "#3b82f6", totalSpent: 1267.8, transactionCount: 15 },
-    { id: 2, name: "Transporte", color: "#10b981", totalSpent: 857.3, transactionCount: 12 },
-    { id: 3, name: "Entretenimiento", color: "#8b5cf6", totalSpent: 640.99, transactionCount: 8 },
-    { id: 4, name: "Salud", color: "#ef4444", totalSpent: 432.75, transactionCount: 5 },
-    { id: 5, name: "Servicios", color: "#f59e0b", totalSpent: 989.5, transactionCount: 6 },
-    { id: 6, name: "Educación", color: "#06b6d4", totalSpent: 299.0, transactionCount: 3 },
-    { id: 7, name: "Ropa", color: "#ec4899", totalSpent: 156.9, transactionCount: 4 },
-    { id: 8, name: "Hogar", color: "#84cc16", totalSpent: 678.45, transactionCount: 9 },
-  ]);
-
+  const [categories, setCategories] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -25,7 +16,11 @@ function CategoriasScreen({ user, onLogout }) {
     "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
   ];
 
-  const handleAddCategory = () => {
+  useEffect(() => {
+    categoriasService.getAll().then(setCategories);
+  }, []);
+
+  const handleAddCategory = async () => {
     if (newCategoryName.trim()) {
       const newCategory = {
         id: Math.max(...categories.map((c) => c.id)) + 1,
@@ -38,10 +33,17 @@ function CategoriasScreen({ user, onLogout }) {
       setNewCategoryName("");
       setNewCategoryColor("#3b82f6");
       setIsAddDialogOpen(false);
+
+      await categoriasService.create({
+        user_id: user.id,
+        nombre: newCategoryName,
+        tipo: 'gasto',
+        color: newCategoryColor
+      });
     }
   };
 
-  const handleEditCategory = () => {
+  const handleEditCategory = async () => {
     if (editingCategory && newCategoryName.trim()) {
       setCategories(
         categories.map((cat) =>
@@ -54,11 +56,17 @@ function CategoriasScreen({ user, onLogout }) {
       setEditingCategory(null);
       setNewCategoryName("");
       setNewCategoryColor("#3b82f6");
+
+      await categoriasService.update(editingCategory.id, {
+        nombre: newCategoryName,
+        color: newCategoryColor
+      });
     }
   };
 
-  const handleDeleteCategory = (id) => {
+  const handleDeleteCategory = async (id) => {
     setCategories(categories.filter((cat) => cat.id !== id));
+    await categoriasService.delete(id);
   };
 
   const openEditDialog = (category) => {

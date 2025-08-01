@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, FileText, Tag, Save, X, CalendarIcon } from 'lucide-react';
+import { gastosService } from '../services/gastosService';
+import { categoriasService } from '../services/categoriasService'; // Importa el servicio
 
 
 function NuevoGastoScreen({ user, onLogout }) {
@@ -10,25 +12,32 @@ function NuevoGastoScreen({ user, onLogout }) {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
+  const [categorias, setCategorias] = useState([]);
 
-  const categories = [
-    "Alimentación",
-    "Transporte", 
-    "Entretenimiento",
-    "Salud",
-    "Servicios",
-    "Educación",
-    "Ropa",
-    "Hogar",
-    "Otros",
-  ];
+  // Traer categorías del backend al montar el componente
+  useEffect(() => {
+    categoriasService.getAll().then(setCategorias);
+  }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para guardar el gasto
-    console.log({ amount, description, category, date, notes });
-    // Redirigir de vuelta a gastos
-    navigate('/gastos');
+    const categoriaObj = categorias.find(c => c.nombre === category);
+    if (!categoriaObj) {
+      alert('Selecciona una categoría válida');
+      return;
+    }
+    try {
+      await gastosService.create({
+        user_id: user.id,
+        categoria_id: categoriaObj.id,
+        descripcion: description,
+        monto: parseFloat(amount),
+        fecha: date,
+      });
+      navigate('/gastos');
+    } catch (err) {
+      alert('Error al guardar el gasto');
+    }
   };
 
   const handleCancel = () => {
@@ -125,8 +134,8 @@ function NuevoGastoScreen({ user, onLogout }) {
                     required
                   >
                     <option value="">Selecciona una categoría</option>
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>{cat}</option>
+                    {categorias.map((cat) => (
+                      <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                     ))}
                   </select>
                 </div>
