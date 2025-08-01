@@ -1,25 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar } from 'lucide-react';
+import { gastosService } from '../services/gastosService';
 
 function GastosScreen({ user, onLogout }) {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Todas");
   const [viewMode, setViewMode] = useState("cards");
+  const [expenses, setExpenses] = useState([]);
 
-  const expenses = [
-    { id: 1, description: "Supermercado Central", amount: 85.5, date: "2024-06-15", category: "Alimentación" },
-    { id: 2, description: "Gasolina Shell", amount: 45.0, date: "2024-06-14", category: "Transporte" },
-    { id: 3, description: "Cine Multiplex", amount: 25.0, date: "2024-06-13", category: "Entretenimiento" },
-    { id: 4, description: "Uber", amount: 12.3, date: "2024-06-12", category: "Transporte" },
-    { id: 5, description: "Netflix", amount: 15.99, date: "2024-06-11", category: "Entretenimiento" },
-    { id: 6, description: "Farmacia", amount: 32.75, date: "2024-06-10", category: "Salud" },
-    { id: 7, description: "Restaurante", amount: 67.8, date: "2024-06-09", category: "Alimentación" },
-    { id: 8, description: "Electricidad", amount: 89.5, date: "2024-06-08", category: "Servicios" },
-  ];
+  useEffect(() => {
+    gastosService.getAll().then(setExpenses);
+  }, []);
 
-  const categories = ["Todas", "Alimentación", "Transporte", "Entretenimiento", "Salud", "Servicios"];
+  // Si tu backend usa otros nombres de campos, mapea aquí
+  const categories = ["Todas", ...Array.from(new Set(expenses.map(e => e.category || e.categoria?.nombre)))];
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -33,12 +29,20 @@ function GastosScreen({ user, onLogout }) {
   };
 
   const filteredExpenses = expenses.filter((expense) => {
-    const matchesSearch = expense.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === "Todas" || expense.category === selectedCategory;
+    const desc = expense.description || expense.descripcion || '';
+    const cat = expense.category || expense.categoria?.nombre || '';
+    const matchesSearch = desc.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === "Todas" || cat === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const totalAmount = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const totalAmount = filteredExpenses.reduce(
+    (sum, expense) => sum + (Number(expense.amount) || Number(expense.monto) || 0),
+    0
+  );
+
+  const averageAmount =
+    filteredExpenses.length > 0 ? (totalAmount / filteredExpenses.length).toFixed(2) : "0.00";
 
   const handleNewExpense = () => {
     navigate('/gastos/nuevo');
@@ -116,9 +120,7 @@ function GastosScreen({ user, onLogout }) {
             <p className="text-sm text-gray-700">Total filtrado</p>
           </div>
           <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">
-              ${(totalAmount / filteredExpenses.length || 0).toFixed(2)}
-            </div>
+            <div className="text-2xl font-bold text-blue-900">${averageAmount}</div>
             <p className="text-sm text-gray-700">Promedio por gasto</p>
           </div>
         </div>
@@ -133,10 +135,10 @@ function GastosScreen({ user, onLogout }) {
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{expense.description}</h3>
+                    <h3 className="font-semibold text-gray-900">{expense.descripcion}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Calendar className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-600">{expense.date}</span>
+                      <span className="text-sm text-gray-600">{expense.fecha}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -149,10 +151,12 @@ function GastosScreen({ user, onLogout }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.category)}`}>
-                    {expense.category}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria)}`}>
+                    {expense.categoria}
                   </span>
-                  <span className="text-lg font-bold text-gray-900">${expense.amount.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-gray-900">
+                    ${Number(expense.monto ?? 0).toFixed(2)}
+                  </span>
                 </div>
               </div>
             ))}
@@ -180,7 +184,9 @@ function GastosScreen({ user, onLogout }) {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">{expense.date}</td>
-                      <td className="p-4 text-right font-semibold text-gray-900">${expense.amount.toFixed(2)}</td>
+                      <td className="p-4 text-right font-semibold text-gray-900">
+                        ${Number(expense.amount ?? expense.monto ?? 0).toFixed(2)}
+                      </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-1">
                           <button className="p-1 text-gray-400 hover:text-gray-600">
