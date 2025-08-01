@@ -53,40 +53,32 @@ function NuevoGastoScreen({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      <main className="max-w-2xl mx-auto p-4 lg:p-8 space-y-6">
+      <main className=" max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center ">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Nuevo Gasto</h1>
             <p className="text-gray-600">Registra un nuevo gasto en tu presupuesto</p>
           </div>
-          <button 
-            onClick={handleCancel}
-            className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
-          >
-            <X className="w-4 h-4 mr-2" />
-            Cancelar
-          </button>
         </div>
 
         {/* Form */}
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-2">
-              <DollarSign className="w-5 h-5" />
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-1">
               Detalles del Gasto
             </h2>
             <p className="text-gray-600">Completa la información del gasto que deseas registrar</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Amount */}
-            <div className="space-y-2">
+            <div className="">
               <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
                 Monto *
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                 <input
                   id="amount"
                   type="number"
@@ -94,26 +86,26 @@ function NuevoGastoScreen({ user, onLogout }) {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 text-lg border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-8 pr-2 py-1 h-10 text-lg border border-gray-300 rounded-md focus:outline-none "
                   required
                 />
               </div>
             </div>
 
             {/* Description */}
-            <div className="space-y-2">
+            <div className="">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Descripción *
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <FileText className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                 <input
                   id="description"
                   type="text"
                   placeholder="Ej: Supermercado, Gasolina, Cine..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
                   required
                 />
               </div>
@@ -122,14 +114,14 @@ function NuevoGastoScreen({ user, onLogout }) {
             {/* Category and Date Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Category */}
-              <div className="space-y-2">
+              <div className="">
                 <label className="block text-sm font-medium text-gray-700">Categoría *</label>
                 <div className="relative">
-                  <Tag className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Tag className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
                     required
                   >
                     <option value="">Selecciona una categoría</option>
@@ -141,15 +133,15 @@ function NuevoGastoScreen({ user, onLogout }) {
               </div>
 
               {/* Date */}
-              <div className="space-y-2">
+              <div className="">
                 <label className="block text-sm font-medium text-gray-700">Fecha *</label>
                 <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <CalendarIcon className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
                     required
                   />
                 </div>
@@ -157,7 +149,7 @@ function NuevoGastoScreen({ user, onLogout }) {
             </div>
 
             {/* Notes */}
-            <div className="space-y-2">
+            <div className="">
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
                 Notas adicionales
               </label>
@@ -166,7 +158,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                 placeholder="Información adicional sobre este gasto (opcional)"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20 resize-none"
+                className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none min-h-20 resize-none"
                 rows="3"
               />
             </div>

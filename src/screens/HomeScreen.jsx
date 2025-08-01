@@ -58,7 +58,7 @@ function HomeScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <main className="w-full mx-auto px-12 py-6">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6">
         {/* Selector de mes y año con botón de refresh */}
         <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between">
           <div>
