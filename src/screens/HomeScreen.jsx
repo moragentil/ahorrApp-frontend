@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { RefreshCw } from 'lucide-react'; // Agrega el icono de refresh
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -41,10 +42,16 @@ function HomeScreen({ user, onLogout }) {
 
   const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88'];
 
+  // Botón para volver al mes actual
+  const handleRefresh = () => {
+    setSelectedMonth(new Date().getMonth());
+    setSelectedYear(new Date().getFullYear());
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="w-full mx-auto px-12 py-6">
-        {/* Selector de mes y año */}
+        {/* Selector de mes y año con botón de refresh */}
         <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -52,7 +59,7 @@ function HomeScreen({ user, onLogout }) {
             </h2>
             <p className="text-gray-600">Tu estado financiero del mes seleccionado</p>
           </div>
-          <div className="flex gap-2 mt-2 md:mt-0">
+          <div className="flex gap-2 mt-2 md:mt-0 items-center">
             <select
               value={selectedMonth}
               onChange={e => setSelectedMonth(Number(e.target.value))}
@@ -71,6 +78,15 @@ function HomeScreen({ user, onLogout }) {
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
+            <button
+              type="button"
+              onClick={handleRefresh}
+              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900 flex items-center hover:bg-gray-100 transition"
+              title="Volver al mes actual"
+            >
+              <RefreshCw className="w-4 h-4 mr-1" />
+              Actual
+            </button>
           </div>
         </div>
 
