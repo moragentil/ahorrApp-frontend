@@ -25,20 +25,17 @@ function LoginScreen({ onLogin }) {
     setLoading(true);
     setError('');
 
-    try {
-      const result = await authService.login(formData.email, formData.password);
-      
-      if (result.success) {
-        onLogin(result.user);
-        navigate('/home');
-      } else {
-        setError(result.error);
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión');
-    } finally {
-      setLoading(false);
+    const result = await authService.login(formData.email, formData.password);
+    if (result.success) {
+      // Puedes obtener el usuario si tienes endpoint /user
+      // const user = await api.get('/user');
+      // onLogin(user.data);
+      onLogin({ email: formData.email }); // O el usuario real si lo tienes
+      navigate('/home');
+    } else {
+      setError(result.error);
     }
+    setLoading(false);
   };
 
   return (

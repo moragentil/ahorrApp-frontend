@@ -21,12 +21,12 @@ function Navbar({ user, onLogout }) {
     setIsMobileMenuOpen(false);
   };
 
-  const handleLogoutClick = () => {
-    authService.logout();
-    if (onLogout) onLogout();
-    navigate('/login');
-    setIsMobileMenuOpen(false);
-  };
+const handleLogoutClick = async () => {
+  await authService.logout();
+  if (onLogout) onLogout();
+  navigate('/login');
+  setIsMobileMenuOpen(false);
+};
 
   return (
     <>

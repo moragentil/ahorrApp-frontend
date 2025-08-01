@@ -26,15 +26,11 @@ function RegisterScreen({ onRegister }) {
     setLoading(true);
     setError('');
 
-    // Simulación de registro (solo permite el usuario demo)
-    if (
-      formData.email === 'admin@ahorrapp.com' &&
-      formData.password === '123456'
-    ) {
-      onRegister({ name: formData.name, email: formData.email });
-      navigate('/home');
+    const result = await authService.register(formData.name, formData.email, formData.password);
+    if (result.success) {
+      navigate('/login');
     } else {
-      setError('Solo se permite el usuario de prueba para esta demo');
+      setError(result.error);
     }
     setLoading(false);
   };

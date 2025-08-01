@@ -1,24 +1,38 @@
-const MOCK_USER = {
-  email: 'admin@ahorrapp.com',
-  password: '123456',
-  name: 'Usuario Admin'
-};
+import api from './api';
 
 export const authService = {
   login: async (email, password) => {
-    // Simular delay de API
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (email === MOCK_USER.email && password === MOCK_USER.password) {
-      const userData = { email: MOCK_USER.email, name: MOCK_USER.name };
-      localStorage.setItem('user', JSON.stringify(userData));
-      return { success: true, user: userData };
+    try {
+      const res = await api.post('/login', { email, password });
+      const { access_token, token_type } = res.data;
+      // Guarda el token en localStorage
+      localStorage.setItem('token', access_token);
+      // Cambia '/user' por '/me'
+      const userRes = await api.get('/me', { headers: { Authorization: `${token_type} ${access_token}` } });
+      localStorage.setItem('user', JSON.stringify(userRes.data));
+      return { success: true, token: access_token };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Error de autenticación' };
     }
-    
-    return { success: false, error: 'Credenciales incorrectas' };
   },
 
-  logout: () => {
+  register: async (name, email, password) => {
+    try {
+      const res = await api.post('/register', { name, email, password });
+      return { success: true, user: res.data };
+    } catch (err) {
+      return { success: false, error: err.response?.data?.message || 'Error al registrar' };
+    }
+  },
+
+  logout: async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      await api.post('/logout', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    }
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
   },
 
@@ -28,6 +42,6 @@ export const authService = {
   },
 
   isAuthenticated: () => {
-    return !!localStorage.getItem('user');
+    return !!localStorage.getItem('token');
   }
 };
