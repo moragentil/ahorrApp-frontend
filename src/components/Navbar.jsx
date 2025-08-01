@@ -1,6 +1,7 @@
 import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { authService } from '../services/authService'; // Importa el servicio
 
 const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
@@ -16,6 +17,13 @@ function Navbar({ user, onLogout }) {
 
   const handleNavigate = (path) => {
     navigate(path);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleLogoutClick = () => {
+    authService.logout();
+    if (onLogout) onLogout();
+    navigate('/login');
     setIsMobileMenuOpen(false);
   };
 
@@ -106,7 +114,7 @@ function Navbar({ user, onLogout }) {
             </div>
             </div>
             <button
-              onClick={onLogout}
+              onClick={handleLogoutClick}
               className="w-full flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent px-3 py-2 rounded-lg"
             >
               <LogOut className="w-4 h-4" />
