@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -5,33 +6,31 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Toolti
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
 
+  // Mes y año seleccionados
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+
+  const months = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+
   const handleLogout = () => {
     authService.logout();
     onLogout();
     navigate('/login');
   };
 
-  // Obtener el mes actual
-  const getCurrentMonth = () => {
-    const months = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-    ];
-    const currentDate = new Date();
-    return `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-  };
-
-  // Datos para el gráfico de torta
-  const expenseData = [
-    { name: "Alimentación", value: 1200, color: "#8884d8" },
-    { name: "Transporte", value: 800, color: "#82ca9d" },
+  // Simular datos según mes/año (puedes reemplazar por fetch real)
+  const getExpenseData = () => [
+    { name: "Alimentación", value: 1200 + selectedMonth * 10, color: "#8884d8" },
+    { name: "Transporte", value: 800 + selectedMonth * 5, color: "#82ca9d" },
     { name: "Entretenimiento", value: 600, color: "#ffc658" },
     { name: "Servicios", value: 900, color: "#ff7300" },
     { name: "Otros", value: 400, color: "#00ff88" },
   ];
 
-  // Datos para el gráfico de barras
-  const monthlyData = [
+  const getMonthlyData = () => [
     { month: "Ene", gastos: 2800, ingresos: 4000 },
     { month: "Feb", gastos: 3200, ingresos: 4000 },
     { month: "Mar", gastos: 2900, ingresos: 4000 },
@@ -44,13 +43,35 @@ function HomeScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-
-      {/* Main Content */}
       <main className="w-full mx-auto px-12 py-6">
-        {/* Título del mes */}
-        <div className="mb-4">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Resumen de {getCurrentMonth()}</h2>
-          <p className="text-gray-600">Tu estado financiero del mes actual</p>
+        {/* Selector de mes y año */}
+        <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Resumen de {months[selectedMonth]} {selectedYear}
+            </h2>
+            <p className="text-gray-600">Tu estado financiero del mes seleccionado</p>
+          </div>
+          <div className="flex gap-2 mt-2 md:mt-0">
+            <select
+              value={selectedMonth}
+              onChange={e => setSelectedMonth(Number(e.target.value))}
+              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            >
+              {months.map((m, idx) => (
+                <option key={m} value={idx}>{m}</option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={e => setSelectedYear(Number(e.target.value))}
+              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            >
+              {[2023, 2024, 2025].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -117,12 +138,12 @@ function HomeScreen({ user, onLogout }) {
           {/* Gráfico de Torta */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribución por Categoría</h2>
-            <p className="text-sm text-gray-600 mb-4">Gastos del mes actual</p>
+            <p className="text-sm text-gray-600 mb-4">Gastos del mes seleccionado</p>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={expenseData}
+                    data={getExpenseData()}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -131,7 +152,7 @@ function HomeScreen({ user, onLogout }) {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {expenseData.map((entry, index) => (
+                    {getExpenseData().map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                     ))}
                   </Pie>
@@ -147,7 +168,7 @@ function HomeScreen({ user, onLogout }) {
             <p className="text-sm text-gray-600 mb-4">Ingresos vs Gastos últimos 6 meses</p>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={monthlyData}>
+                <BarChart data={getMonthlyData()}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
