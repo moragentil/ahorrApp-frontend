@@ -151,8 +151,8 @@ function GastosScreen({ user, onLogout }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria)}`}>
-                    {expense.categoria}
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria?.nombre)}`}>
+                    {expense.categoria?.nombre}
                   </span>
                   <span className="text-lg font-bold text-gray-900">
                     ${Number(expense.monto ?? 0).toFixed(2)}
@@ -177,15 +177,15 @@ function GastosScreen({ user, onLogout }) {
                 <tbody>
                   {filteredExpenses.map((expense) => (
                     <tr key={expense.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 text-gray-900">{expense.description}</td>
+                      <td className="p-4 text-gray-900">{expense.descripcion}</td>
                       <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.category)}`}>
-                          {expense.category}
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria?.nombre)}`}>
+                          {expense.categoria?.nombre}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-600">{expense.date}</td>
+                      <td className="p-4 text-gray-600">{expense.fecha}</td>
                       <td className="p-4 text-right font-semibold text-gray-900">
-                        ${Number(expense.amount ?? expense.monto ?? 0).toFixed(2)}
+                        ${Number(expense.monto ?? 0).toFixed(2)}
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-1">
