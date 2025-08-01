@@ -90,13 +90,20 @@ function Navbar({ user, onLogout }) {
           {/* User Section */}
           <div className="p-4 border-t border-gray-200">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-sm font-bold">
                 {user?.name?.slice(0, 2).toUpperCase() || 'US'}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">{user?.name}</p>
-                <p className="text-sm text-gray-600 truncate">{user?.email}</p>
-              </div>
+            <div className="flex-1 min-w-0">
+              <button
+                type="button"
+                onClick={() => handleNavigate('/configuracion')}
+                className="font-medium text-gray-900 truncate text-left w-full hover:underline"
+                title="Editar perfil"
+              >
+                {user?.name}
+              </button>
+              <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+            </div>
             </div>
             <button
               onClick={onLogout}
