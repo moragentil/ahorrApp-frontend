@@ -27,10 +27,8 @@ function LoginScreen({ onLogin }) {
 
     const result = await authService.login(formData.email, formData.password);
     if (result.success) {
-      // Puedes obtener el usuario si tienes endpoint /user
-      // const user = await api.get('/user');
-      // onLogin(user.data);
-      onLogin({ email: formData.email }); // O el usuario real si lo tienes
+      const user = authService.getCurrentUser();
+      onLogin(user); // Pasa el usuario completo al estado de App
       navigate('/home');
     } else {
       setError(result.error);

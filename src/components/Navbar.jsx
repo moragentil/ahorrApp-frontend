@@ -102,17 +102,17 @@ const handleLogoutClick = async () => {
               <div className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-sm font-bold">
                 {user?.name?.slice(0, 2).toUpperCase() || 'US'}
               </div>
-            <div className="flex-1 min-w-0">
-              <button
-                type="button"
-                onClick={() => handleNavigate('/configuracion')}
-                className="font-medium text-gray-900 truncate text-left w-full hover:underline"
-                title="Editar perfil"
-              >
-                {user?.name}
-              </button>
-              <p className="text-sm text-gray-600 truncate">{user?.email}</p>
-            </div>
+              <div className="flex-1 min-w-0">
+                <button
+                  type="button"
+                  onClick={() => handleNavigate('/configuracion')}
+                  className="font-medium text-gray-900 truncate text-left w-full hover:underline"
+                  title="Editar perfil"
+                >
+                  {user?.name}
+                </button>
+                <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+              </div>
             </div>
             <button
               onClick={handleLogoutClick}
