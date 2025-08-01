@@ -6,6 +6,7 @@ import GastosScreen from '../screens/GastosScreen';
 import NuevoGastoScreen from '../screens/NuevoGastoScreen';
 import CategoriasScreen from '../screens/CategoriasScreen';
 import ConfiguracionScreen from '../screens/ConfiguracionScreen';
+import RegisterScreen from '../screens/RegisterScreen';
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children }) {
@@ -38,6 +39,16 @@ function AppRoutes({ user, onLogin, onLogout }) {
         element={
           <PublicRoute>
             <LoginScreen onLogin={onLogin} />
+          </PublicRoute>
+        } 
+      />
+      
+      {/* Ruta de registro - solo accesible si no está autenticado */}
+      <Route 
+        path="/register" 
+        element={
+          <PublicRoute>
+            <RegisterScreen onRegister={onLogin} />
           </PublicRoute>
         } 
       />

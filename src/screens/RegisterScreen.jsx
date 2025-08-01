@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
 import { PiggyBank } from 'lucide-react';
+import { authService } from '../services/authService';
 
-function LoginScreen({ onLogin }) {
+function RegisterScreen({ onRegister }) {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: ''
   });
@@ -25,20 +26,17 @@ function LoginScreen({ onLogin }) {
     setLoading(true);
     setError('');
 
-    try {
-      const result = await authService.login(formData.email, formData.password);
-      
-      if (result.success) {
-        onLogin(result.user);
-        navigate('/home');
-      } else {
-        setError(result.error);
-      }
-    } catch (err) {
-      setError('Error al iniciar sesión');
-    } finally {
-      setLoading(false);
+    // Simulación de registro (solo permite el usuario demo)
+    if (
+      formData.email === 'admin@ahorrapp.com' &&
+      formData.password === '123456'
+    ) {
+      onRegister({ name: formData.name, email: formData.email });
+      navigate('/home');
+    } else {
+      setError('Solo se permite el usuario de prueba para esta demo');
     }
+    setLoading(false);
   };
 
   return (
@@ -47,7 +45,7 @@ function LoginScreen({ onLogin }) {
         <div className="text-center mb-8">
           <PiggyBank className="w-14 h-14 text-white bg-blue-900 rounded-full p-2 mx-auto mb-4" />
           <h1 className="text-3xl font-bold text-blue-900 mb-2">AhorrApp</h1>
-          <p className="text-gray-600">Inicia sesión en tu cuenta</p>
+          <p className="text-gray-600">Crea tu cuenta</p>
         </div>
 
         {error && (
@@ -58,7 +56,22 @@ function LoginScreen({ onLogin }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block  text-start text-sm font-medium text-gray-700 ">
+            <label htmlFor="name" className="block text-start text-sm font-medium text-gray-700 ">
+              Nombre
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Tu nombre"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="block text-start text-sm font-medium text-gray-700 ">
               Email
             </label>
             <input
@@ -72,7 +85,6 @@ function LoginScreen({ onLogin }) {
               placeholder="admin@ahorrapp.com"
             />
           </div>
-
           <div>
             <label htmlFor="password" className="block text-start text-sm font-medium text-gray-700 ">
               Contraseña
@@ -88,13 +100,12 @@ function LoginScreen({ onLogin }) {
               placeholder="123456"
             />
           </div>
-
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-900 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </form>
 
@@ -102,9 +113,9 @@ function LoginScreen({ onLogin }) {
           <button
             type="button"
             className="underline text-blue-900 hover:text-blue-700"
-            onClick={() => navigate('/register')}
+            onClick={() => navigate('/login')}
           >
-            ¿No tienes cuenta? Regístrate
+            ¿Ya tienes cuenta? Inicia sesión
           </button>
           <div className="mt-2">
             <p>Credenciales de prueba:</p>
@@ -117,4 +128,4 @@ function LoginScreen({ onLogin }) {
   );
 }
 
-export default LoginScreen;
+export default RegisterScreen;
