@@ -72,7 +72,7 @@ function CategoriasScreen({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      <main className="max-w-6xl mx-auto p-4 lg:p-8 space-y-6">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -81,7 +81,7 @@ function CategoriasScreen({ user, onLogout }) {
           </div>
           <button 
             onClick={() => setIsAddDialogOpen(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Nueva Categoría
@@ -90,19 +90,19 @@ function CategoriasScreen({ user, onLogout }) {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">{categories.length}</div>
-            <p className="text-sm text-gray-600">Categorías activas</p>
+          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">{categories.length}</div>
+            <p className="text-sm text-gray-700">Categorías activas</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">${totalSpent.toFixed(2)}</div>
-            <p className="text-sm text-gray-600">Total gastado</p>
+          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">${totalSpent.toFixed(2)}</div>
+            <p className="text-sm text-gray-700">Total gastado</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="text-2xl font-bold text-gray-900">
+          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
+            <div className="text-2xl font-bold text-blue-900">
               {categories.reduce((sum, cat) => sum + cat.transactionCount, 0)}
             </div>
-            <p className="text-sm text-gray-600">Total transacciones</p>
+            <p className="text-sm text-gray-700">Total transacciones</p>
           </div>
         </div>
 
