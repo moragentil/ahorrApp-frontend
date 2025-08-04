@@ -1,63 +1,87 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp } from 'lucide-react';
+import { ahorroService } from '../services/ahorroService';
 
 function AhorrosScreen({ user }) {
-  const [goals, setGoals] = useState([
-    { id: 1, name: "Vacaciones", target: 5000, saved: 2500 },
-    { id: 2, name: "Auto Nuevo", target: 20000, saved: 15000 },
-    { id: 3, name: "Fondo Emergencia", target: 10000, saved: 3000 },
-  ]);
+  const [goals, setGoals] = useState([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [newGoalName, setNewGoalName] = useState('');
   const [newGoalTarget, setNewGoalTarget] = useState('');
+  const [newGoalDesc, setNewGoalDesc] = useState('');
+  const [newGoalDate, setNewGoalDate] = useState('');
+  const [newGoalPriority, setNewGoalPriority] = useState('Media');
+  const [newGoalEstado, setNewGoalEstado] = useState('Activo');
   const [addAmount, setAddAmount] = useState('');
   const [addGoalId, setAddGoalId] = useState(null);
 
-  const totalSaved = goals.reduce((sum, g) => sum + g.saved, 0);
-  const totalTarget = goals.reduce((sum, g) => sum + g.target, 0);
+  useEffect(() => {
+    ahorroService.getAll().then(setGoals);
+  }, []);
+
+  const totalSaved = goals.reduce((sum, g) => sum + (Number(g.monto_actual) || 0), 0);
+  const totalTarget = goals.reduce((sum, g) => sum + (Number(g.monto_objetivo) || 0), 0);
   const percentTotal = totalTarget > 0 ? ((totalSaved / totalTarget) * 100).toFixed(1) : 0;
 
-  const handleAddGoal = () => {
+  const handleAddGoal = async () => {
     if (newGoalName.trim() && newGoalTarget > 0) {
-      setGoals([
-        ...goals,
-        {
-          id: Math.max(0, ...goals.map(g => g.id)) + 1,
-          name: newGoalName.trim(),
-          target: Number(newGoalTarget),
-          saved: 0,
-        },
-      ]);
+      const newGoal = await ahorroService.create({
+        user_id: user.id,
+        nombre: newGoalName.trim(),
+        descripcion: newGoalDesc,
+        monto_objetivo: Number(newGoalTarget),
+        monto_actual: 0,
+        fecha_limite: newGoalDate || null,
+        prioridad: newGoalPriority,
+        estado: newGoalEstado,
+      });
+      setGoals([...goals, newGoal]);
       setNewGoalName('');
       setNewGoalTarget('');
+      setNewGoalDesc('');
+      setNewGoalDate('');
+      setNewGoalPriority('Media');
+      setNewGoalEstado('Activo');
       setIsAddDialogOpen(false);
     }
   };
 
-  const handleEditGoal = () => {
+  const handleEditGoal = async () => {
     if (editingGoal && newGoalName.trim() && newGoalTarget > 0) {
-      setGoals(goals.map(g =>
-        g.id === editingGoal.id
-          ? { ...g, name: newGoalName.trim(), target: Number(newGoalTarget) }
-          : g
-      ));
+      const updated = await ahorroService.update(editingGoal.id, {
+        nombre: newGoalName.trim(),
+        descripcion: newGoalDesc,
+        monto_objetivo: Number(newGoalTarget),
+        fecha_limite: newGoalDate || null,
+        prioridad: newGoalPriority,
+        estado: newGoalEstado,
+      });
+      setGoals(goals.map(g => g.id === editingGoal.id ? updated : g));
       setIsEditDialogOpen(false);
       setEditingGoal(null);
       setNewGoalName('');
       setNewGoalTarget('');
+      setNewGoalDesc('');
+      setNewGoalDate('');
+      setNewGoalPriority('Media');
+      setNewGoalEstado('Activo');
     }
   };
 
-  const handleDeleteGoal = (id) => {
+  const handleDeleteGoal = async (id) => {
+    await ahorroService.delete(id);
     setGoals(goals.filter(g => g.id !== id));
   };
 
   const openEditDialog = (goal) => {
     setEditingGoal(goal);
-    setNewGoalName(goal.name);
-    setNewGoalTarget(goal.target);
+    setNewGoalName(goal.nombre);
+    setNewGoalTarget(goal.monto_objetivo);
+    setNewGoalDesc(goal.descripcion || '');
+    setNewGoalDate(goal.fecha_limite ? goal.fecha_limite.split('T')[0] : '');
+    setNewGoalPriority(goal.prioridad || 'Media');
+    setNewGoalEstado(goal.estado || 'Activo');
     setIsEditDialogOpen(true);
   };
 
@@ -66,13 +90,13 @@ function AhorrosScreen({ user }) {
     setAddAmount('');
   };
 
-  const handleAddAmount = () => {
+  const handleAddAmount = async () => {
     if (addAmount > 0) {
-      setGoals(goals.map(g =>
-        g.id === addGoalId
-          ? { ...g, saved: g.saved + Number(addAmount) }
-          : g
-      ));
+      const goal = goals.find(g => g.id === addGoalId);
+      const updated = await ahorroService.update(goal.id, {
+        monto_actual: Number(goal.monto_actual) + Number(addAmount)
+      });
+      setGoals(goals.map(g => g.id === goal.id ? updated : g));
       setAddGoalId(null);
       setAddAmount('');
     }
@@ -118,11 +142,11 @@ function AhorrosScreen({ user }) {
         {/* Goals List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {goals.map(goal => {
-            const percent = ((goal.saved / goal.target) * 100).toFixed(1);
+            const percent = ((goal.monto_actual / goal.monto_objetivo) * 100).toFixed(1);
             return (
               <div key={goal.id} className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{goal.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">{goal.nombre}</h3>
                   <div className="flex gap-1">
                     <button
                       onClick={() => openEditDialog(goal)}
@@ -139,10 +163,10 @@ function AhorrosScreen({ user }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Meta: ${goal.target.toLocaleString()}</span>
+                  <span className="text-sm text-gray-600">Meta: ${goal.monto_objetivo.toLocaleString()}</span>
                   <span className="text-sm text-green-700 font-bold flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
-                    ${goal.saved.toLocaleString()}
+                    ${goal.monto_actual.toLocaleString()}
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
@@ -173,7 +197,7 @@ function AhorrosScreen({ user }) {
                           <X className="w-5 h-5" />
                         </button>
                       </div>
-                      <p className="text-gray-600 mb-2">¿Cuánto quieres agregar a <span className="font-bold">{goal.name}</span>?</p>
+                      <p className="text-gray-600 mb-2">¿Cuánto quieres agregar a <span className="font-bold">{goal.nombre}</span>?</p>
                       <input
                         type="number"
                         min="1"
@@ -255,6 +279,56 @@ function AhorrosScreen({ user }) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descripción
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Opcional"
+                    value={newGoalDesc}
+                    onChange={e => setNewGoalDesc(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha límite
+                  </label>
+                  <input
+                    type="date"
+                    value={newGoalDate}
+                    onChange={e => setNewGoalDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Prioridad
+                  </label>
+                  <select
+                    value={newGoalPriority}
+                    onChange={e => setNewGoalPriority(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Baja">Baja</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Estado
+                  </label>
+                  <select
+                    value={newGoalEstado}
+                    onChange={e => setNewGoalEstado(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
+                </div>
               </div>
               <div className="flex gap-3 mt-6">
                 <button
@@ -311,6 +385,55 @@ function AhorrosScreen({ user }) {
                     onChange={e => setNewGoalTarget(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descripción
+                  </label>
+                  <input
+                    type="text"
+                    value={newGoalDesc}
+                    onChange={e => setNewGoalDesc(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha límite
+                  </label>
+                  <input
+                    type="date"
+                    value={newGoalDate}
+                    onChange={e => setNewGoalDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Prioridad
+                  </label>
+                  <select
+                    value={newGoalPriority}
+                    onChange={e => setNewGoalPriority(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="Media">Media</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Baja">Baja</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Estado
+                  </label>
+                  <select
+                    value={newGoalEstado}
+                    onChange={e => setNewGoalEstado(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                  </select>
                 </div>
               </div>
               <div className="flex gap-3 mt-6">
