@@ -134,6 +134,13 @@ function IngresosScreen({ user }) {
     return colors[category] || 'bg-gray-100 text-gray-800';
   };
 
+  // Colores de categoría para el chart
+  const getCategoryHexColor = (categoryName) => {
+    // Busca el color en las categorías cargadas desde el backend
+    const cat = categoriasIngreso.find(c => c.nombre === categoryName);
+    return cat?.color || "#e5e7eb";
+  };
+
   // Datos de ejemplo para los gráficos (puedes reemplazar por datos reales si lo deseas)
   const monthlyIncomeData = [
     { month: "Ene", ingresos: 4200, meta: 5000 },
@@ -364,23 +371,7 @@ function IngresosScreen({ user }) {
           </button>
         </div>
 
-        {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-sm text-gray-600">Ingresos Totales</p>
-            <p className="text-2xl font-bold text-gray-900">${totalAmount.toLocaleString()}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-sm text-gray-600">Promedio</p>
-            <p className="text-2xl font-bold text-gray-900">${averageAmount}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-sm text-gray-600">Fuentes Activas</p>
-            <p className="text-2xl font-bold text-gray-900">{fuentesActivas}</p>
-          </div>
-        </div>
-
-        {/* Selector de mes y año para los gráficos */}
+        {/* Selector de mes y año  */}
         <div className="mb-4 flex gap-2 items-center">
           <select
             value={selectedMonth}
@@ -402,6 +393,22 @@ function IngresosScreen({ user }) {
           </select>
         </div>
 
+        {/* Summary Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-600">Ingresos Totales</p>
+            <p className="text-2xl font-bold text-gray-900">${totalAmount.toLocaleString()}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-600">Promedio</p>
+            <p className="text-2xl font-bold text-gray-900">${averageAmount}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <p className="text-sm text-gray-600">Fuentes Activas</p>
+            <p className="text-2xl font-bold text-gray-900">{fuentesActivas}</p>
+          </div>
+        </div>
+
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Monthly Trend */}
@@ -411,8 +418,11 @@ function IngresosScreen({ user }) {
               <p className="text-sm text-gray-600">Evolución mensual</p>
             </div>
             <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={estadisticas?.tendencia_ingresos ?? []}>
+              <ResponsiveContainer width="100%" height={320}>
+                <LineChart
+                  data={estadisticas?.tendencia_ingresos ?? []}
+                  margin={{ top: 20, right: 30, left: 30, bottom: 20 }} // aumenta los márgenes
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="mes" />
                   <YAxis />
@@ -420,7 +430,7 @@ function IngresosScreen({ user }) {
                   <Line
                     type="monotone"
                     dataKey="total"
-                    stroke="#3b82f6"
+                    stroke="#1e3a8a"
                     strokeWidth={3}
                     name="Ingresos"
                   />
@@ -431,18 +441,20 @@ function IngresosScreen({ user }) {
 
           {/* Category Distribution */}
           <div className="bg-white rounded-lg shadow-sm p-4">
-            <div className="mb-2">
+            <div className="mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Distribución por Categoría</h2>
               <p className="text-sm text-gray-600">Ingresos del mes seleccionado</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-6">
               {(estadisticas?.distribucion_categoria ?? []).map((cat, index) => (
                 <div key={cat.categoria} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${getCategoryColor(cat.categoria)}`}
+                    <span
+                      className="w-4 h-4 rounded-full border border-gray-300"
+                      style={{ backgroundColor: getCategoryHexColor(cat.categoria) }}
+                      title={cat.categoria}
                     />
-                    <span className="text-sm font-medium text-gray-900">{cat.categoria}</span>
+                    <span className=" font-medium text-gray-900">{cat.categoria}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-lg font-bold text-gray-900">
@@ -602,7 +614,7 @@ function IngresosScreen({ user }) {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron ingresos</h3>
             <p className="text-gray-600 mb-4">Intenta ajustar los filtros o agregar un nuevo ingreso</p>
             <button
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
               onClick={() => setIsAddDialogOpen(true)}
             >
               <Plus className="w-4 h-4" />

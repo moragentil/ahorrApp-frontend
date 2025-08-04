@@ -267,7 +267,7 @@ function GastosScreen({ user, onLogout }) {
             <p className="text-gray-600 mb-4">Intenta ajustar los filtros o agregar un nuevo gasto</p>
             <button 
               onClick={handleNewExpense}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
             >
               <Plus className="w-4 h-4" />
               Agregar Gasto
