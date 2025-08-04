@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Calendar, TrendingUp, TrendingDown, DollarSign, Tar
 import { ingresosService } from '../services/ingresosService';
 import { categoriasService } from '../services/categoriasService';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { parseISO } from 'date-fns';
 
 function IngresosScreen({ user }) {
   const [incomes, setIncomes] = useState([]);
@@ -120,6 +121,15 @@ function IngresosScreen({ user }) {
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
+
+  // Función para formatear fecha a dd/mm/yyyy usando parseISO
+  function formatFecha(fechaStr) {
+    if (!fechaStr) return '';
+    // Extrae solo la parte de fecha si viene con hora
+    const [datePart] = fechaStr.split('T');
+    const [year, month, day] = datePart.split('-');
+    return `${day}/${month}/${year}`;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 p-4 lg:p-8">
@@ -289,7 +299,7 @@ function IngresosScreen({ user }) {
                     <h3 className="font-semibold text-gray-900">{income.descripcion}</h3>
                     <div className="flex items-center gap-2 mt-1">
                       <Calendar className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-600">{income.fecha}</span>
+                      <span className="text-sm text-gray-600">{formatFecha(income.fecha)}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
@@ -336,7 +346,7 @@ function IngresosScreen({ user }) {
                         {income.categoria?.nombre}
                       </span>
                     </td>
-                    <td className="p-4 text-gray-600">{income.fecha}</td>
+                    <td className="p-4 text-gray-600">{formatFecha(income.fecha)}</td>
                     <td className="p-4 text-right font-semibold text-green-600">
                       +${Number(income.monto ?? 0).toFixed(2)}
                     </td>
