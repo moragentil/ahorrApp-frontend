@@ -454,7 +454,6 @@ function IngresosScreen({ user }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
@@ -494,7 +493,6 @@ function IngresosScreen({ user }) {
               </button>
             </div>
           </div>
-        </div>
 
         {/* Incomes List */}
         {viewMode === 'cards' ? (
@@ -525,9 +523,16 @@ function IngresosScreen({ user }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(income.categoria?.nombre)}`}>
+                  <div className="flex items-center">
+                  <span
+                    className="inline-block w-4 h-4 rounded-full border border-gray-300 "
+                    style={{ backgroundColor: income.categoria?.color || "#e5e7eb" }}
+                    title={income.categoria?.nombre}
+                  />
+                  <span className="px-2 py-1 rounded-full text-xs font-medium">
                     {income.categoria?.nombre}
                   </span>
+                  </div>
                   <span className="text-lg font-bold text-green-600">
                     +${Number(income.monto ?? 0).toFixed(2)}
                   </span>
@@ -551,8 +556,13 @@ function IngresosScreen({ user }) {
                 {filteredIncomes.map((income) => (
                   <tr key={income.id} className="border-b hover:bg-gray-50">
                     <td className="p-4 text-gray-900">{income.descripcion}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(income.categoria?.nombre)}`}>
+                    <td className="p-4 items-center flex">
+                      <span
+                        className="inline-block w-4 h-4 rounded-full border border-gray-300 "
+                        style={{ backgroundColor: income.categoria?.color || "#e5e7eb" }}
+                        title={income.categoria?.nombre}
+                      />
+                      <span className="px-2 py-1 rounded-full text-xs font-medium">
                         {income.categoria?.nombre}
                       </span>
                     </td>
