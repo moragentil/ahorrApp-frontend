@@ -11,6 +11,9 @@ function IngresosScreen({ user }) {
   const [viewMode, setViewMode] = useState('cards');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [categoriasIngreso, setCategoriasIngreso] = useState([]);
+  const [estadisticas, setEstadisticas] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // Formulario de ingreso
   const [form, setForm] = useState({
@@ -25,6 +28,10 @@ function IngresosScreen({ user }) {
     categoriasService.getIngresoCategorias().then(setCategoriasIngreso);
     ingresosService.getAll().then(setIncomes);
   }, []);
+
+  useEffect(() => {
+    ingresosService.getEstadisticas({ month: selectedMonth, year: selectedYear }).then(setEstadisticas);
+  }, [selectedMonth, selectedYear]);
 
   // Obtener categorías únicas del backend
   const categories = [
@@ -77,6 +84,29 @@ function IngresosScreen({ user }) {
     return colors[category] || 'bg-gray-100 text-gray-800';
   };
 
+  // Datos de ejemplo para los gráficos (puedes reemplazar por datos reales si lo deseas)
+  const monthlyIncomeData = [
+    { month: "Ene", ingresos: 4200, meta: 5000 },
+    { month: "Feb", ingresos: 4800, meta: 5000 },
+    { month: "Mar", ingresos: 5200, meta: 5000 },
+    { month: "Abr", ingresos: 4600, meta: 5000 },
+    { month: "May", ingresos: 5800, meta: 5000 },
+    { month: "Jun", ingresos: 7615, meta: 5000 },
+  ];
+
+  const categoryDistribution = [
+    { name: "Salario", value: 4500, percentage: 59.1 },
+    { name: "Freelance", value: 1400, percentage: 18.4 },
+    { name: "Alquiler", value: 1200, percentage: 15.8 },
+    { name: "Inversiones", value: 195, percentage: 2.6 },
+    { name: "Negocio", value: 320, percentage: 4.2 },
+  ];
+
+  const months = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
+
   return (
     <div className="min-h-screen bg-gray-100 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -119,6 +149,84 @@ function IngresosScreen({ user }) {
           <div className="bg-white rounded-lg shadow-sm p-4">
             <p className="text-sm text-gray-600">Fuentes Activas</p>
             <p className="text-2xl font-bold text-gray-900">{categories.length - 1}</p>
+          </div>
+        </div>
+
+        {/* Selector de mes y año para los gráficos */}
+        <div className="mb-4 flex gap-2 items-center">
+          <select
+            value={selectedMonth}
+            onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+          >
+            {months.map((m, idx) => (
+              <option key={m} value={idx}>{m}</option>
+            ))}
+          </select>
+          <select
+            value={selectedYear}
+            onChange={e => setSelectedYear(Number(e.target.value))}
+            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+          >
+            {[2023, 2024, 2025].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Monthly Trend */}
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="mb-2">
+              <h2 className="text-lg font-semibold text-gray-900">Tendencia de Ingresos</h2>
+              <p className="text-sm text-gray-600">Evolución mensual</p>
+            </div>
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={estadisticas?.tendencia_ingresos ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="mes" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => [`$${value}`, ""]} />
+                  <Line
+                    type="monotone"
+                    dataKey="total"
+                    stroke="#3b82f6"
+                    strokeWidth={3}
+                    name="Ingresos"
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Category Distribution */}
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="mb-2">
+              <h2 className="text-lg font-semibold text-gray-900">Distribución por Categoría</h2>
+              <p className="text-sm text-gray-600">Ingresos del mes seleccionado</p>
+            </div>
+            <div className="space-y-4">
+              {(estadisticas?.distribucion_categoria ?? []).map((cat, index) => (
+                <div key={cat.categoria} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${getCategoryColor(cat.categoria)}`}
+                    />
+                    <span className="text-sm font-medium text-gray-900">{cat.categoria}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="text-lg font-bold text-gray-900">
+                      ${cat.total.toLocaleString()}
+                    </span>
+                    <span className="text-sm text-gray-500">
+                      ({cat.porcentaje}%)
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
