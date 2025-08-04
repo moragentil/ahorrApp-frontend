@@ -47,5 +47,11 @@ export const categoriasService = {
   getIngresoCategorias: async () => {
     const res = await api.get('/categorias/ingreso');
     return res.data;
+  },
+
+  // Obtener resumen de categorías (total gastado/ingresos y transacciones por categoría)
+  getResumen: async () => {
+    const res = await api.get('/categorias/resumen');
+    return res.data;
   }
 };

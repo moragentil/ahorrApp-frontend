@@ -18,7 +18,17 @@ function CategoriasScreen({ user, onLogout }) {
   ];
 
   useEffect(() => {
-    categoriasService.getAll().then(setCategories);
+    categoriasService.getResumen().then(data => {
+      // Mapea los datos del backend al formato esperado por la UI
+      setCategories(data.map(cat => ({
+        id: cat.id,
+        nombre: cat.nombre,
+        tipo: cat.tipo,
+        color: cat.color,
+        totalSpent: cat.total_gastado,         // <-- usa el campo del backend
+        transactionCount: cat.total_transacciones, // <-- usa el campo del backend
+      })));
+    });
   }, []);
 
   const handleAddCategory = async () => {
@@ -82,7 +92,15 @@ function CategoriasScreen({ user, onLogout }) {
     setIsEditDialogOpen(true);
   };
 
-  const totalSpent = categories.reduce((sum, cat) => sum + cat.totalSpent, 0);
+  // Calcula el total gastado solo para categorías de tipo "gasto"
+  const totalSpent = categories
+    .filter(cat => cat.tipo === "gasto")
+    .reduce((sum, cat) => sum + Number(cat.totalSpent ?? 0), 0);
+
+  // Calcula el total ingresado solo para categorías de tipo "ingreso"
+  const totalIngresado = categories
+    .filter(cat => cat.tipo === "ingreso")
+    .reduce((sum, cat) => sum + Number(cat.totalSpent ?? 0), 0);
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -123,89 +141,103 @@ function CategoriasScreen({ user, onLogout }) {
             <p className="text-sm text-gray-700">Categorías activas</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">${totalSpent.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-blue-900">
+              ${Number(totalSpent).toFixed(2)}
+            </div>
             <p className="text-sm text-gray-700">Total gastado</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
             <div className="text-2xl font-bold text-blue-900">
-              {categories.reduce((sum, cat) => sum + cat.transactionCount, 0)}
+              ${Number(totalIngresado).toFixed(2)}
             </div>
-            <p className="text-sm text-gray-700">Total transacciones</p>
+            <p className="text-sm text-gray-700">Total ingresado</p>
           </div>
         </div>
 
         {/* Categories List */}
         {viewMode === "cards" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category) => (
-              <div
-                key={category.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
-                    <h3 className="text-lg font-semibold text-gray-900">{category.nombre}</h3>
-                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-                      {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
-                    </span>
+            {categories.map((category) => {
+              // Calcula el porcentaje para la barra según el tipo
+              let percent = 0;
+              if (category.tipo === "gasto" && totalSpent > 0) {
+                percent = (category.totalSpent / totalSpent) * 100;
+              } else if (category.tipo === "ingreso" && totalIngresado > 0) {
+                percent = (category.totalSpent / totalIngresado) * 100;
+              }
+
+              return (
+                <div
+                  key={category.id}
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <h3 className="text-lg font-semibold text-gray-900">{category.nombre}</h3>
+                      <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                        {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
+                      </span>
+                    </div>
+                    <div className="flex gap-1">
+                      <button 
+                        onClick={() => openEditDialog(category)}
+                        className="p-1 text-gray-400 hover:text-gray-600"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteCategory(category.id)}
+                        className="p-1 text-red-400 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1">
-                    <button 
-                      onClick={() => openEditDialog(category)}
-                      className="p-1 text-gray-400 hover:text-gray-600"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteCategory(category.id)}
-                      className="p-1 text-red-400 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                          {category.tipo === "ingreso" ? "Total ingresado" : "Total gastado"}
+                        </span>
+                      </div>
+                      <span className="font-bold text-gray-900">
+                        ${Number(category.totalSpent ?? 0).toFixed(2)}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">Transacciones</span>
+                      </div>
+                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {category.transactionCount ?? 0}
+                      </span>
+                    </div>
+                    
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="h-2 rounded-full transition-all duration-300"
+                        style={{
+                          backgroundColor: category.color,
+                          width: `${Math.min(percent, 100)}%`,
+                        }}
+                      />
+                    </div>
+                    
+                    <p className="text-xs text-gray-600 text-center">
+                      {percent.toFixed(1)}% del total
+                    </p>
                   </div>
                 </div>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Total gastado</span>
-                    </div>
-                    <span className="font-bold text-gray-900">
-                      ${Number(category.totalSpent ?? 0).toFixed(2)}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-4 h-4 text-gray-400" />
-                      <span className="text-sm text-gray-600">Transacciones</span>
-                    </div>
-                    <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {category.transactionCount ?? 0}
-                    </span>
-                  </div>
-                  
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="h-2 rounded-full transition-all duration-300"
-                      style={{
-                        backgroundColor: category.color,
-                        width: `${totalSpent > 0 ? (category.totalSpent / totalSpent) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
-                  
-                  <p className="text-xs text-gray-600 text-center">
-                    {totalSpent > 0 ? ((category.totalSpent / totalSpent) * 100).toFixed(1) : 0}% del total
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
