@@ -172,7 +172,7 @@ function AhorrosScreen({ user }) {
                 <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
                   <div
                     className="h-3 rounded-full transition-all duration-300 bg-blue-600"
-                    style={{ width: `${percent}%` }}
+                    style={{ width: `${Math.min(percent, 100)}%` }}
                   />
                 </div>
                 <p className="text-xs text-gray-600 text-center mb-2">{percent}% alcanzado</p>
