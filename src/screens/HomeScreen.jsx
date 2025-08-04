@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/authService';
+import { dashboardService } from '../services/dashboardService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { RefreshCw, DollarSign, CreditCard, TrendingUp, TrendingDown, Target } from 'lucide-react';
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
-
-  // Mes y año seleccionados
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [dashboard, setDashboard] = useState(null);
+
+  useEffect(() => {
+    dashboardService.getHomeData({ month: selectedMonth, year: selectedYear }).then(setDashboard);
+  }, [selectedMonth, selectedYear]);
 
   const months = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -22,39 +25,36 @@ function HomeScreen({ user, onLogout }) {
     navigate('/login');
   };
 
-  // Simular datos según mes/año (puedes reemplazar por fetch real)
-  const getExpenseData = () => [
-    { name: "Alimentación", value: 1200 + selectedMonth * 10, color: "#8884d8" },
-    { name: "Transporte", value: 800 + selectedMonth * 5, color: "#82ca9d" },
-    { name: "Entretenimiento", value: 600, color: "#ffc658" },
-    { name: "Servicios", value: 900, color: "#ff7300" },
-    { name: "Otros", value: 400, color: "#00ff88" },
-  ];
-
-  const getMonthlyData = () => [
-    { month: "Ene", gastos: 2800, ingresos: 4000 },
-    { month: "Feb", gastos: 3200, ingresos: 4000 },
-    { month: "Mar", gastos: 2900, ingresos: 4000 },
-    { month: "Abr", gastos: 3900, ingresos: 4000 },
-    { month: "May", gastos: 3100, ingresos: 4000 },
-    { month: "Jun", gastos: 3500, ingresos: 4000 },
-  ];
-
-  const colors = ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff88'];
-
-  // Botón para volver al mes actual
   const handleRefresh = () => {
     setSelectedMonth(new Date().getMonth());
     setSelectedYear(new Date().getFullYear());
   };
 
-  // Ejemplo de datos (ajusta según tu lógica)
-  const balance = 25430;
-  const monthlyIncome = 1200000;
-  const totalExpenses = 3240;
-  const savingsGoalPercent = 75;
-  const savingsCurrent = 600;
-  const savingsTarget = 800;
+  if (!dashboard) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+  }
+
+  // Datos del backend
+  const balance = dashboard.balance_total.valor;
+  const balancePercent = dashboard.balance_total.porcentaje_vs_mes_anterior;
+  const monthlyIncome = dashboard.ingresos_mes;
+  const totalExpenses = dashboard.gastos_mes.valor;
+  const expensesPercent = dashboard.gastos_mes.porcentaje_vs_mes_anterior;
+  const savingsGoalPercent = dashboard.meta_ahorro.porcentaje;
+  const savingsCurrent = dashboard.meta_ahorro.total_ahorrado;
+  const savingsTarget = dashboard.meta_ahorro.total_objetivo;
+  const expenseData = dashboard.distribucion_categoria.map(cat => ({
+    name: cat.categoria,
+    value: cat.porcentaje,
+    color: cat.color
+  }));
+  const monthlyData = dashboard.tendencia_mensual.map(m => ({
+    month: m.mes,
+    gastos: m.gastos,
+    ingresos: m.ingresos
+  }));
+  const movimientosRecientes = dashboard.movimientos_recientes;
+  const objetivosAhorro = dashboard.objetivos_ahorro;
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -176,7 +176,7 @@ function HomeScreen({ user, onLogout }) {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={getExpenseData()}
+                    data={expenseData}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
@@ -185,8 +185,8 @@ function HomeScreen({ user, onLogout }) {
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {getExpenseData().map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                    {expenseData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => [`$${value}`, "Gasto"]} />
@@ -201,7 +201,7 @@ function HomeScreen({ user, onLogout }) {
             <p className="text-sm text-gray-600 mb-4">Ingresos vs Gastos últimos 6 meses</p>
             <div className="h-80">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={getMonthlyData()}>
+                <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
@@ -219,60 +219,38 @@ function HomeScreen({ user, onLogout }) {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Movimientos Recientes</h2>
             <div className="space-y-3">
-              <div className="flex justify-between items-center py-2 border-b">
-                <div>
-                  <p className="font-medium">Supermercado</p>
-                  <p className="text-sm text-gray-500">Hace 2 horas</p>
+              {movimientosRecientes.map((mov, idx) => (
+                <div key={idx} className="flex justify-between items-center py-2 border-b">
+                  <div>
+                    <p className="font-medium">{mov.descripcion}</p>
+                    <p className="text-sm text-gray-500">{mov.fecha_hora}</p>
+                  </div>
+                  <span className={`font-medium ${mov.tipo === "ingreso" ? "text-green-600" : "text-red-600"}`}>
+                    {mov.tipo === "ingreso" ? "+" : "-"}
+                    ${Math.abs(mov.monto).toLocaleString()}
+                  </span>
                 </div>
-                <span className="text-red-600 font-medium">-$45.30</span>
-              </div>
-              <div className="flex justify-between items-center py-2 border-b">
-                <div>
-                  <p className="font-medium">Ahorro Mensual</p>
-                  <p className="text-sm text-gray-500">Hace 1 día</p>
-                </div>
-                <span className="text-green-600 font-medium">+$500.00</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <div>
-                  <p className="font-medium">Combustible</p>
-                  <p className="text-sm text-gray-500">Hace 2 días</p>
-                </div>
-                <span className="text-red-600 font-medium">-$80.00</span>
-              </div>
+              ))}
             </div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Objetivos de Ahorro</h2>
             <div className="space-y-4">
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Vacaciones</span>
-                  <span className="text-sm text-gray-500">$2,500 / $5,000</span>
+              {objetivosAhorro.map((obj, idx) => (
+                <div key={idx}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium">{obj.nombre}</span>
+                    <span className="text-sm text-gray-500">${obj.total_ahorrado} / ${obj.total_objetivo}</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="h-2 rounded-full"
+                      style={{ width: `${obj.porcentaje}%`, backgroundColor: obj.color }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '50%' }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Auto Nuevo</span>
-                  <span className="text-sm text-gray-500">$15,000 / $20,000</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-green-600 h-2 rounded-full" style={{ width: '75%' }}></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-medium">Fondo Emergencia</span>
-                  <span className="text-sm text-gray-500">$3,000 / $10,000</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-yellow-600 h-2 rounded-full" style={{ width: '30%' }}></div>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
