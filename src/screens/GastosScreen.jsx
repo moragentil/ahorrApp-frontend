@@ -9,10 +9,17 @@ function GastosScreen({ user, onLogout }) {
   const [selectedCategory, setSelectedCategory] = useState("Todas");
   const [viewMode, setViewMode] = useState("cards");
   const [expenses, setExpenses] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   useEffect(() => {
     gastosService.getAll().then(setExpenses);
   }, []);
+
+  const months = [
+    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  ];
 
   // Si tu backend usa otros nombres de campos, mapea aquí
   const categories = ["Todas", ...Array.from(new Set(expenses.map(e => e.category || e.categoria?.nombre)))];
@@ -28,12 +35,18 @@ function GastosScreen({ user, onLogout }) {
     return colors[category] || "bg-gray-100 text-gray-800";
   };
 
+  // Filtrar gastos por mes y año seleccionados
   const filteredExpenses = expenses.filter((expense) => {
     const desc = expense.description || expense.descripcion || '';
     const cat = expense.category || expense.categoria?.nombre || '';
     const matchesSearch = desc.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "Todas" || cat === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const fecha = expense.fecha || expense.date;
+    if (!fecha) return false;
+    const [year, month] = fecha.split('-');
+    const matchesMonth = Number(month) - 1 === selectedMonth;
+    const matchesYear = Number(year) === selectedYear;
+    return matchesSearch && matchesCategory && matchesMonth && matchesYear;
   });
 
   const totalAmount = filteredExpenses.reduce(
@@ -51,7 +64,6 @@ function GastosScreen({ user, onLogout }) {
   function formatDate(dateString) {
     if (!dateString) return "";
     const date = new Date(dateString);
-    // Usar los métodos getUTC* para evitar el desfase local
     const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
     const day = days[date.getUTCDay()];
     const dd = String(date.getUTCDate()).padStart(2, "0");
@@ -62,7 +74,6 @@ function GastosScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -79,46 +90,68 @@ function GastosScreen({ user, onLogout }) {
           </button>
         </div>
 
+        {/* Selector de mes y año */}
+        <div className="mb-4 flex gap-2 items-center">
+          <select
+            value={selectedMonth}
+            onChange={e => setSelectedMonth(Number(e.target.value))}
+            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+          >
+            {months.map((m, idx) => (
+              <option key={m} value={idx}>{m}</option>
+            ))}
+          </select>
+          <select
+            value={selectedYear}
+            onChange={e => setSelectedYear(Number(e.target.value))}
+            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+          >
+            {[2023, 2024, 2025].map(y => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+        </div>
+
         {/* Filters and Search */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar gastos..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none "
-                />
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={() => setViewMode("cards")}
-                className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-              >
-                Tarjetas
-              </button>
-              <button
-                onClick={() => setViewMode("table")}
-                className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-              >
-                Tabla
-              </button>
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Buscar gastos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none "
+              />
             </div>
           </div>
+          <div className="flex gap-2">
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={() => setViewMode("cards")}
+              className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+            >
+              Tarjetas
+            </button>
+            <button
+              onClick={() => setViewMode("table")}
+              className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+            >
+              Tabla
+            </button>
+          </div>
+        </div>
 
 
         {/* Summary */}
