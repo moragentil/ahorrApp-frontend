@@ -196,9 +196,15 @@ function GastosScreen({ user, onLogout }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria?.nombre)}`}>
+                  <div className='flex items-center gap-2'>
+                  <span className="inline-block w-4 h-4 rounded-full border border-gray-300 "
+                    style={{ backgroundColor: expense.categoria?.color || "#e5e7eb" }}
+                    title={expense.categoria?.nombre}
+                  />
+                  <span className=" rounded-full text-xs font-medium">
                     {expense.categoria?.nombre}
                   </span>
+                  </div>
                   <span className="text-lg font-bold text-gray-900">
                     ${Number(expense.monto ?? 0).toFixed(2)}
                   </span>
@@ -223,8 +229,12 @@ function GastosScreen({ user, onLogout }) {
                   {filteredExpenses.map((expense) => (
                     <tr key={expense.id} className="border-b hover:bg-gray-50">
                       <td className="p-4 text-gray-900">{expense.descripcion}</td>
-                      <td className="p-4">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(expense.categoria?.nombre)}`}>
+                      <td className="p-4 flex items-center">
+                        <span className="inline-block w-4 h-4 rounded-full border border-gray-300"
+                          style={{ backgroundColor: expense.categoria?.color || "#e5e7eb" }}
+                          title={expense.categoria?.nombre}
+                        />
+                        <span className="px-2 py-1 rounded-full text-xs font-medium">
                           {expense.categoria?.nombre}
                         </span>
                       </td>
