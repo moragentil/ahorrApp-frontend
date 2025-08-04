@@ -11,6 +11,7 @@ function IngresosScreen({ user }) {
   const [selectedCategory, setSelectedCategory] = useState('Todas');
   const [viewMode, setViewMode] = useState('cards');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [categoriasIngreso, setCategoriasIngreso] = useState([]);
   const [estadisticas, setEstadisticas] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
@@ -23,6 +24,8 @@ function IngresosScreen({ user }) {
     monto: '',
     fecha: '',
   });
+
+  const [editingIncome, setEditingIncome] = useState(null);
 
   // Cargar ingresos y categorías del backend
   useEffect(() => {
@@ -60,6 +63,8 @@ function IngresosScreen({ user }) {
     return cat ? cat.nombre : undefined;
   }
 
+  console.log("Filtered Incomes:", filteredIncomes);
+
   const fuentesActivas = new Set(
     filteredIncomes
       .map(getCategoriaNombre)
@@ -84,6 +89,31 @@ function IngresosScreen({ user }) {
   const handleDeleteIncome = async (id) => {
     await ingresosService.delete(id);
     setIncomes(incomes.filter(i => i.id !== id));
+  };
+
+  const openEditDialog = (income) => {
+    setEditingIncome(income);
+    setForm({
+      categoria_id: income.categoria_id,
+      descripcion: income.descripcion,
+      monto: income.monto,
+      fecha: income.fecha.split('T')[0], // formato yyyy-mm-dd
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditIncome = async () => {
+    if (!editingIncome || !form.categoria_id || !form.descripcion.trim() || !form.monto || !form.fecha) return;
+    const updated = await ingresosService.update(editingIncome.id, {
+      categoria_id: form.categoria_id,
+      descripcion: form.descripcion,
+      monto: Number(form.monto),
+      fecha: form.fecha,
+    });
+    setIncomes(incomes.map(i => i.id === editingIncome.id ? updated : i));
+    setIsEditDialogOpen(false);
+    setEditingIncome(null);
+    setForm({ categoria_id: '', descripcion: '', monto: '', fecha: '' });
   };
 
   // Colores de categoría
@@ -218,6 +248,96 @@ function IngresosScreen({ user }) {
                   className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Guardar Ingreso
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      {/* Modal para editar ingreso */}
+        {isEditDialogOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-xl font-semibold text-gray-900">Editar Ingreso</h2>
+                <button
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-gray-600 mb-4 text-sm">Modifica los datos del ingreso</p>
+              <div className="space-y-2">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 ">
+                    Categoría
+                  </label>
+                  <select
+                    value={form.categoria_id}
+                    onChange={e => setForm(f => ({ ...f, categoria_id: e.target.value }))}
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="">Selecciona una categoría</option>
+                    {categoriasIngreso.map(cat => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 ">
+                    Descripción
+                  </label>
+                  <input
+                    type="text"
+                    value={form.descripcion}
+                    onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))}
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 ">
+                    Monto
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.monto}
+                    onChange={e => setForm(f => ({ ...f, monto: e.target.value }))}
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 ">
+                    Fecha
+                  </label>
+                  <input
+                    type="date"
+                    value={form.fecha}
+                    onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))}
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsEditDialogOpen(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleEditIncome}
+                  disabled={
+                    !form.categoria_id ||
+                    !form.descripcion.trim() ||
+                    !form.monto ||
+                    !form.fecha
+                  }
+                  className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Guardar Cambios
                 </button>
               </div>
             </div>
@@ -382,7 +502,7 @@ function IngresosScreen({ user }) {
             {filteredIncomes.map((income) => (
               <div
                 key={income.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4"
+                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-4"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
@@ -393,7 +513,7 @@ function IngresosScreen({ user }) {
                     </div>
                   </div>
                   <div className="flex gap-1">
-                    <button className="p-1 text-gray-400 hover:text-gray-600">
+                    <button className="p-1 text-gray-400 hover:text-gray-600" onClick={() => openEditDialog(income)}>
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
@@ -442,7 +562,7 @@ function IngresosScreen({ user }) {
                     </td>
                     <td className="p-4 text-center">
                       <div className="flex justify-center gap-1">
-                        <button className="p-1 text-gray-400 hover:text-gray-600">
+                        <button className="p-1 text-gray-400 hover:text-gray-600" onClick={() => openEditDialog(income)}>
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
