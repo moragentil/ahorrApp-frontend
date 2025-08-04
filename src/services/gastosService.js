@@ -31,5 +31,11 @@ export const gastosService = {
   delete: async (id) => {
     const res = await api.delete(`/gastos/${id}`);
     return res.data;
+  },
+
+  // Obtener los gastos más altos
+  getTopGastos: async () => {
+    const res = await api.get('/gastos/top');
+    return res.data;
   }
 };

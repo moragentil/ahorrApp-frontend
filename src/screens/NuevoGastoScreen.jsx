@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DollarSign, FileText, Tag, Save, X, CalendarIcon } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
 import { categoriasService } from '../services/categoriasService'; // Importa el servicio
-
+import BtnLoading from '../components/BtnLoading';
 
 function NuevoGastoScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -13,10 +13,21 @@ function NuevoGastoScreen({ user, onLogout }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
   const [categorias, setCategorias] = useState([]);
+  const [quickActions, setQuickActions] = useState([]);
+  const [loadingQuick, setLoadingQuick] = useState(true);
 
   // Traer categorías del backend al montar el componente
   useEffect(() => {
     categoriasService.getGastoCategorias().then(setCategorias);
+  }, []);
+
+  // Traer acciones rápidas del backend
+  useEffect(() => {
+    setLoadingQuick(true);
+    gastosService.getTopGastos().then(data => {
+      setQuickActions(data);
+      setLoadingQuick(false);
+    });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -214,23 +225,28 @@ function NuevoGastoScreen({ user, onLogout }) {
         {/* Quick Actions */}
         <div className="bg-white rounded-lg shadow-sm p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {[
-              { name: "Supermercado", amount: "50.00", category: "Alimentación" },
-              { name: "Gasolina", amount: "40.00", category: "Transporte" },
-              { name: "Café", amount: "5.00", category: "Alimentación" },
-              { name: "Parking", amount: "3.00", category: "Transporte" },
-            ].map((quick, index) => (
-              <button
-                key={index}
-                onClick={() => setQuickExpense(quick)}
-                className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex flex-col items-start text-left"
-              >
-                <span className="font-medium text-gray-900">{quick.name}</span>
-                <span className="text-sm text-gray-600">${quick.amount}</span>
-              </button>
-            ))}
-          </div>
+          {loadingQuick ? (
+            <div className="flex justify-center items-center h-20">
+              <BtnLoading text="Cargando..." />
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {quickActions.map((quick, index) => (
+                <button
+                  key={index}
+                  onClick={() => setQuickExpense({
+                    name: quick.descripcion,
+                    amount: quick.total,
+                    category: "", // Puedes sugerir una categoría si tienes el dato
+                  })}
+                  className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex flex-col items-start text-left"
+                >
+                  <span className="font-medium text-gray-900">{quick.descripcion}</span>
+                  <span className="text-sm text-gray-600">${Number(quick.total).toLocaleString()}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
