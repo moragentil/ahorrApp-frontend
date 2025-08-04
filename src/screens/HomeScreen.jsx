@@ -56,6 +56,10 @@ function HomeScreen({ user, onLogout }) {
   const movimientosRecientes = dashboard.movimientos_recientes;
   const objetivosAhorro = dashboard.objetivos_ahorro;
 
+  // Solo mostrar los últimos 5 movimientos y objetivos
+  const movimientosRecientesLimit = movimientosRecientes.slice(0, 5);
+  const objetivosAhorroLimit = objetivosAhorro.slice(0, 5);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="max-w-7xl mx-auto p-4 lg:p-6">
@@ -219,7 +223,7 @@ function HomeScreen({ user, onLogout }) {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Movimientos Recientes</h2>
             <div className="space-y-3">
-              {movimientosRecientes.map((mov, idx) => (
+              {movimientosRecientesLimit.map((mov, idx) => (
                 <div key={idx} className="flex justify-between items-center py-2 border-b">
                   <div>
                     <p className="font-medium">{mov.descripcion}</p>
@@ -237,7 +241,7 @@ function HomeScreen({ user, onLogout }) {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Objetivos de Ahorro</h2>
             <div className="space-y-4">
-              {objetivosAhorro.map((obj, idx) => (
+              {objetivosAhorroLimit.map((obj, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">{obj.nombre}</span>
