@@ -49,7 +49,12 @@ function IngresosScreen({ user }) {
     const cat = income.categoria?.nombre || '';
     const matchesSearch = desc.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'Todas' || cat === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const fecha = income.fecha;
+    if (!fecha) return false;
+    const [year, month] = fecha.split('-');
+    const matchesMonth = Number(month) - 1 === selectedMonth;
+    const matchesYear = Number(year) === selectedYear;
+    return matchesSearch && matchesCategory && matchesMonth && matchesYear;
   });
 
   const totalAmount = filteredIncomes.reduce((sum, income) => sum + (Number(income.monto) || 0), 0);
