@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
+import BtnLoading from '../components/BtnLoading';
 
 function GastosScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -11,9 +12,13 @@ function GastosScreen({ user, onLogout }) {
   const [expenses, setExpenses] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    gastosService.getAll().then(setExpenses);
+    gastosService.getAll().then(data => {
+      setExpenses(data);
+      setLoading(false);
+    });
   }, []);
 
   const months = [
@@ -70,6 +75,14 @@ function GastosScreen({ user, onLogout }) {
     const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
     const yyyy = date.getUTCFullYear();
     return `${day}, ${dd}/${mm}/${yyyy}`;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BtnLoading color="#1e3a8a" height={40} />
+      </div>
+    );
   }
 
   return (

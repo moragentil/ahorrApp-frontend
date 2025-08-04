@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Tag, DollarSign, X } from 'lucide-react';
 import { categoriasService } from '../services/categoriasService';
+import BtnLoading from '../components/BtnLoading';
 
 function CategoriasScreen({ user, onLogout }) {
   const [categories, setCategories] = useState([]);
@@ -11,6 +12,7 @@ function CategoriasScreen({ user, onLogout }) {
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
   const [newCategoryType, setNewCategoryType] = useState("gasto"); // Nuevo estado para tipo
   const [viewMode, setViewMode] = useState("cards");
+  const [loading, setLoading] = useState(true);
 
   const colorOptions = [
     "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
@@ -19,15 +21,15 @@ function CategoriasScreen({ user, onLogout }) {
 
   useEffect(() => {
     categoriasService.getResumen().then(data => {
-      // Mapea los datos del backend al formato esperado por la UI
       setCategories(data.map(cat => ({
         id: cat.id,
         nombre: cat.nombre,
         tipo: cat.tipo,
         color: cat.color,
-        totalSpent: cat.total_gastado,         // <-- usa el campo del backend
-        transactionCount: cat.total_transacciones, // <-- usa el campo del backend
+        totalSpent: cat.total_gastado,
+        transactionCount: cat.total_transacciones,
       })));
+      setLoading(false);
     });
   }, []);
 
@@ -101,6 +103,14 @@ function CategoriasScreen({ user, onLogout }) {
   const totalIngresado = categories
     .filter(cat => cat.tipo === "ingreso")
     .reduce((sum, cat) => sum + Number(cat.totalSpent ?? 0), 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BtnLoading color="#1e3a8a" height={40} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

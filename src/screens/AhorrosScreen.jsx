@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp } from 'lucide-react';
 import { ahorroService } from '../services/ahorroService';
+import BtnLoading from '../components/BtnLoading';
 
 function AhorrosScreen({ user }) {
   const [goals, setGoals] = useState([]);
@@ -15,9 +16,13 @@ function AhorrosScreen({ user }) {
   const [newGoalEstado, setNewGoalEstado] = useState('Activo');
   const [addAmount, setAddAmount] = useState('');
   const [addGoalId, setAddGoalId] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    ahorroService.getAll().then(setGoals);
+    ahorroService.getAll().then(data => {
+      setGoals(data);
+      setLoading(false);
+    });
   }, []);
 
   const totalSaved = goals.reduce((sum, g) => sum + (Number(g.monto_actual) || 0), 0);
@@ -101,6 +106,14 @@ function AhorrosScreen({ user }) {
       setAddAmount('');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BtnLoading color="#1e3a8a" height={40} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

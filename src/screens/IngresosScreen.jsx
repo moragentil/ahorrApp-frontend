@@ -4,6 +4,7 @@ import { ingresosService } from '../services/ingresosService';
 import { categoriasService } from '../services/categoriasService';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { parseISO } from 'date-fns';
+import BtnLoading from '../components/BtnLoading';
 
 function IngresosScreen({ user }) {
   const [incomes, setIncomes] = useState([]);
@@ -27,14 +28,17 @@ function IngresosScreen({ user }) {
 
   const [editingIncome, setEditingIncome] = useState(null);
 
+  // Loading state
+  const [loading, setLoading] = useState(true);
+
   // Cargar ingresos y categorías del backend
   useEffect(() => {
-    categoriasService.getIngresoCategorias().then(setCategoriasIngreso);
-    ingresosService.getAll().then(setIncomes);
-  }, []);
-
-  useEffect(() => {
-    ingresosService.getEstadisticas({ month: selectedMonth, year: selectedYear }).then(setEstadisticas);
+    Promise.all([
+      categoriasService.getIngresoCategorias().then(setCategoriasIngreso),
+      ingresosService.getAll().then(setIncomes),
+      ingresosService.getEstadisticas({ month: selectedMonth, year: selectedYear }).then(setEstadisticas)
+    ]).finally(() => setLoading(false));
+    // eslint-disable-next-line
   }, [selectedMonth, selectedYear]);
 
   // Obtener categorías únicas del backend
@@ -171,6 +175,14 @@ function IngresosScreen({ user }) {
     const [datePart] = fechaStr.split('T');
     const [year, month, day] = datePart.split('-');
     return `${day}/${month}/${year}`;
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BtnLoading color="#1e3a8a" height={40} />
+      </div>
+    );
   }
 
   return (
