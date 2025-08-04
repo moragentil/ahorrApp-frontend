@@ -62,8 +62,8 @@ const handleLogoutClick = async () => {
           {/* Logo */}
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-900 rounded-lg flex items-center justify-center">
-                <PiggyBank className="w-6 h-6 text-white" />
+              <div className="p-3 bg-blue-900 rounded-full flex items-center justify-center">
+                <PiggyBank className="w-7 h-7 text-white" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-blue-900">AhorrApp</h1>
