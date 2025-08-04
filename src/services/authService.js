@@ -43,5 +43,12 @@ export const authService = {
 
   isAuthenticated: () => {
     return !!localStorage.getItem('token');
-  }
+  },
+
+  updateProfile: async (data) => {
+    const res = await api.put('/profile', data);
+    // Actualiza el usuario en localStorage
+    localStorage.setItem('user', JSON.stringify(res.data));
+    return res.data;
+  },
 };

@@ -1,20 +1,46 @@
 import { useState } from 'react';
 import { User, Mail, Save, Lock } from 'lucide-react';
+import { authService } from '../services/authService';
+import BtnLoading from '../components/BtnLoading';
 
 function ConfiguracionScreen({ user, onLogout }) {
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    // Simulación de guardado
-    setSuccess('Perfil actualizado correctamente');
+    setLoading(true);
+    setSuccess('');
     setError('');
-    setPassword('');
-    // Aquí podrías actualizar el usuario en el backend/localStorage
+    try {
+      const data = { name, email };
+      if (password) {
+        if (password.length < 6) {
+          setError('La contraseña debe tener al menos 6 caracteres');
+          setLoading(false);
+          return;
+        }
+        if (password !== passwordConfirm) {
+          setError('Las contraseñas no coinciden');
+          setLoading(false);
+          return;
+        }
+        data.password = password;
+        data.password_confirmation = passwordConfirm;
+      }
+      await authService.updateProfile(data);
+      setSuccess('Perfil actualizado correctamente');
+      setPassword('');
+      setPasswordConfirm('');
+    } catch (err) {
+      setError('Error al actualizar el perfil');
+    }
+    setLoading(false);
   };
 
   return (
@@ -32,7 +58,7 @@ function ConfiguracionScreen({ user, onLogout }) {
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
               required
             />
           </div>
@@ -45,7 +71,7 @@ function ConfiguracionScreen({ user, onLogout }) {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
               required
             />
           </div>
@@ -58,17 +84,31 @@ function ConfiguracionScreen({ user, onLogout }) {
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
               placeholder="••••••••"
             />
             <p className="text-xs text-gray-500 mt-1">Deja en blanco para no cambiarla</p>
           </div>
+          {password && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirmar Contraseña
+              </label>
+              <input
+                type="password"
+                value={passwordConfirm}
+                onChange={e => setPasswordConfirm(e.target.value)}
+                className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+                placeholder="••••••••"
+              />
+            </div>
+          )}
           <button
             type="submit"
-            className="w-full bg-blue-900 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2"
+            className="w-full bg-blue-900 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50"
+            disabled={loading}
           >
-            <Save className="w-4 h-4" />
-            Guardar Cambios
+            {loading ? <BtnLoading color="white" /> : <><Save className="w-4 h-4" /> Guardar Cambios</>}
           </button>
           {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
           {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
