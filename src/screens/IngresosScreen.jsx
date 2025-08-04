@@ -51,6 +51,20 @@ function IngresosScreen({ user }) {
   const totalAmount = filteredIncomes.reduce((sum, income) => sum + (Number(income.monto) || 0), 0);
   const averageAmount = filteredIncomes.length > 0 ? (totalAmount / filteredIncomes.length).toFixed(2) : '0.00';
 
+  // Cantidad de fuentes activas (categorías únicas en los ingresos filtrados)
+  // Obtiene el nombre de la categoría, usando categoriasIngreso si es necesario
+  function getCategoriaNombre(income) {
+    if (income.categoria?.nombre) return income.categoria.nombre;
+    const cat = categoriasIngreso.find(c => c.id === income.categoria_id);
+    return cat ? cat.nombre : undefined;
+  }
+
+  const fuentesActivas = new Set(
+    filteredIncomes
+      .map(getCategoriaNombre)
+      .filter(Boolean)
+  ).size;
+
   // Acciones CRUD
   const handleAddIncome = async () => {
     if (!form.categoria_id || !form.descripcion.trim() || !form.monto || !form.fecha) return;
@@ -137,7 +151,7 @@ function IngresosScreen({ user }) {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <p className="text-sm text-gray-600">Fuentes Activas</p>
-            <p className="text-2xl font-bold text-gray-900">{categories.length - 1}</p>
+            <p className="text-2xl font-bold text-gray-900">{fuentesActivas}</p>
           </div>
         </div>
 
