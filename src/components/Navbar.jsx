@@ -1,4 +1,4 @@
-import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target } from 'lucide-react';
+import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target, BanknoteArrowUp } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService'; // Importa el servicio
@@ -7,6 +7,7 @@ const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
   { id: '/gastos', label: 'Mis Gastos', icon: CreditCard },
   { id: '/gastos/nuevo', label: 'Nuevo Gasto', icon: Plus },
+  { id: '/ingresos', label: 'Ingresos', icon: BanknoteArrowUp },
   { id: '/categorias', label: 'Categorías', icon: Tag },
   { id: '/ahorros', label: 'Ahorros', icon: Target },
 ];

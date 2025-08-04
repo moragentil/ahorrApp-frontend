@@ -8,6 +8,7 @@ import CategoriasScreen from '../screens/CategoriasScreen';
 import ConfiguracionScreen from '../screens/ConfiguracionScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import AhorrosScreen from '../screens/AhorrosScreen';
+import IngresosScreen from '../screens/IngresosScreen';
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children }) {
@@ -112,6 +113,16 @@ function AppRoutes({ user, onLogin, onLogout }) {
             <AhorrosScreen user={user} />
           </ProtectedRoute>
         } 
+      />
+      
+      {/* Nueva ruta para ingresos */}
+      <Route
+        path="/ingresos"
+        element={
+          <ProtectedRoute>
+            <IngresosScreen user={user} />
+          </ProtectedRoute>
+        }
       />
       
       {/* Rutas futuras para otras pantallas */}
