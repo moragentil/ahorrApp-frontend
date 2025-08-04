@@ -9,6 +9,7 @@ function CategoriasScreen({ user, onLogout }) {
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
+  const [newCategoryType, setNewCategoryType] = useState("gasto"); // Nuevo estado para tipo
   const [viewMode, setViewMode] = useState("cards");
 
   const colorOptions = [
@@ -24,7 +25,8 @@ function CategoriasScreen({ user, onLogout }) {
     if (newCategoryName.trim()) {
       const newCategory = {
         id: Math.max(...categories.map((c) => c.id)) + 1,
-        name: newCategoryName.trim(),
+        nombre: newCategoryName.trim(),
+        tipo: newCategoryType,
         color: newCategoryColor,
         totalSpent: 0,
         transactionCount: 0,
@@ -32,12 +34,13 @@ function CategoriasScreen({ user, onLogout }) {
       setCategories([...categories, newCategory]);
       setNewCategoryName("");
       setNewCategoryColor("#3b82f6");
+      setNewCategoryType("gasto");
       setIsAddDialogOpen(false);
 
       await categoriasService.create({
         user_id: user.id,
         nombre: newCategoryName,
-        tipo: 'gasto',
+        tipo: newCategoryType,
         color: newCategoryColor
       });
     }
@@ -47,8 +50,8 @@ function CategoriasScreen({ user, onLogout }) {
     if (editingCategory && newCategoryName.trim()) {
       setCategories(
         categories.map((cat) =>
-          cat.id === editingCategory.id 
-            ? { ...cat, name: newCategoryName.trim(), color: newCategoryColor } 
+          cat.id === editingCategory.id
+            ? { ...cat, nombre: newCategoryName.trim(), tipo: newCategoryType, color: newCategoryColor }
             : cat
         )
       );
@@ -56,9 +59,11 @@ function CategoriasScreen({ user, onLogout }) {
       setEditingCategory(null);
       setNewCategoryName("");
       setNewCategoryColor("#3b82f6");
+      setNewCategoryType("gasto");
 
       await categoriasService.update(editingCategory.id, {
         nombre: newCategoryName,
+        tipo: newCategoryType,
         color: newCategoryColor
       });
     }
@@ -73,6 +78,7 @@ function CategoriasScreen({ user, onLogout }) {
     setEditingCategory(category);
     setNewCategoryName(category.nombre);
     setNewCategoryColor(category.color);
+    setNewCategoryType(category.tipo || "gasto");
     setIsEditDialogOpen(true);
   };
 
@@ -138,11 +144,14 @@ function CategoriasScreen({ user, onLogout }) {
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div 
-                      className="w-4 h-4 rounded-full" 
+                    <div
+                      className="w-4 h-4 rounded-full"
                       style={{ backgroundColor: category.color }}
                     />
                     <h3 className="text-lg font-semibold text-gray-900">{category.nombre}</h3>
+                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                      {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
+                    </span>
                   </div>
                   <div className="flex gap-1">
                     <button 
@@ -204,6 +213,7 @@ function CategoriasScreen({ user, onLogout }) {
               <thead className="bg-gray-50 border-b">
                 <tr>
                   <th className="text-left p-4 font-semibold text-gray-900">Nombre</th>
+                  <th className="text-left p-4 font-semibold text-gray-900">Tipo</th>
                   <th className="text-left p-4 font-semibold text-gray-900">Color</th>
                   <th className="text-right p-4 font-semibold text-gray-900">Total gastado</th>
                   <th className="text-center p-4 font-semibold text-gray-900">Transacciones</th>
@@ -214,6 +224,11 @@ function CategoriasScreen({ user, onLogout }) {
                 {categories.map((category) => (
                   <tr key={category.id} className="border-b hover:bg-gray-50">
                     <td className="p-4 text-gray-900">{category.nombre}</td>
+                    <td className="p-4">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                        {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
+                      </span>
+                    </td>
                     <td className="p-4">
                       <span
                         className="inline-block w-4 h-4 rounded-full border border-gray-300"
@@ -299,7 +314,19 @@ function CategoriasScreen({ user, onLogout }) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de categoría
+                  </label>
+                  <select
+                    value={newCategoryType}
+                    onChange={e => setNewCategoryType(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="gasto">Gasto</option>
+                    <option value="ingreso">Ingreso</option>
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Color de la categoría
@@ -367,7 +394,19 @@ function CategoriasScreen({ user, onLogout }) {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tipo de categoría
+                  </label>
+                  <select
+                    value={newCategoryType}
+                    onChange={e => setNewCategoryType(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  >
+                    <option value="gasto">Gasto</option>
+                    <option value="ingreso">Ingreso</option>
+                  </select>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Color de la categoría

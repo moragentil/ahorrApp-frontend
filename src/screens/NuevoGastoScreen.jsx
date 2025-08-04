@@ -16,7 +16,7 @@ function NuevoGastoScreen({ user, onLogout }) {
 
   // Traer categorías del backend al montar el componente
   useEffect(() => {
-    categoriasService.getAll().then(setCategorias);
+    categoriasService.getGastoCategorias().then(setCategorias);
   }, []);
 
   const handleSubmit = async (e) => {

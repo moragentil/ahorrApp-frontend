@@ -15,14 +15,12 @@ export const categoriasService = {
 
   // Crear una categoría
   create: async (categoria) => {
-    // categoria debe tener: user_id (opcional), nombre, tipo, color
     const res = await api.post('/categorias', categoria);
     return res.data;
   },
 
   // Actualizar una categoría
   update: async (id, categoria) => {
-    // categoria puede tener: nombre, tipo, color
     const res = await api.put(`/categorias/${id}`, categoria);
     return res.data;
   },
@@ -30,6 +28,24 @@ export const categoriasService = {
   // Eliminar una categoría
   delete: async (id) => {
     const res = await api.delete(`/categorias/${id}`);
+    return res.data;
+  },
+
+  // Obtener categorías por tipo
+  getByTipo: async (tipo) => {
+    const res = await api.get(`/categorias/${tipo}`);
+    return res.data;
+  },
+
+  // Obtener solo categorías de gasto
+  getGastoCategorias: async () => {
+    const res = await api.get('/categorias/gasto');
+    return res.data;
+  },
+
+  // Obtener solo categorías de ingreso
+  getIngresoCategorias: async () => {
+    const res = await api.get('/categorias/ingreso');
     return res.data;
   }
 };
