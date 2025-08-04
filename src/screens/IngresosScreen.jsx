@@ -126,7 +126,7 @@ function IngresosScreen({ user }) {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white rounded-lg shadow-sm p-4">
             <p className="text-sm text-gray-600">Ingresos Totales</p>
             <p className="text-2xl font-bold text-gray-900">${totalAmount.toLocaleString()}</p>
@@ -134,17 +134,6 @@ function IngresosScreen({ user }) {
           <div className="bg-white rounded-lg shadow-sm p-4">
             <p className="text-sm text-gray-600">Promedio</p>
             <p className="text-2xl font-bold text-gray-900">${averageAmount}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <p className="text-sm text-gray-600">Meta Mensual</p>
-            <p className="text-2xl font-bold text-gray-900">$5,000</p>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-              <div
-                className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${Math.min((totalAmount / 5000) * 100, 100)}%` }}
-              />
-            </div>
-            <p className="text-sm text-gray-600 mt-1">{((totalAmount / 5000) * 100).toFixed(1)}% completado</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4">
             <p className="text-sm text-gray-600">Fuentes Activas</p>
