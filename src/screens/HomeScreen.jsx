@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { dashboardService } from '../services/dashboardService';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { RefreshCw, DollarSign, CreditCard, TrendingUp, TrendingDown, Target } from 'lucide-react';
+import BtnLoading from '../components/BtnLoading';
 
 function HomeScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -31,7 +32,11 @@ function HomeScreen({ user, onLogout }) {
   };
 
   if (!dashboard) {
-    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <BtnLoading text="Cargando datos..." />
+      </div>
+    );
   }
 
   // Datos del backend

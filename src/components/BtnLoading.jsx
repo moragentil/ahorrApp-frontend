@@ -1,14 +1,13 @@
-import { ScaleLoader } from 'react-spinners';
+import { ClipLoader } from 'react-spinners';
 
-function BtnLoading({ text = "Cargando...", color = "#2563eb", height = 20 }) {
+function BtnLoading({ color = "#1e3a8a", height = 40 }) {
   return (
     <button
       type="button"
       disabled
-      className="flex items-center justify-center gap-2 px-4 py-2 rounded-md bg-blue-900 text-white opacity-70 cursor-not-allowed"
+      className="flex items-center justify-center gap-2 px-4 py-2 rounded-md cursor-not-allowed"
     >
-      <ScaleLoader height={height} color={color} />
-      <span>{text}</span>
+      <ClipLoader  height={height} color={color} />
     </button>
   );
 }
