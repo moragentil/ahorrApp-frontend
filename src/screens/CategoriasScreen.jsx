@@ -272,7 +272,7 @@ function CategoriasScreen({ user, onLogout }) {
             </div>
           </div>
         )}
-      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>

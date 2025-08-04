@@ -334,7 +334,6 @@ function AhorrosScreen({ user }) {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-              <PiggyBank className="w-7 h-7 text-blue-900" />
               Ahorros y Metas
             </h1>
             <p className="text-gray-600">Registra tus objetivos y el dinero ahorrado para cada uno</p>

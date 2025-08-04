@@ -84,14 +84,11 @@ const handleLogoutClick = async () => {
                   className={`w-full flex items-center gap-3 h-12 rounded-lg px-3 text-left transition-colors ${
                     isActive
                       ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      : 'text-gray-700 hover:bg-blue-200'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
                   {item.label}
-                  {item.id === '/gastos/nuevo' && (
-                    <span className="ml-auto bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Nuevo</span>
-                  )}
                 </button>
               );
             })}
