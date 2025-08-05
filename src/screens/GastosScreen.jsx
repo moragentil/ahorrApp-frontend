@@ -160,7 +160,7 @@ function GastosScreen({ user, onLogout }) {
       />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">
               Mis Gastos
@@ -171,7 +171,7 @@ function GastosScreen({ user, onLogout }) {
           </div>
           <button 
             onClick={handleNewExpense}
-            className="text-sm lg:text-base bg-blue-900 text-white px-2 text-center justify-center lg:px-4 py-2 w-1/2 lg:w-fit rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="text-sm lg:text-base bg-blue-900 text-white px-2 text-center justify-center lg:px-4 py-2 w-1/2 md:w-fit rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Nuevo Gasto
@@ -201,7 +201,7 @@ function GastosScreen({ user, onLogout }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col lg:flex-row gap-4 ">
+        <div className="flex flex-col md:flex-row gap-4 ">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
