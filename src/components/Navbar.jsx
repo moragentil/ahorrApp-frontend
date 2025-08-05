@@ -5,7 +5,7 @@ import { authService } from '../services/authService'; // Importa el servicio
 
 const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
-  { id: '/gastos', label: 'Mis Gastos', icon: CreditCard },
+  { id: '/gastos', label: 'Gastos', icon: CreditCard },
   { id: '/gastos/nuevo', label: 'Nuevo Gasto', icon: Plus },
   { id: '/ingresos', label: 'Ingresos', icon: BanknoteArrowUp },
   { id: '/categorias', label: 'Categorías', icon: Tag },
