@@ -26,11 +26,20 @@ function GastosScreen({ user, onLogout }) {
     fecha: '',
   });
 
+  // Estado para detectar si la pantalla es lg o mayor
+  const [isLg, setIsLg] = useState(window.innerWidth > 768);
+
   useEffect(() => {
     gastosService.getAll().then(data => {
       setExpenses(data);
       setLoading(false);
     });
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsLg(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const months = [
@@ -201,7 +210,7 @@ function GastosScreen({ user, onLogout }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col md:flex-row gap-4 ">
+        <div className="flex flex-row gap-4 ">
           <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -226,18 +235,22 @@ function GastosScreen({ user, onLogout }) {
                 </option>
               ))}
             </select>
+            {isLg && (
+              <>
             <button
               onClick={() => setViewMode("cards")}
               className={`px-3 py-1 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
             >
               Tarjetas
             </button>
-            <button
-              onClick={() => setViewMode("table")}
-              className={`px-3 py-1 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-            >
-              Tabla
-            </button>
+              <button
+                onClick={() => setViewMode("table")}
+                className={`px-3 py-1 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+              >
+                Tabla
+              </button>
+              </>
+            )}
           </div>
         </div>
 
