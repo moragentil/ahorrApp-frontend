@@ -206,7 +206,7 @@ function GastosScreen({ user, onLogout }) {
                 placeholder="Buscar gastos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none "
+                className="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md focus:outline-none "
               />
             </div>
           </div>
@@ -214,7 +214,7 @@ function GastosScreen({ user, onLogout }) {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -224,13 +224,13 @@ function GastosScreen({ user, onLogout }) {
             </select>
             <button
               onClick={() => setViewMode("cards")}
-              className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+              className={`px-3 py-1 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
             >
               Tarjetas
             </button>
             <button
               onClick={() => setViewMode("table")}
-              className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+              className={`px-3 py-1 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
             >
               Tabla
             </button>
@@ -311,7 +311,7 @@ function GastosScreen({ user, onLogout }) {
                     <th className="text-left p-4 font-semibold text-gray-900">Descripción</th>
                     <th className="text-left p-4 font-semibold text-gray-900">Categoría</th>
                     <th className="text-left p-4 font-semibold text-gray-900">Fecha</th>
-                    <th className="text-right p-4 font-semibold text-gray-900">Monto</th>
+                    <th className="text-left p-4 font-semibold text-gray-900">Monto</th>
                     <th className="text-center p-4 font-semibold text-gray-900">Acciones</th>
                   </tr>
                 </thead>
@@ -329,7 +329,7 @@ function GastosScreen({ user, onLogout }) {
                         </span>
                       </td>
                       <td className="p-4 text-gray-600">{formatDate(expense.fecha)}</td>
-                      <td className="p-4 text-right font-semibold text-gray-900">
+                      <td className="p-4 text-left font-semibold text-gray-900">
                         ${Number(expense.monto ?? 0).toFixed(2)}
                       </td>
                       <td className="p-4 text-center">

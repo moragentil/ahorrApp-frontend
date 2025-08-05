@@ -303,7 +303,7 @@ function CategoriasScreen({ user, onLogout }) {
                   <th className="text-left p-4 font-semibold text-gray-900">Nombre</th>
                   <th className="text-left p-4 font-semibold text-gray-900">Tipo</th>
                   <th className="text-left p-4 font-semibold text-gray-900">Color</th>
-                  <th className="text-right p-4 font-semibold text-gray-900">Total gastado</th>
+                  <th className="text-left p-4 font-semibold text-gray-900">Total gastado</th>
                   <th className="text-center p-4 font-semibold text-gray-900">Transacciones</th>
                   <th className="text-center p-4 font-semibold text-gray-900">Acciones</th>
                 </tr>
@@ -324,7 +324,7 @@ function CategoriasScreen({ user, onLogout }) {
                         title={category.color}
                       />
                     </td>
-                    <td className="p-4 text-right font-semibold text-gray-900">
+                    <td className="p-4 text-left font-semibold text-gray-900">
                       ${Number(category.totalSpent ?? 0).toFixed(2)}
                     </td>
                     <td className="p-4 text-center">
