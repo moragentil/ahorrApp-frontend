@@ -125,28 +125,28 @@ function NuevoGastoScreen({ user, onLogout }) {
         colorOptions={colorOptions}
         loading={loadingAddCategory}
       />
-      <main className=" max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
         {/* Header */}
-        <div className="flex items-center ">
+        <div className="flex items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Nuevo Gasto</h1>
-            <p className="text-gray-600">Registra un nuevo gasto en tu presupuesto</p>
+            <h1 className="text-xl lg:text-3xl font-bold text-gray-900">Nuevo Gasto</h1>
+            <p className="text-sm lg:text-base text-gray-600">Registra un nuevo gasto en tu presupuesto</p>
           </div>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2 mb-1">
+            <h2 className="text-lg lg:text-xl font-semibold text-gray-900 flex items-center gap-2 mb-1">
               Detalles del Gasto
             </h2>
-            <p className="text-gray-600">Completa la información del gasto que deseas registrar</p>
+            <p className="text-sm lg:text-base text-gray-600">Completa la información del gasto que deseas registrar</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Amount */}
-            <div className="">
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
+            <div>
+              <label htmlFor="amount" className="block text-sm lg:text-base font-medium text-gray-700">
                 Monto *
               </label>
               <div className="relative">
@@ -158,15 +158,15 @@ function NuevoGastoScreen({ user, onLogout }) {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1 h-10 text-lg border border-gray-300 rounded-md focus:outline-none "
+                  className="w-full pl-8 pr-2 py-1 h-10 text-lg border border-gray-300 rounded-md focus:outline-none"
                   required
                 />
               </div>
             </div>
 
             {/* Description */}
-            <div className="">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            <div>
+              <label htmlFor="description" className="block text-sm lg:text-base font-medium text-gray-700">
                 Descripción *
               </label>
               <div className="relative">
@@ -177,7 +177,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                   placeholder="Ej: Supermercado, Gasolina, Cine..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
+                  className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
                   required
                 />
               </div>
@@ -186,8 +186,8 @@ function NuevoGastoScreen({ user, onLogout }) {
             {/* Category and Date Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Category */}
-              <div className="">
-                <label className="block text-sm font-medium text-gray-700">Categoría *</label>
+              <div>
+                <label className="block text-sm lg:text-base font-medium text-gray-700">Categoría *</label>
                 <div className="relative">
                   <Tag className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                   <select
@@ -199,7 +199,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                         setCategory(e.target.value);
                       }
                     }}
-                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
                     required
                   >
                     <option value="">Selecciona una categoría</option>
@@ -212,34 +212,19 @@ function NuevoGastoScreen({ user, onLogout }) {
               </div>
 
               {/* Date */}
-              <div className="">
-                <label className="block text-sm font-medium text-gray-700">Fecha *</label>
+              <div>
+                <label className="block text-sm lg:text-base font-medium text-gray-700">Fecha *</label>
                 <div className="relative">
                   <CalendarIcon className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
                     required
                   />
                 </div>
               </div>
-            </div>
-
-            {/* Notes */}
-            <div className="">
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-                Notas adicionales
-              </label>
-              <textarea
-                id="notes"
-                placeholder="Información adicional sobre este gasto (opcional)"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none min-h-20 resize-none"
-                rows="3"
-              />
             </div>
 
             {/* Preview */}
@@ -249,11 +234,11 @@ function NuevoGastoScreen({ user, onLogout }) {
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="font-medium text-gray-900">{description}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm lg:text-base text-gray-600">
                       {category} • {formatDate(date)}
                     </p>
                   </div>
-                  <span className="text-xl font-bold text-gray-900">
+                  <span className="text-xl lg:text-2xl font-bold text-gray-900">
                     ${parseFloat(amount || "0").toFixed(2)}
                   </span>
                 </div>
@@ -265,7 +250,7 @@ function NuevoGastoScreen({ user, onLogout }) {
               <button
                 type="submit"
                 disabled={!amount || !description || !category || loadingSave}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 lg:text-base text-sm"
               >
                 <Save className="w-4 h-4" />
                 {loadingSave ? <BtnLoading text="Guardando..." /> : "Guardar Gasto"}
@@ -273,7 +258,7 @@ function NuevoGastoScreen({ user, onLogout }) {
               <button 
                 type="button" 
                 onClick={handleCancel}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300"
+                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 lg:text-base text-sm"
                 disabled={loadingSave}
               >
                 Cancelar
@@ -283,8 +268,8 @@ function NuevoGastoScreen({ user, onLogout }) {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
+          <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
           {loadingQuick ? (
             <div className="flex justify-center items-center h-20">
               <BtnLoading text="Cargando..." />
@@ -302,7 +287,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                   className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex flex-col items-start text-left"
                 >
                   <span className="font-medium text-gray-900">{quick.descripcion}</span>
-                  <span className="text-sm text-gray-600">${Number(quick.total).toLocaleString()}</span>
+                  <span className="text-sm lg:text-base text-gray-600">${Number(quick.total).toLocaleString()}</span>
                 </button>
               ))}
             </div>
