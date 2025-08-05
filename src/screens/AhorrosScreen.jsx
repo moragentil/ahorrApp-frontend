@@ -217,7 +217,7 @@ function AhorrosScreen({ user }) {
               <button
                 onClick={handleAddGoal}
                 disabled={!newGoalName.trim() || !newGoalTarget || newGoalTarget <= 0}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Crear Objetivo
               </button>
@@ -227,8 +227,8 @@ function AhorrosScreen({ user }) {
       )}
       {isEditDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90%] overflow-y-auto">
+            <div className="flex justify-between items-center mb-2">
               <h2 className="text-xl font-semibold text-gray-900">Editar Objetivo</h2>
               <button
                 onClick={() => setIsEditDialogOpen(false)}
@@ -237,20 +237,20 @@ function AhorrosScreen({ user }) {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-2">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Nombre del objetivo
                 </label>
                 <input
                   type="text"
                   value={newGoalName}
                   onChange={e => setNewGoalName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Monto objetivo
                 </label>
                 <input
@@ -258,39 +258,39 @@ function AhorrosScreen({ user }) {
                   min="1"
                   value={newGoalTarget}
                   onChange={e => setNewGoalTarget(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Descripción
                 </label>
                 <input
                   type="text"
                   value={newGoalDesc}
                   onChange={e => setNewGoalDesc(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Fecha límite
                 </label>
                 <input
                   type="date"
                   value={newGoalDate}
                   onChange={e => setNewGoalDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Prioridad
                 </label>
                 <select
                   value={newGoalPriority}
                   onChange={e => setNewGoalPriority(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
                 >
                   <option value="Media">Media</option>
                   <option value="Alta">Alta</option>
@@ -298,7 +298,7 @@ function AhorrosScreen({ user }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 ">
                   Estado
                 </label>
                 <select
@@ -321,7 +321,7 @@ function AhorrosScreen({ user }) {
               <button
                 onClick={handleEditGoal}
                 disabled={!newGoalName.trim() || !newGoalTarget || newGoalTarget <= 0}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Guardar Cambios
               </button>
