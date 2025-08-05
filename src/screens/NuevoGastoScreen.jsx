@@ -4,6 +4,7 @@ import { DollarSign, FileText, Tag, Save, X, CalendarIcon } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
 import { categoriasService } from '../services/categoriasService'; // Importa el servicio
 import BtnLoading from '../components/BtnLoading';
+import AddCategoryModal from '../components/Modals/AddCategoryModal';
 
 function NuevoGastoScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -16,6 +17,16 @@ function NuevoGastoScreen({ user, onLogout }) {
   const [quickActions, setQuickActions] = useState([]);
   const [loadingQuick, setLoadingQuick] = useState(true);
   const [loadingSave, setLoadingSave] = useState(false);
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryType, setNewCategoryType] = useState('gasto');
+  const [newCategoryColor, setNewCategoryColor] = useState('#3b82f6');
+  const [loadingAddCategory, setLoadingAddCategory] = useState(false);
+
+  const colorOptions = [
+    "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
+    "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
+  ];
 
   // Traer categorías del backend al montar el componente
   useEffect(() => {
@@ -74,9 +85,46 @@ function NuevoGastoScreen({ user, onLogout }) {
     setCategory(quickExpense.category);
   };
 
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setLoadingAddCategory(true);
+    console.log('Intentando crear categoría...');
+    try {
+      const nueva = await categoriasService.create({
+        user_id: user.id, // <-- Agrega el user_id aquí
+        nombre: newCategoryName.trim(),
+        tipo: newCategoryType,
+        color: newCategoryColor,
+      });
+      console.log('Respuesta del backend:', nueva);
+      setCategorias([...categorias, nueva]);
+      setCategory(nueva.nombre);
+      setIsAddCategoryOpen(false);
+      setNewCategoryName('');
+      setNewCategoryType('gasto');
+      setNewCategoryColor('#3b82f6');
+    } catch (err) {
+      console.error('Error al crear la categoría:', err);
+      alert('Error al crear la categoría');
+    }
+    setLoadingAddCategory(false);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
-
+      <AddCategoryModal
+        isOpen={isAddCategoryOpen}
+        onClose={() => setIsAddCategoryOpen(false)}
+        onSave={handleAddCategory}
+        newCategoryName={newCategoryName}
+        setNewCategoryName={setNewCategoryName}
+        newCategoryType={newCategoryType}
+        setNewCategoryType={setNewCategoryType}
+        newCategoryColor={newCategoryColor}
+        setNewCategoryColor={setNewCategoryColor}
+        colorOptions={colorOptions}
+        loading={loadingAddCategory}
+      />
       <main className=" max-w-7xl mx-auto p-4 lg:p-6 space-y-4">
         {/* Header */}
         <div className="flex items-center ">
@@ -144,7 +192,13 @@ function NuevoGastoScreen({ user, onLogout }) {
                   <Tag className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
                   <select
                     value={category}
-                    onChange={(e) => setCategory(e.target.value)}
+                    onChange={e => {
+                      if (e.target.value === "__add__") {
+                        setIsAddCategoryOpen(true);
+                      } else {
+                        setCategory(e.target.value);
+                      }
+                    }}
                     className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none "
                     required
                   >
@@ -152,6 +206,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                     {categorias.map((cat) => (
                       <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
                     ))}
+                    <option value="__add__">+ Registrar nueva categoría</option>
                   </select>
                 </div>
               </div>
