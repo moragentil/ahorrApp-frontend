@@ -37,12 +37,13 @@ function LoginScreen({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center ">
+    <div className="min-h-screen bg-gradient-to-r from-blue-900 to-blue-600 flex items-center justify-center ">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
-          <PiggyBank className="w-14 h-14 text-white bg-blue-900 rounded-full p-2 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-blue-900 mb-2">AhorrApp</h1>
-          <p className="text-gray-600">Inicia sesión en tu cuenta</p>
+          <PiggyBank className="w-14 h-14 text-white bg-blue-900 rounded-full p-2 mx-auto mb-2" />
+          <h1 className="text-3xl font-bold text-blue-900 ">AhorrApp</h1>
+          <p className='text-blue-900 mb-2'>Gestioná tus finanzas</p>
+          <p className="text-gray-600 ">Inicia sesión en tu cuenta</p>
         </div>
 
         {error && (
@@ -101,11 +102,6 @@ function LoginScreen({ onLogin }) {
           >
             ¿No tienes cuenta? Regístrate
           </button>
-          <div className="mt-2">
-            <p>Credenciales de prueba:</p>
-            <p>Email: admin@ahorrapp.com</p>
-            <p>Contraseña: 123456</p>
-          </div>
         </div>
       </div>
     </div>

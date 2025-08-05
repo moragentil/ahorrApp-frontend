@@ -89,7 +89,7 @@ function Navbar({ user, onLogout }) {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-blue-900">AhorrApp</h1>
-                <p className="text-sm text-gray-600">Gestor de gastos</p>
+                <p className="text-sm text-gray-600">Gestor de finanzas</p>
               </div>
             </div>
           </div>
