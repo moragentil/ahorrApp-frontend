@@ -16,6 +16,9 @@ export default function AddGoalModal({
   setNewGoalDate,
   newGoalPriority,
   setNewGoalPriority,
+  newGoalColor,
+  setNewGoalColor,
+  colorOptions,
   loading
 }) {
   if (!isOpen) return null;
@@ -94,6 +97,22 @@ export default function AddGoalModal({
               <option value="Alta">Alta</option>
               <option value="Baja">Baja</option>
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Color del objetivo
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {colorOptions.map((color) => (
+                <button
+                  key={color}
+                  className={`w-8 h-8 rounded-full border-2 ${newGoalColor === color ? "border-gray-900" : "border-gray-300"}`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => setNewGoalColor(color)}
+                  type="button"
+                />
+              ))}
+            </div>
           </div>
         </div>
         <div className="flex gap-3 mt-6">

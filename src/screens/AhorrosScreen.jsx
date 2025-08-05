@@ -25,6 +25,12 @@ function AhorrosScreen({ user }) {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [showAllGoals, setShowAllGoals] = useState(false);
   const [completeLoadingId, setCompleteLoadingId] = useState(null);
+  const [newGoalColor, setNewGoalColor] = useState("#3b82f6"); // color por defecto
+
+  const colorOptions = [
+    "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
+    "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
+  ];
 
   useEffect(() => {
     ahorroService.getAll().then(data => {
@@ -47,7 +53,8 @@ function AhorrosScreen({ user }) {
         monto_actual: 0,
         fecha_limite: newGoalDate || null,
         prioridad: newGoalPriority,
-        estado: "Activo", // Siempre activo al crear
+        estado: "Activo",
+        color: newGoalColor,
       });
       setGoals([...goals, newGoal]);
       setNewGoalName('');
@@ -56,6 +63,7 @@ function AhorrosScreen({ user }) {
       setNewGoalDate('');
       setNewGoalPriority('Media');
       setNewGoalEstado('Activo');
+      setNewGoalColor("#3b82f6");
       setIsAddDialogOpen(false);
     }
   };
@@ -69,6 +77,7 @@ function AhorrosScreen({ user }) {
         fecha_limite: newGoalDate || null,
         prioridad: newGoalPriority,
         estado: newGoalEstado,
+        color: newGoalColor,
       });
       setGoals(goals.map(g => g.id === editingGoal.id ? updated : g));
       setIsEditDialogOpen(false);
@@ -79,6 +88,7 @@ function AhorrosScreen({ user }) {
       setNewGoalDate('');
       setNewGoalPriority('Media');
       setNewGoalEstado('Activo');
+      setNewGoalColor("#3b82f6");
     }
   };
 
@@ -98,6 +108,7 @@ function AhorrosScreen({ user }) {
     setNewGoalDate(goal.fecha_limite ? goal.fecha_limite.split('T')[0] : '');
     setNewGoalPriority(goal.prioridad || 'Media');
     setNewGoalEstado(goal.estado || 'Activo');
+    setNewGoalColor(goal.color || "#3b82f6");
     setIsEditDialogOpen(true);
   };
 
@@ -162,6 +173,9 @@ function AhorrosScreen({ user }) {
         setNewGoalDate={setNewGoalDate}
         newGoalPriority={newGoalPriority}
         setNewGoalPriority={setNewGoalPriority}
+        newGoalColor={newGoalColor}
+        setNewGoalColor={setNewGoalColor}
+        colorOptions={colorOptions}
         newGoalEstado={newGoalEstado}
         setNewGoalEstado={setNewGoalEstado}
         loading={false}
@@ -181,6 +195,9 @@ function AhorrosScreen({ user }) {
         setNewGoalDate={setNewGoalDate}
         newGoalPriority={newGoalPriority}
         setNewGoalPriority={setNewGoalPriority}
+        newGoalColor={newGoalColor}
+        setNewGoalColor={setNewGoalColor}
+        colorOptions={colorOptions}
         newGoalEstado={newGoalEstado}
         setNewGoalEstado={setNewGoalEstado}
         loading={false}
@@ -262,7 +279,14 @@ function AhorrosScreen({ user }) {
             return (
               <div key={goal.id} className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{goal.nombre}</h3>
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-4 h-4 rounded-full border border-gray-300"
+                      style={{ backgroundColor: goal.color || "#e5e7eb" }}
+                      title={goal.color}
+                    />
+                    <h3 className="text-lg font-semibold text-gray-900">{goal.nombre}</h3>
+                  </div>
                   <div className="flex gap-1">
                     <button
                       onClick={() => openEditDialog(goal)}

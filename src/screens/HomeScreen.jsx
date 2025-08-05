@@ -250,7 +250,7 @@ function HomeScreen({ user, onLogout }) {
                 <div key={idx}>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm font-medium">{obj.nombre}</span>
-                    <span className="text-sm text-gray-500">${obj.total_ahorrado} / ${obj.total_objetivo}</span>
+                    <span className="text-sm text-gray-500">${obj.monto_actual} / ${obj.monto_objetivo}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
