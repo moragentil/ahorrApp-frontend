@@ -29,7 +29,7 @@ export default function AddCategoryModal({
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-gray-600 text-sm mb-4">Agrega una nueva categoría para organizar mejor tus gastos</p>
+        <p className="text-gray-600 text-sm mb-4">Agrega una nueva categoría para organizar mejor tus gastos e ingresos</p>
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 ">

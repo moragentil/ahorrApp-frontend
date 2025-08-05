@@ -165,7 +165,7 @@ function CategoriasScreen({ user, onLogout }) {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
-            <p className="text-gray-600">Organiza y personaliza tus categorías de gastos</p>
+            <p className="text-gray-600">Organiza y personaliza tus categorías de gastos e ingresos</p>
           </div>
           <div className="flex gap-2">
             <button 
@@ -361,7 +361,7 @@ function CategoriasScreen({ user, onLogout }) {
             <div className="text-6xl mb-4">🏷️</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay categorías</h3>
             <p className="text-gray-600 mb-4">
-              Crea tu primera categoría para comenzar a organizar tus gastos
+              Crea tu primera categoría para comenzar a organizar tus gastos e ingresos
             </p>
             <button 
               onClick={() => setIsAddDialogOpen(true)}
