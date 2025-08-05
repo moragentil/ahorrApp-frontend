@@ -45,7 +45,7 @@ function AhorrosScreen({ user }) {
         monto_actual: 0,
         fecha_limite: newGoalDate || null,
         prioridad: newGoalPriority,
-        estado: newGoalEstado,
+        estado: "Activo", // Siempre activo al crear
       });
       setGoals([...goals, newGoal]);
       setNewGoalName('');

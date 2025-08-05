@@ -16,8 +16,6 @@ export default function AddGoalModal({
   setNewGoalDate,
   newGoalPriority,
   setNewGoalPriority,
-  newGoalEstado,
-  setNewGoalEstado,
   loading
 }) {
   if (!isOpen) return null;
@@ -95,19 +93,6 @@ export default function AddGoalModal({
               <option value="Media">Media</option>
               <option value="Alta">Alta</option>
               <option value="Baja">Baja</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 ">
-              Estado
-            </label>
-            <select
-              value={newGoalEstado}
-              onChange={e => setNewGoalEstado(e.target.value)}
-              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-            >
-              <option value="Activo">Activo</option>
-              <option value="Inactivo">Inactivo</option>
             </select>
           </div>
         </div>
