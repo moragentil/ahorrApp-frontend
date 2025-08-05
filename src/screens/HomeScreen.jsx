@@ -68,21 +68,21 @@ function HomeScreen({ user, onLogout }) {
   const objetivosAhorroLimit = objetivosAhorroActivos.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <main className="max-w-7xl mx-auto p-4 lg:p-6">
+    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 ">
         {/* Selector de mes y año con botón de refresh */}
         <div className="mb-4 flex flex-col md:flex-row md:items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">
               Resumen de {months[selectedMonth]} {selectedYear}
             </h2>
-            <p className="text-gray-600">Tu estado financiero del mes seleccionado</p>
+            <p className="lg:text-base text-sm text-gray-600">Tu estado financiero del mes seleccionado</p>
           </div>
           <div className="flex gap-2 mt-2 md:mt-0 items-center">
             <select
               value={selectedMonth}
               onChange={e => setSelectedMonth(Number(e.target.value))}
-              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+              className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
             >
               {months.map((m, idx) => (
                 <option key={m} value={idx}>{m}</option>
@@ -91,7 +91,7 @@ function HomeScreen({ user, onLogout }) {
             <select
               value={selectedYear}
               onChange={e => setSelectedYear(Number(e.target.value))}
-              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+              className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
             >
               {[2023, 2024, 2025].map(y => (
                 <option key={y} value={y}>{y}</option>
@@ -100,7 +100,7 @@ function HomeScreen({ user, onLogout }) {
             <button
               type="button"
               onClick={handleRefresh}
-              className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900 flex items-center hover:bg-gray-100 transition"
+              className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900 flex items-center hover:bg-gray-100 transition"
               title="Volver al mes actual"
             >
               <RefreshCw className="w-4 h-4 mr-1" />
@@ -109,15 +109,15 @@ function HomeScreen({ user, onLogout }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-6 mb-6">
           {/* Balance Total */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-lg  p-4 ">
-            <div className="flex flex-row items-center justify-between mb-2">
-              <span className="text-lg font-medium text-gray-600">Balance Total</span>
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-2 lg:p-4 ">
+            <div className="flex flex-row items-center justify-between mb-1 lg:mb-2">
+              <span className="text-base lg:text-lg font-medium text-gray-600">Balance Total</span>
               <DollarSign className="h-4 w-4 text-blue-900" />
             </div>
             <div className="">
-              <div className={`text-2xl font-bold mb-2 ${balance >= 0 ? "text-green-600" : "text-red-600"}`}>
+              <div className={`text-xl lg:text-2xl font-bold mb-2 ${balance >= 0 ? "text-green-600" : "text-red-600"}`}>
                 ${balance.toLocaleString()}
               </div>
               <p className="text-sm text-gray-600 flex items-center mt-1">
@@ -133,13 +133,13 @@ function HomeScreen({ user, onLogout }) {
           </div>
 
           {/* Gastos del Mes */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-lg  p-4">
-            <div className="flex flex-row items-center justify-between mb-2">
-              <span className="text-lg font-medium text-gray-600">Gastos del Mes</span>
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg  p-2 lg:p-4 ">
+            <div className="flex flex-row items-center justify-between mb-1 lg:mb-2">
+              <span className="text-base lg:text-lg font-medium text-gray-600">Gastos del Mes</span>
               <CreditCard className="h-4 w-4 text-blue-900" />
             </div>
             <div className="">
-              <div className="text-2xl mb-2 font-bold text-gray-900">${totalExpenses.toLocaleString()}</div>
+              <div className="text-xl lg:text-2xl mb-2 font-bold text-gray-900">${totalExpenses.toLocaleString()}</div>
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <TrendingUp className="w-3 h-3 mr-1 text-red-500" />
                 +12.5% vs mes anterior
@@ -148,13 +148,13 @@ function HomeScreen({ user, onLogout }) {
           </div>
 
           {/* Ingresos */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
-            <div className="flex flex-row items-center justify-between mb-2">
-              <span className="text-lg font-medium text-gray-600">Ingresos</span>
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-2 lg:p-4 ">
+            <div className="flex flex-row items-center justify-between mb-1 lg:mb-2">
+              <span className="text-base lg:text-lg font-medium text-gray-600">Ingresos</span>
               <TrendingUp className="h-4 w-4 text-blue-900" />
             </div>
             <div className="">
-              <div className="text-2xl font-bold mb-2 text-gray-900">${monthlyIncome.toLocaleString()}</div>
+              <div className="text-xl lg:text-2xl font-bold mb-2 text-gray-900">${monthlyIncome.toLocaleString()}</div>
               <p className="text-sm text-gray-600 flex items-center mt-1">
                 <TrendingUp className="w-3 h-3 mr-1 text-green-600" />
                 Estable
@@ -163,13 +163,13 @@ function HomeScreen({ user, onLogout }) {
           </div>
 
           {/* Meta de Ahorro */}
-          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-4">
-            <div className="flex flex-row items-center justify-between mb-2">
-              <span className="text-lg font-medium text-gray-600">Meta de Ahorro</span>
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-2 lg:p-4 ">
+            <div className="flex flex-row items-center justify-between mb-1 lg:mb-2">
+              <span className="text-base lg:text-lg font-medium text-gray-600">Meta de Ahorro</span>
               <Target className="h-4 w-4 text-blue-900" />
             </div>
             <div className="">
-              <div className="text-2xl font-bold mb-2 text-gray-900">{savingsGoalPercent}%</div>
+              <div className="text-xl lg:text-2xl font-bold mb-2 text-gray-900">{savingsGoalPercent}%</div>
               <p className="text-sm text-gray-600">
                 ${savingsCurrent} de ${savingsTarget} objetivo
               </p>
@@ -178,12 +178,12 @@ function HomeScreen({ user, onLogout }) {
         </div>
 
         {/* Gráficos */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4 lg:mb-8">
           {/* Gráfico de Torta */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribución por Categoría</h2>
-            <p className="text-sm text-gray-600 mb-4">Gastos del mes seleccionado</p>
-            <div className="h-80">
+          <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md ">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1 lg:mb-4">Distribución por Categoría</h2>
+            <p className="text-sm text-gray-600 mb-1 lg:mb-4">Gastos del mes seleccionado</p>
+            <div className="h-60 lg:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -207,10 +207,10 @@ function HomeScreen({ user, onLogout }) {
           </div>
 
           {/* Gráfico de Barras */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Tendencia Mensual</h2>
-            <p className="text-sm text-gray-600 mb-4">Ingresos vs Gastos últimos 6 meses</p>
-            <div className="h-80">
+          <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1 lg:mb-4">Tendencia Mensual</h2>
+            <p className="text-sm text-gray-600 mb-2 lg:mb-4">Ingresos vs Gastos últimos 6 meses</p>
+            <div className="h-60 lg:h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -226,15 +226,15 @@ function HomeScreen({ user, onLogout }) {
         </div>
 
         {/* Secciones principales */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Movimientos Recientes</h2>
-            <div className="space-y-3">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
+          <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2 lg:mb-4">Movimientos Recientes</h2>
+            <div className="space-y-1 lg:space-y-3">
               {movimientosRecientesLimit.map((mov, idx) => (
                 <div key={idx} className="flex justify-between items-center py-2 border-b">
                   <div>
-                    <p className="font-medium">{mov.descripcion}</p>
-                    <p className="text-sm text-gray-500">{mov.fecha_hora}</p>
+                    <p className="lg:text-base text-sm font-medium">{mov.descripcion}</p>
+                    <p className="text-sm text-gray-500">{formatDate(mov.fecha)}</p>
                   </div>
                   <span className={`font-medium ${mov.tipo === "ingreso" ? "text-green-600" : "text-red-600"}`}>
                     {mov.tipo === "ingreso" ? "+" : "-"}
@@ -245,14 +245,14 @@ function HomeScreen({ user, onLogout }) {
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md mb-8 lg:mb-0">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Objetivos de Ahorro</h2>
             <div className="space-y-4">
               {objetivosAhorroLimit.map((obj, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">{obj.nombre}</span>
-                    <span className="text-sm text-gray-500">${obj.monto_actual} / ${obj.monto_objetivo}</span>
+                    <span className="text-sm lg:text-base font-medium">{obj.nombre}</span>
+                    <span className="text-xs lg:text-sm text-gray-500">${obj.monto_actual} / ${obj.monto_objetivo}</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
@@ -268,6 +268,17 @@ function HomeScreen({ user, onLogout }) {
       </main>
     </div>
   );
+}
+
+function formatDate(dateString) {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const days = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  const day = days[date.getUTCDay()];
+  const dd = String(date.getUTCDate()).padStart(2, "0");
+  const mm = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const yyyy = date.getUTCFullYear();
+  return `${day}, ${dd}/${mm}/${yyyy}`;
 }
 
 export default HomeScreen;
