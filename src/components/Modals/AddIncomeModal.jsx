@@ -10,15 +10,15 @@ export default function AddIncomeModal({
   setForm,
   categoriasIngreso,
   loading,
-  onAddCategory, // NUEVO: función para abrir modal de categoría
+  onAddCategory,
 }) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
+      <div className="bg-white rounded-lg p-4 lg:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-semibold text-gray-900">Nuevo Ingreso</h2>
+          <h2 className="text-lg lg:text-xl font-semibold text-gray-900">Nuevo Ingreso</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600"
@@ -26,10 +26,10 @@ export default function AddIncomeModal({
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-gray-600 mb-4 text-sm">Agrega un nuevo ingreso</p>
+        <p className="text-gray-600 mb-4 text-sm lg:text-base">Agrega un nuevo ingreso</p>
         <div className="space-y-2">
           <div>
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
               Categoría
             </label>
             <select
@@ -53,7 +53,7 @@ export default function AddIncomeModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
               Descripción
             </label>
             <input
@@ -64,7 +64,7 @@ export default function AddIncomeModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
               Monto
             </label>
             <input
@@ -76,7 +76,7 @@ export default function AddIncomeModal({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
               Fecha
             </label>
             <input
@@ -90,7 +90,7 @@ export default function AddIncomeModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="lg:text-base text-sm flex-1 px-1 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
           >
             Cancelar
           </button>
@@ -103,7 +103,7 @@ export default function AddIncomeModal({
               !form.fecha ||
               loading
             }
-            className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="lg:text-base text-sm flex-1 px-2 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? <BtnLoading text="Guardando..." /> : "Guardar Ingreso"}
           </button>
