@@ -157,7 +157,7 @@ function AhorrosScreen({ user }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
       {/* MODALS FUERA DEL MAIN */}
       <AddGoalModal
         isOpen={isAddDialogOpen}
@@ -225,16 +225,17 @@ function AhorrosScreen({ user }) {
         accionando="Eliminando"
         nombreElemento={goals.find(g => g.id === deleteGoalId)?.nombre}
       />
-      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
+
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 flex items-center gap-2 mb-1 lg:mb-2">
               Ahorros y Metas
             </h1>
-            <p className="text-gray-600">Registra tus objetivos y el dinero ahorrado para cada uno</p>
+            <p className="text-sm lg:text-base text-gray-600">Registra tus objetivos y el dinero ahorrado para cada uno</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center w-full  lg:justify-end justify-between gap-4">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -243,12 +244,12 @@ function AhorrosScreen({ user }) {
                 className="accent-blue-900"
               />
               <span className="text-sm text-gray-700">
-                Mostrar todos ({showAllGoals ? "incluye completados" : "solo activos"})
+                Mostrar todos
               </span>
             </label>
             <button
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="bg-blue-900 text-white px-2 lg:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm lg:text-base"
             >
               <Plus className="w-4 h-4" />
               Nuevo Objetivo
@@ -257,27 +258,27 @@ function AhorrosScreen({ user }) {
         </div>
 
         {/* Summary Stats SOLO ACTIVOS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 lg:gap-4">
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{activeGoals.length}</div>
-            <p className="text-sm text-gray-700">Objetivos activos</p>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">{activeGoals.length}</div>
+            <p className="text-sm lg:text-base text-gray-700">Objetivos activos</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">${totalActiveSaved.toLocaleString()}</div>
-            <p className="text-sm text-gray-700">Total ahorrado (activos)</p>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">${totalActiveSaved.toLocaleString()}</div>
+            <p className="text-sm lg:text-base text-gray-700">Total ahorrado (activos)</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{percentActiveTotal}%</div>
-            <p className="text-sm text-gray-700">Porcentaje global (activos)</p>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">{percentActiveTotal}%</div>
+            <p className="text-sm lg:text-base text-gray-700">Porcentaje global (activos)</p>
           </div>
         </div>
 
         {/* Goals List */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {filteredGoals.map(goal => {
             const percent = ((goal.monto_actual / goal.monto_objetivo) * 100).toFixed(1);
             return (
-              <div key={goal.id} className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
+              <div key={goal.id} className="bg-white rounded-lg shadow-sm p-4 lg:p-6 flex flex-col">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div
@@ -285,7 +286,7 @@ function AhorrosScreen({ user }) {
                       style={{ backgroundColor: goal.color || "#e5e7eb" }}
                       title={goal.color}
                     />
-                    <h3 className="text-lg font-semibold text-gray-900">{goal.nombre}</h3>
+                    <h3 className="text-base lg:text-lg font-semibold text-gray-900">{goal.nombre}</h3>
                   </div>
                   <div className="flex gap-1">
                     <button
@@ -303,23 +304,23 @@ function AhorrosScreen({ user }) {
                   </div>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">Meta: ${goal.monto_objetivo.toLocaleString()}</span>
-                  <span className="text-sm text-green-700 font-bold flex items-center gap-1">
+                  <span className="text-sm lg:text-base text-gray-600">Meta: ${goal.monto_objetivo.toLocaleString()}</span>
+                  <span className="text-sm lg:text-base text-green-700 font-bold flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
                     ${goal.monto_actual.toLocaleString()}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                   <div
-                    className="h-3 rounded-full transition-all duration-300 bg-blue-600"
-                    style={{ width: `${Math.min(percent, 100)}%` }}
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ backgroundColor: goal.color, width: `${Math.min(percent, 100)}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-600 text-center mb-2">{percent}% alcanzado</p>
+                <p className="text-xs lg:text-sm text-gray-600 text-center mb-2">{percent}% alcanzado</p>
                 <div className="flex gap-2 mt-auto">
                   <button
                     onClick={() => openAddAmount(goal.id)}
-                    className="flex-1 bg-green-600 text-white py-1 px-2 rounded-md hover:bg-green-700 text-sm"
+                    className="flex-1 bg-green-600 text-white py-2 px-2 lg:px-4 rounded-md hover:bg-green-700 text-sm lg:text-base"
                   >
                     Agregar dinero
                   </button>
@@ -327,7 +328,7 @@ function AhorrosScreen({ user }) {
                     <button
                       onClick={() => handleCompleteGoal(goal.id)}
                       disabled={completeLoadingId === goal.id}
-                      className="flex-1 bg-gray-300 text-gray-700 py-1 px-2 rounded-md hover:bg-gray-400 text-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-gray-300 text-gray-700 py-2 px-2 lg:px-4 rounded-md hover:bg-gray-400 text-sm lg:text-base flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {completeLoadingId === goal.id ? (
                         <BtnLoading text="Completando..." />
@@ -340,45 +341,12 @@ function AhorrosScreen({ user }) {
                     </button>
                   )}
                   {goal.estado === "Completado" && (
-                    <span className="flex-1 bg-gray-100 text-green-600 py-1 px-2 rounded-md text-sm flex items-center justify-center gap-1">
+                    <span className="flex-1 bg-gray-100 text-green-600 py-2 px-4 rounded-md text-sm lg:text-base flex items-center justify-center gap-1">
                       <CheckCircle2 className="w-4 h-4" />
                       Completado
                     </span>
                   )}
                 </div>
-                {/* Modal para agregar dinero */}
-                {addGoalId === goal.id && (
-                  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg p-6 w-full max-w-xs">
-                      <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900">Agregar dinero</h2>
-                        <button
-                          onClick={() => setAddGoalId(null)}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                      <p className="text-gray-600 mb-2">¿Cuánto quieres agregar a <span className="font-bold">{goal.nombre}</span>?</p>
-                      <input
-                        type="number"
-                        min="1"
-                        value={addAmount}
-                        onChange={e => setAddAmount(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none mb-4"
-                        placeholder="Monto"
-                      />
-                      <button
-                        onClick={handleAddAmount}
-                        disabled={!addAmount || addAmount <= 0}
-                        className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <Save className="w-4 h-4 inline mr-1" />
-                        Guardar
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             );
           })}
