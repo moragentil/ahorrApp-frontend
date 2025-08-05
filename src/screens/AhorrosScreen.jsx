@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp } from 'lucide-react';
 import { ahorroService } from '../services/ahorroService';
 import BtnLoading from '../components/BtnLoading';
+import AddGoalModal from '../components/Modals/AddGoalModal';
+import EditGoalModal from '../components/Modals/EditGoalModal';
+import AddAmountModal from '../components/Modals/AddAmountModal';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function AhorrosScreen({ user }) {
@@ -124,217 +127,54 @@ function AhorrosScreen({ user }) {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* MODALS FUERA DEL MAIN */}
-      {isAddDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90%] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">Nuevo Objetivo de Ahorro</h2>
-              <button
-                onClick={() => setIsAddDialogOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Nombre del objetivo
-                </label>
-                <input
-                  type="text"
-                  placeholder="Ej: Viaje, Auto, Fondo Emergencia..."
-                  value={newGoalName}
-                  onChange={e => setNewGoalName(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Monto objetivo
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  placeholder="Ej: 5000"
-                  value={newGoalTarget}
-                  onChange={e => setNewGoalTarget(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Descripción
-                </label>
-                <input
-                  type="text"
-                  placeholder="Opcional"
-                  value={newGoalDesc}
-                  onChange={e => setNewGoalDesc(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Fecha límite
-                </label>
-                <input
-                  type="date"
-                  value={newGoalDate}
-                  onChange={e => setNewGoalDate(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Prioridad
-                </label>
-                <select
-                  value={newGoalPriority}
-                  onChange={e => setNewGoalPriority(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                >
-                  <option value="Media">Media</option>
-                  <option value="Alta">Alta</option>
-                  <option value="Baja">Baja</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Estado
-                </label>
-                <select
-                  value={newGoalEstado}
-                  onChange={e => setNewGoalEstado(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setIsAddDialogOpen(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleAddGoal}
-                disabled={!newGoalName.trim() || !newGoalTarget || newGoalTarget <= 0}
-                className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Crear Objetivo
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {isEditDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90%] overflow-y-auto">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-900">Editar Objetivo</h2>
-              <button
-                onClick={() => setIsEditDialogOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Nombre del objetivo
-                </label>
-                <input
-                  type="text"
-                  value={newGoalName}
-                  onChange={e => setNewGoalName(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Monto objetivo
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={newGoalTarget}
-                  onChange={e => setNewGoalTarget(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Descripción
-                </label>
-                <input
-                  type="text"
-                  value={newGoalDesc}
-                  onChange={e => setNewGoalDesc(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Fecha límite
-                </label>
-                <input
-                  type="date"
-                  value={newGoalDate}
-                  onChange={e => setNewGoalDate(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Prioridad
-                </label>
-                <select
-                  value={newGoalPriority}
-                  onChange={e => setNewGoalPriority(e.target.value)}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                >
-                  <option value="Media">Media</option>
-                  <option value="Alta">Alta</option>
-                  <option value="Baja">Baja</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Estado
-                </label>
-                <select
-                  value={newGoalEstado}
-                  onChange={e => setNewGoalEstado(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-                >
-                  <option value="Activo">Activo</option>
-                  <option value="Inactivo">Inactivo</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setIsEditDialogOpen(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleEditGoal}
-                disabled={!newGoalName.trim() || !newGoalTarget || newGoalTarget <= 0}
-                className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Guardar Cambios
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddGoalModal
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSave={handleAddGoal}
+        newGoalName={newGoalName}
+        setNewGoalName={setNewGoalName}
+        newGoalTarget={newGoalTarget}
+        setNewGoalTarget={setNewGoalTarget}
+        newGoalDesc={newGoalDesc}
+        setNewGoalDesc={setNewGoalDesc}
+        newGoalDate={newGoalDate}
+        setNewGoalDate={setNewGoalDate}
+        newGoalPriority={newGoalPriority}
+        setNewGoalPriority={setNewGoalPriority}
+        newGoalEstado={newGoalEstado}
+        setNewGoalEstado={setNewGoalEstado}
+        loading={false}
+      />
+
+      <EditGoalModal
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSave={handleEditGoal}
+        newGoalName={newGoalName}
+        setNewGoalName={setNewGoalName}
+        newGoalTarget={newGoalTarget}
+        setNewGoalTarget={setNewGoalTarget}
+        newGoalDesc={newGoalDesc}
+        setNewGoalDesc={setNewGoalDesc}
+        newGoalDate={newGoalDate}
+        setNewGoalDate={setNewGoalDate}
+        newGoalPriority={newGoalPriority}
+        setNewGoalPriority={setNewGoalPriority}
+        newGoalEstado={newGoalEstado}
+        setNewGoalEstado={setNewGoalEstado}
+        loading={false}
+      />
+
+      <AddAmountModal
+        isOpen={!!addGoalId}
+        onClose={() => setAddGoalId(null)}
+        onSave={handleAddAmount}
+        goal={goals.find(g => g.id === addGoalId)}
+        addAmount={addAmount}
+        setAddAmount={setAddAmount}
+        loading={false}
+      />
+
       <ConfirmDeleteModal
         isOpen={!!deleteGoalId}
         onClose={() => setDeleteGoalId(null)}
