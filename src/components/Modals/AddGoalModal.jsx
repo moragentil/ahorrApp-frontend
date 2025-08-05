@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import BtnLoading from '../BtnLoading';
 
 export default function AddGoalModal({
   isOpen,
@@ -120,9 +121,9 @@ export default function AddGoalModal({
           <button
             onClick={onSave}
             disabled={!newGoalName.trim() || !newGoalTarget || newGoalTarget <= 0 || loading}
-            className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Crear Objetivo
+            {loading ? <BtnLoading text="Creando..." /> : "Crear Objetivo"}
           </button>
         </div>
       </div>

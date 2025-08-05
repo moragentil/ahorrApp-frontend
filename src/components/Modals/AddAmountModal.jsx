@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Save } from 'lucide-react';
+import BtnLoading from '../BtnLoading';
 
 export default function AddAmountModal({
   isOpen,
@@ -38,10 +39,10 @@ export default function AddAmountModal({
         <button
           onClick={onSave}
           disabled={!addAmount || addAmount <= 0 || loading}
-          className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           <Save className="w-4 h-4 inline mr-1" />
-          Guardar
+          {loading ? <BtnLoading text="Guardando..." /> : "Guardar"}
         </button>
       </div>
     </div>

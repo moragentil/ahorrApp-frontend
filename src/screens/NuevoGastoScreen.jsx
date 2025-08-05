@@ -15,6 +15,7 @@ function NuevoGastoScreen({ user, onLogout }) {
   const [categorias, setCategorias] = useState([]);
   const [quickActions, setQuickActions] = useState([]);
   const [loadingQuick, setLoadingQuick] = useState(true);
+  const [loadingSave, setLoadingSave] = useState(false);
 
   // Traer categorías del backend al montar el componente
   useEffect(() => {
@@ -32,9 +33,11 @@ function NuevoGastoScreen({ user, onLogout }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoadingSave(true);
     const categoriaObj = categorias.find(c => c.nombre === category);
     if (!categoriaObj) {
       alert('Selecciona una categoría válida');
+      setLoadingSave(false);
       return;
     }
     try {
@@ -48,6 +51,7 @@ function NuevoGastoScreen({ user, onLogout }) {
       navigate('/gastos');
     } catch (err) {
       alert('Error al guardar el gasto');
+      setLoadingSave(false);
     }
   };
 
@@ -205,16 +209,17 @@ function NuevoGastoScreen({ user, onLogout }) {
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <button
                 type="submit"
-                disabled={!amount || !description || !category}
+                disabled={!amount || !description || !category || loadingSave}
                 className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <Save className="w-4 h-4" />
-                Guardar Gasto
+                {loadingSave ? <BtnLoading text="Guardando..." /> : "Guardar Gasto"}
               </button>
               <button 
                 type="button" 
                 onClick={handleCancel}
                 className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300"
+                disabled={loadingSave}
               >
                 Cancelar
               </button>

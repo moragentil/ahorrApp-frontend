@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import BtnLoading from '../BtnLoading';
 
 export default function AddIncomeModal({
   isOpen,
@@ -94,9 +95,9 @@ export default function AddIncomeModal({
               !form.fecha ||
               loading
             }
-            className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Guardar Ingreso
+            {loading ? <BtnLoading text="Guardando..." /> : "Guardar Ingreso"}
           </button>
         </div>
       </div>
