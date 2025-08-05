@@ -165,11 +165,11 @@ function CategoriasScreen({ user, onLogout }) {
         colorOptions={colorOptions}
         loading={false}
       />
-      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">Gestión de Categorías</h1>
+            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">Gestión de Categorías</h1>
             <p className="text-sm lg:text-base text-gray-600">Organiza y personaliza tus categorías de gastos e ingresos</p>
           </div>
           <div className="flex gap-2">
@@ -200,7 +200,7 @@ function CategoriasScreen({ user, onLogout }) {
         </div>
 
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 lg:gap-4">
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
             <div className="text-xl lg:text-2xl font-bold text-blue-900">{categories.length}</div>
             <p className="text-sm lg:text-base text-gray-700">Categorías activas</p>
@@ -221,7 +221,7 @@ function CategoriasScreen({ user, onLogout }) {
 
         {/* Categories List */}
         {(viewMode === "cards" || !isMd) ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
             {categories.map((category) => {
               let percent = 0;
               if (category.tipo === "gasto" && totalSpent > 0) {
