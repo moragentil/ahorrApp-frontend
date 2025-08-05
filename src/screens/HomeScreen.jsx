@@ -61,9 +61,11 @@ function HomeScreen({ user, onLogout }) {
   const movimientosRecientes = dashboard.movimientos_recientes;
   const objetivosAhorro = dashboard.objetivos_ahorro;
 
-  // Solo mostrar los últimos 5 movimientos y objetivos
+  // Solo mostrar los últimos 5 movimientos y objetivos activos
   const movimientosRecientesLimit = movimientosRecientes.slice(0, 5);
-  const objetivosAhorroLimit = objetivosAhorro.slice(0, 5);
+  const objetivosAhorroActivos = objetivosAhorro.filter(obj => obj.estado === "Activo");
+  console.log('objetivos', objetivosAhorro);
+  const objetivosAhorroLimit = objetivosAhorroActivos.slice(0, 5);
 
   return (
     <div className="min-h-screen bg-gray-100">
