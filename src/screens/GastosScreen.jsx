@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar, X } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
 import BtnLoading from '../components/BtnLoading';
+import EditExpenseModal from '../components/Modals/EditExpenseModal';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function GastosScreen({ user, onLogout }) {
@@ -129,6 +130,11 @@ function GastosScreen({ user, onLogout }) {
     );
   }
 
+  // Extrae las categorías únicas para el modal de edición
+  const categoriasUnicas = expenses
+    .map(e => e.categoria)
+    .filter((cat, idx, arr) => cat && arr.findIndex(c => c?.id === cat?.id) === idx);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <ConfirmDeleteModal
@@ -143,99 +149,15 @@ function GastosScreen({ user, onLogout }) {
         accionando="Eliminando"
         nombreElemento={expenses.find(e => e.id === deleteExpenseId)?.descripcion}
       />
-      {/* Modal de edición */}
-      {isEditDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-semibold text-gray-900">Editar Gasto</h2>
-              <button
-                onClick={() => setIsEditDialogOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4 text-sm">Modifica los datos del gasto</p>
-            <div className="space-y-2">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Categoría
-                </label>
-                <select
-                  value={editForm.categoria_id}
-                  onChange={e => setEditForm(f => ({ ...f, categoria_id: e.target.value }))}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                >
-                  <option value="">Selecciona una categoría</option>
-                  {expenses
-                    .map(e => e.categoria)
-                    .filter((cat, idx, arr) => cat && arr.findIndex(c => c?.id === cat?.id) === idx)
-                    .map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.nombre}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Descripción
-                </label>
-                <input
-                  type="text"
-                  value={editForm.descripcion}
-                  onChange={e => setEditForm(f => ({ ...f, descripcion: e.target.value }))}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Monto
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={editForm.monto}
-                  onChange={e => setEditForm(f => ({ ...f, monto: e.target.value }))}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 ">
-                  Fecha
-                </label>
-                <input
-                  type="date"
-                  value={editForm.fecha}
-                  onChange={e => setEditForm(f => ({ ...f, fecha: e.target.value }))}
-                  className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                />
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setIsEditDialogOpen(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleEditExpense}
-                disabled={
-                  !editForm.categoria_id ||
-                  !editForm.descripcion.trim() ||
-                  !editForm.monto ||
-                  !editForm.fecha
-                }
-                className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Guardar Cambios
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditExpenseModal
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSave={handleEditExpense}
+        editForm={editForm}
+        setEditForm={setEditForm}
+        loading={false}
+        categorias={categoriasUnicas}
+      />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
