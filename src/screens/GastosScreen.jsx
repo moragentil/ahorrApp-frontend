@@ -136,7 +136,7 @@ function GastosScreen({ user, onLogout }) {
     .filter((cat, idx, arr) => cat && arr.findIndex(c => c?.id === cat?.id) === idx);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
       <ConfirmDeleteModal
         isOpen={!!deleteExpenseId}
         onClose={() => setDeleteExpenseId(null)}
@@ -158,16 +158,20 @@ function GastosScreen({ user, onLogout }) {
         loading={false}
         categorias={categoriasUnicas}
       />
-      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
+      <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Mis Gastos</h1>
-            <p className="text-gray-600">Gestiona y revisa todos tus gastos</p>
+            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">
+              Mis Gastos
+            </h1>
+            <p className="lg:text-base text-sm text-gray-600">
+              Gestiona y revisa todos tus gastos
+            </p>
           </div>
           <button 
             onClick={handleNewExpense}
-            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="text-sm lg:text-base bg-blue-900 text-white px-2 text-center justify-center lg:px-4 py-2 w-1/2 lg:w-fit rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Nuevo Gasto
@@ -179,7 +183,7 @@ function GastosScreen({ user, onLogout }) {
           <select
             value={selectedMonth}
             onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
           >
             {months.map((m, idx) => (
               <option key={m} value={idx}>{m}</option>
@@ -188,7 +192,7 @@ function GastosScreen({ user, onLogout }) {
           <select
             value={selectedYear}
             onChange={e => setSelectedYear(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
           >
             {[2023, 2024, 2025].map(y => (
               <option key={y} value={y}>{y}</option>
@@ -197,24 +201,24 @@ function GastosScreen({ user, onLogout }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 ">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Buscar gastos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-1 border border-gray-300 rounded-md focus:outline-none "
+                className="w-full pl-8 pr-4 py-1 border border-gray-300 rounded-md focus:outline-none"
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 ">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="lg:text-base text-sm px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -237,19 +241,18 @@ function GastosScreen({ user, onLogout }) {
           </div>
         </div>
 
-
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{filteredExpenses.length}</div>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">{filteredExpenses.length}</div>
             <p className="text-sm text-gray-700">Gastos encontrados</p>
           </div>
           <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">${totalAmount.toFixed(2)}</div>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">${totalAmount.toFixed(2)}</div>
             <p className="text-sm text-gray-700">Total filtrado</p>
           </div>
           <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">${averageAmount}</div>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">${averageAmount}</div>
             <p className="text-sm text-gray-700">Promedio por gasto</p>
           </div>
         </div>
