@@ -109,7 +109,6 @@ function GastosScreen({ user, onLogout }) {
         entidad="gasto"
         accionando="Eliminando"
         nombreElemento={expenses.find(e => e.id === deleteExpenseId)?.descripcion}
-        advertencia="Esta acción eliminará el gasto permanentemente."
       />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}

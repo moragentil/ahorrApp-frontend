@@ -204,7 +204,6 @@ function IngresosScreen({ user }) {
         entidad="ingreso"
         accionando="Eliminando"
         nombreElemento={incomes.find(i => i.id === deleteIncomeId)?.descripcion}
-        advertencia="Esta acción eliminará el ingreso permanentemente."
       />
       {/* Modal para agregar ingreso */}
         {isAddDialogOpen && (

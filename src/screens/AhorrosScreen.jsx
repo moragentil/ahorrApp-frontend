@@ -346,7 +346,6 @@ function AhorrosScreen({ user }) {
         entidad="objetivo"
         accionando="Eliminando"
         nombreElemento={goals.find(g => g.id === deleteGoalId)?.nombre}
-        advertencia="Se eliminará el objetivo y el progreso asociado."
       />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}

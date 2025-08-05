@@ -131,7 +131,6 @@ function CategoriasScreen({ user, onLogout }) {
         entidad="categoría"
         accionando="Eliminando"
         nombreElemento={categories.find(cat => cat.id === deleteCategoryId)?.nombre}
-        advertencia="Se eliminará la categoría y sus datos asociados."
       />
        {/* Add Category Modal */}
         {isAddDialogOpen && (
