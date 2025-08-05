@@ -5,6 +5,8 @@ import { categoriasService } from '../services/categoriasService';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { parseISO } from 'date-fns';
 import BtnLoading from '../components/BtnLoading';
+import AddIncomeModal from '../components/Modals/AddIncomeModal';
+import EditIncomeModal from '../components/Modals/EditIncomeModal';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function IngresosScreen({ user }) {
@@ -205,186 +207,24 @@ function IngresosScreen({ user }) {
         accionando="Eliminando"
         nombreElemento={incomes.find(i => i.id === deleteIncomeId)?.descripcion}
       />
-      {/* Modal para agregar ingreso */}
-        {isAddDialogOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold text-gray-900">Nuevo Ingreso</h2>
-                <button
-                  onClick={() => setIsAddDialogOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-               <p className="text-gray-600 mb-4 text-sm">Agrega un nuevo ingreso</p>
-              <div className="space-y-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Categoría
-                  </label>
-                  <select
-                    value={form.categoria_id}
-                    onChange={e => setForm(f => ({ ...f, categoria_id: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categoriasIngreso.map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Descripción
-                  </label>
-                  <input
-                    type="text"
-                    value={form.descripcion}
-                    onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Monto
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.monto}
-                    onChange={e => setForm(f => ({ ...f, monto: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Fecha
-                  </label>
-                  <input
-                    type="date"
-                    value={form.fecha}
-                    onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setIsAddDialogOpen(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleAddIncome}
-                  disabled={
-                    !form.categoria_id ||
-                    !form.descripcion.trim() ||
-                    !form.monto ||
-                    !form.fecha
-                  }
-                  className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Guardar Ingreso
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      {/* Modal para editar ingreso */}
-        {isEditDialogOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-xl font-semibold text-gray-900">Editar Ingreso</h2>
-                <button
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <p className="text-gray-600 mb-4 text-sm">Modifica los datos del ingreso</p>
-              <div className="space-y-2">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Categoría
-                  </label>
-                  <select
-                    value={form.categoria_id}
-                    onChange={e => setForm(f => ({ ...f, categoria_id: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  >
-                    <option value="">Selecciona una categoría</option>
-                    {categoriasIngreso.map(cat => (
-                      <option key={cat.id} value={cat.id}>
-                        {cat.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Descripción
-                  </label>
-                  <input
-                    type="text"
-                    value={form.descripcion}
-                    onChange={e => setForm(f => ({ ...f, descripcion: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Monto
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={form.monto}
-                    onChange={e => setForm(f => ({ ...f, monto: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 ">
-                    Fecha
-                  </label>
-                  <input
-                    type="date"
-                    value={form.fecha}
-                    onChange={e => setForm(f => ({ ...f, fecha: e.target.value }))}
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleEditIncome}
-                  disabled={
-                    !form.categoria_id ||
-                    !form.descripcion.trim() ||
-                    !form.monto ||
-                    !form.fecha
-                  }
-                  className="flex-1 px-4 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Guardar Cambios
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      <AddIncomeModal
+        isOpen={isAddDialogOpen}
+        onClose={() => setIsAddDialogOpen(false)}
+        onSave={handleAddIncome}
+        form={form}
+        setForm={setForm}
+        categoriasIngreso={categoriasIngreso}
+        loading={false}
+      />
+      <EditIncomeModal
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSave={handleEditIncome}
+        form={form}
+        setForm={setForm}
+        categoriasIngreso={categoriasIngreso}
+        loading={false}
+      />
       <div className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
