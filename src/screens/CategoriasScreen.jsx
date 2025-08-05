@@ -13,11 +13,12 @@ function CategoriasScreen({ user, onLogout }) {
   const [editingCategory, setEditingCategory] = useState(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3b82f6");
-  const [newCategoryType, setNewCategoryType] = useState("gasto"); // Nuevo estado para tipo
+  const [newCategoryType, setNewCategoryType] = useState("gasto");
   const [viewMode, setViewMode] = useState("cards");
   const [loading, setLoading] = useState(true);
   const [deleteCategoryId, setDeleteCategoryId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isMd, setIsMd] = useState(window.innerWidth >= 768);
 
   const colorOptions = [
     "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
@@ -36,6 +37,12 @@ function CategoriasScreen({ user, onLogout }) {
       })));
       setLoading(false);
     });
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => setIsMd(window.innerWidth >= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleAddCategory = async () => {
@@ -102,12 +109,10 @@ function CategoriasScreen({ user, onLogout }) {
     setIsEditDialogOpen(true);
   };
 
-  // Calcula el total gastado solo para categorías de tipo "gasto"
   const totalSpent = categories
     .filter(cat => cat.tipo === "gasto")
     .reduce((sum, cat) => sum + Number(cat.totalSpent ?? 0), 0);
 
-  // Calcula el total ingresado solo para categorías de tipo "ingreso"
   const totalIngresado = categories
     .filter(cat => cat.tipo === "ingreso")
     .reduce((sum, cat) => sum + Number(cat.totalSpent ?? 0), 0);
@@ -121,7 +126,7 @@ function CategoriasScreen({ user, onLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
       <ConfirmDeleteModal
         isOpen={!!deleteCategoryId}
         onClose={() => setDeleteCategoryId(null)}
@@ -164,57 +169,60 @@ function CategoriasScreen({ user, onLogout }) {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Gestión de Categorías</h1>
-            <p className="text-gray-600">Organiza y personaliza tus categorías de gastos e ingresos</p>
+            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">Gestión de Categorías</h1>
+            <p className="text-sm lg:text-base text-gray-600">Organiza y personaliza tus categorías de gastos e ingresos</p>
           </div>
           <div className="flex gap-2">
             <button 
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="text-sm lg:text-base bg-blue-900 text-white px-2 lg:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Nueva Categoría
             </button>
-            <button
-              onClick={() => setViewMode("cards")}
-              className={`px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-            >
-              Tarjetas
-            </button>
-            <button
-              onClick={() => setViewMode("table")}
-              className={`px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-            >
-              Tabla
-            </button>
+            {isMd && (
+              <>
+                <button
+                  onClick={() => setViewMode("cards")}
+                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+                >
+                  Tarjetas
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+                >
+                  Tabla
+                </button>
+              </>
+            )}
           </div>
         </div>
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{categories.length}</div>
-            <p className="text-sm text-gray-700">Categorías activas</p>
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">{categories.length}</div>
+            <p className="text-sm lg:text-base text-gray-700">Categorías activas</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">
               ${Number(totalSpent).toFixed(2)}
             </div>
-            <p className="text-sm text-gray-700">Total gastado</p>
+            <p className="text-sm lg:text-base text-gray-700">Total gastado</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">
+            <div className="text-xl lg:text-2xl font-bold text-blue-900">
               ${Number(totalIngresado).toFixed(2)}
             </div>
-            <p className="text-sm text-gray-700">Total ingresado</p>
+            <p className="text-sm lg:text-base text-gray-700">Total ingresado</p>
           </div>
         </div>
 
         {/* Categories List */}
-        {viewMode === "cards" ? (
+        {(viewMode === "cards" || !isMd) ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category) => {
-              // Calcula el porcentaje para la barra según el tipo
               let percent = 0;
               if (category.tipo === "gasto" && totalSpent > 0) {
                 percent = (category.totalSpent / totalSpent) * 100;
@@ -225,7 +233,7 @@ function CategoriasScreen({ user, onLogout }) {
               return (
                 <div
                   key={category.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-6"
+                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 lg:p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -258,7 +266,7 @@ function CategoriasScreen({ user, onLogout }) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <DollarSign className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm lg:text-base text-gray-600">
                           {category.tipo === "ingreso" ? "Total ingresado" : "Total gastado"}
                         </span>
                       </div>
@@ -270,7 +278,7 @@ function CategoriasScreen({ user, onLogout }) {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Tag className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-600">Transacciones</span>
+                        <span className="text-sm lg:text-base text-gray-600">Transacciones</span>
                       </div>
                       <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
                         {category.transactionCount ?? 0}
@@ -287,7 +295,7 @@ function CategoriasScreen({ user, onLogout }) {
                       />
                     </div>
                     
-                    <p className="text-xs text-gray-600 text-center">
+                    <p className="text-xs lg:text-sm text-gray-600 text-center">
                       {percent.toFixed(1)}% del total
                     </p>
                   </div>
@@ -372,10 +380,6 @@ function CategoriasScreen({ user, onLogout }) {
             </button>
           </div>
         )}
-
-       
-
-        
       </main>
     </div>
   );
