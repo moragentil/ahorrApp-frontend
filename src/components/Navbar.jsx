@@ -2,6 +2,7 @@ import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target, Bankno
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService'; // Importa el servicio
+import ConfirmDeleteModal from './Modals/ConfirmDeleteModal';
 
 const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
@@ -14,6 +15,8 @@ const menuItems = [
 
 function Navbar({ user, onLogout }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [loadingLogout, setLoadingLogout] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -22,15 +25,34 @@ function Navbar({ user, onLogout }) {
     setIsMobileMenuOpen(false);
   };
 
-const handleLogoutClick = async () => {
-  await authService.logout();
-  if (onLogout) onLogout();
-  navigate('/login');
-  setIsMobileMenuOpen(false);
-};
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+    setIsMobileMenuOpen(false);
+  };
+
+  const confirmLogout = async () => {
+    setLoadingLogout(true);
+    await authService.logout();
+    if (onLogout) onLogout();
+    setLoadingLogout(false);
+    setShowLogoutModal(false);
+    navigate('/login');
+  };
 
   return (
     <>
+      {/* Confirm Logout Modal */}
+      <ConfirmDeleteModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+        loading={loadingLogout}
+        accionTitulo="cerrar sesión"
+        accion="Cerrar Sesión"
+        pronombre=""
+        entidad=""
+        accionando="Cerrando sesión"
+      />
       {/* Mobile Menu Button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
