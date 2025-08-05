@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp } from 'lucide-react';
+import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { ahorroService } from '../services/ahorroService';
 import BtnLoading from '../components/BtnLoading';
 import AddGoalModal from '../components/Modals/AddGoalModal';
@@ -23,6 +23,8 @@ function AhorrosScreen({ user }) {
   const [loading, setLoading] = useState(true);
   const [deleteGoalId, setDeleteGoalId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showAllGoals, setShowAllGoals] = useState(false);
+  const [completeLoadingId, setCompleteLoadingId] = useState(null);
 
   useEffect(() => {
     ahorroService.getAll().then(data => {
@@ -116,6 +118,25 @@ function AhorrosScreen({ user }) {
     }
   };
 
+  // Filtrar objetivos según el estado
+  const filteredGoals = showAllGoals
+    ? goals
+    : goals.filter(g => g.estado === "Activo");
+
+  // Summary stats SOLO de los activos
+  const activeGoals = goals.filter(g => g.estado === "Activo");
+  const totalActiveSaved = activeGoals.reduce((sum, g) => sum + (Number(g.monto_actual) || 0), 0);
+  const totalActiveTarget = activeGoals.reduce((sum, g) => sum + (Number(g.monto_objetivo) || 0), 0);
+  const percentActiveTotal = totalActiveTarget > 0 ? ((totalActiveSaved / totalActiveTarget) * 100).toFixed(1) : 0;
+
+  // Función para completar un objetivo
+  const handleCompleteGoal = async (goalId) => {
+    setCompleteLoadingId(goalId);
+    const updated = await ahorroService.update(goalId, { estado: "Completado" });
+    setGoals(goals.map(g => g.id === goalId ? updated : g));
+    setCompleteLoadingId(null);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -196,34 +217,47 @@ function AhorrosScreen({ user }) {
             </h1>
             <p className="text-gray-600">Registra tus objetivos y el dinero ahorrado para cada uno</p>
           </div>
-          <button
-            onClick={() => setIsAddDialogOpen(true)}
-            className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo Objetivo
-          </button>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={showAllGoals}
+                onChange={e => setShowAllGoals(e.target.checked)}
+                className="accent-blue-900"
+              />
+              <span className="text-sm text-gray-700">
+                Mostrar todos ({showAllGoals ? "incluye completados" : "solo activos"})
+              </span>
+            </label>
+            <button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo Objetivo
+            </button>
+          </div>
         </div>
 
-        {/* Summary Stats */}
+        {/* Summary Stats SOLO ACTIVOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{goals.length}</div>
+            <div className="text-2xl font-bold text-blue-900">{activeGoals.length}</div>
             <p className="text-sm text-gray-700">Objetivos activos</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">${totalSaved.toLocaleString()}</div>
-            <p className="text-sm text-gray-700">Total ahorrado</p>
+            <div className="text-2xl font-bold text-blue-900">${totalActiveSaved.toLocaleString()}</div>
+            <p className="text-sm text-gray-700">Total ahorrado (activos)</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-2xl font-bold text-blue-900">{percentTotal}%</div>
-            <p className="text-sm text-gray-700">Porcentaje global</p>
+            <div className="text-2xl font-bold text-blue-900">{percentActiveTotal}%</div>
+            <p className="text-sm text-gray-700">Porcentaje global (activos)</p>
           </div>
         </div>
 
         {/* Goals List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {goals.map(goal => {
+          {filteredGoals.map(goal => {
             const percent = ((goal.monto_actual / goal.monto_objetivo) * 100).toFixed(1);
             return (
               <div key={goal.id} className="bg-white rounded-lg shadow-sm p-6 flex flex-col">
@@ -265,6 +299,28 @@ function AhorrosScreen({ user }) {
                   >
                     Agregar dinero
                   </button>
+                  {goal.estado === "Activo" && (
+                    <button
+                      onClick={() => handleCompleteGoal(goal.id)}
+                      disabled={completeLoadingId === goal.id}
+                      className="flex-1 bg-gray-300 text-gray-700 py-1 px-2 rounded-md hover:bg-gray-400 text-sm flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {completeLoadingId === goal.id ? (
+                        <BtnLoading text="Completando..." />
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          Completar
+                        </>
+                      )}
+                    </button>
+                  )}
+                  {goal.estado === "Completado" && (
+                    <span className="flex-1 bg-gray-100 text-green-600 py-1 px-2 rounded-md text-sm flex items-center justify-center gap-1">
+                      <CheckCircle2 className="w-4 h-4" />
+                      Completado
+                    </span>
+                  )}
                 </div>
                 {/* Modal para agregar dinero */}
                 {addGoalId === goal.id && (
@@ -305,7 +361,7 @@ function AhorrosScreen({ user }) {
         </div>
 
         {/* Empty State */}
-        {goals.length === 0 && (
+        {filteredGoals.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center">
             <div className="text-6xl mb-4">🐷</div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes objetivos de ahorro</h3>
