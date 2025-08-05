@@ -9,7 +9,8 @@ export default function AddIncomeModal({
   form,
   setForm,
   categoriasIngreso,
-  loading
+  loading,
+  onAddCategory, // NUEVO: función para abrir modal de categoría
 }) {
   if (!isOpen) return null;
 
@@ -33,7 +34,13 @@ export default function AddIncomeModal({
             </label>
             <select
               value={form.categoria_id}
-              onChange={e => setForm(f => ({ ...f, categoria_id: e.target.value }))}
+              onChange={e => {
+                if (e.target.value === "__add__") {
+                  onAddCategory?.();
+                } else {
+                  setForm(f => ({ ...f, categoria_id: e.target.value }));
+                }
+              }}
               className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
             >
               <option value="">Selecciona una categoría</option>
@@ -42,6 +49,7 @@ export default function AddIncomeModal({
                   {cat.nombre}
                 </option>
               ))}
+              <option value="__add__">+ Registrar nueva categoría</option>
             </select>
           </div>
           <div>

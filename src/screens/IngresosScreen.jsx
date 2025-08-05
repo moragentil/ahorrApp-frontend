@@ -8,6 +8,7 @@ import BtnLoading from '../components/BtnLoading';
 import AddIncomeModal from '../components/Modals/AddIncomeModal';
 import EditIncomeModal from '../components/Modals/EditIncomeModal';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
+import AddCategoryModal from '../components/Modals/AddCategoryModal';
 
 function IngresosScreen({ user }) {
   const [incomes, setIncomes] = useState([]);
@@ -35,6 +36,16 @@ function IngresosScreen({ user }) {
   const [loading, setLoading] = useState(true);
   const [deleteIncomeId, setDeleteIncomeId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryType, setNewCategoryType] = useState('ingreso');
+  const [newCategoryColor, setNewCategoryColor] = useState('#3b82f6');
+  const [loadingAddCategory, setLoadingAddCategory] = useState(false);
+
+  const colorOptions = [
+    "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
+    "#06b6d4", "#ec4899", "#84cc16", "#f97316", "#6366f1",
+  ];
 
   // Cargar ingresos y categorías del backend
   useEffect(() => {
@@ -133,6 +144,29 @@ function IngresosScreen({ user }) {
     setForm({ categoria_id: '', descripcion: '', monto: '', fecha: '' });
   };
 
+  // Función para agregar categoría
+  const handleAddCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    setLoadingAddCategory(true);
+    try {
+      const nueva = await categoriasService.create({
+        user_id: user.id,
+        nombre: newCategoryName.trim(),
+        tipo: newCategoryType,
+        color: newCategoryColor,
+      });
+      setCategoriasIngreso([...categoriasIngreso, nueva]);
+      setForm(f => ({ ...f, categoria_id: nueva.id }));
+      setIsAddCategoryOpen(false);
+      setNewCategoryName('');
+      setNewCategoryType('ingreso');
+      setNewCategoryColor('#3b82f6');
+    } catch (err) {
+      alert('Error al crear la categoría');
+    }
+    setLoadingAddCategory(false);
+  };
+
   // Colores de categoría
   const getCategoryColor = (category) => {
     const colors = {
@@ -207,6 +241,19 @@ function IngresosScreen({ user }) {
         accionando="Eliminando"
         nombreElemento={incomes.find(i => i.id === deleteIncomeId)?.descripcion}
       />
+      <AddCategoryModal
+        isOpen={isAddCategoryOpen}
+        onClose={() => setIsAddCategoryOpen(false)}
+        onSave={handleAddCategory}
+        newCategoryName={newCategoryName}
+        setNewCategoryName={setNewCategoryName}
+        newCategoryType={newCategoryType}
+        setNewCategoryType={setNewCategoryType}
+        newCategoryColor={newCategoryColor}
+        setNewCategoryColor={setNewCategoryColor}
+        colorOptions={colorOptions}
+        loading={loadingAddCategory}
+      />
       <AddIncomeModal
         isOpen={isAddDialogOpen}
         onClose={() => setIsAddDialogOpen(false)}
@@ -215,6 +262,7 @@ function IngresosScreen({ user }) {
         setForm={setForm}
         categoriasIngreso={categoriasIngreso}
         loading={false}
+        onAddCategory={() => setIsAddCategoryOpen(true)} // PASA LA FUNCIÓN
       />
       <EditIncomeModal
         isOpen={isEditDialogOpen}
