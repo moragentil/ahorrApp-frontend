@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp } from 'lucide-react';
 import { ahorroService } from '../services/ahorroService';
 import BtnLoading from '../components/BtnLoading';
+import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function AhorrosScreen({ user }) {
   const [goals, setGoals] = useState([]);
@@ -17,6 +18,8 @@ function AhorrosScreen({ user }) {
   const [addAmount, setAddAmount] = useState('');
   const [addGoalId, setAddGoalId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [deleteGoalId, setDeleteGoalId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     ahorroService.getAll().then(data => {
@@ -75,8 +78,11 @@ function AhorrosScreen({ user }) {
   };
 
   const handleDeleteGoal = async (id) => {
+    setDeleteLoading(true);
     await ahorroService.delete(id);
     setGoals(goals.filter(g => g.id !== id));
+    setDeleteLoading(false);
+    setDeleteGoalId(null);
   };
 
   const openEditDialog = (goal) => {
@@ -329,6 +335,19 @@ function AhorrosScreen({ user }) {
           </div>
         </div>
       )}
+      <ConfirmDeleteModal
+        isOpen={!!deleteGoalId}
+        onClose={() => setDeleteGoalId(null)}
+        onConfirm={() => handleDeleteGoal(deleteGoalId)}
+        loading={deleteLoading}
+        accionTitulo="eliminación"
+        accion="Eliminar"
+        pronombre="el"
+        entidad="objetivo"
+        accionando="Eliminando"
+        nombreElemento={goals.find(g => g.id === deleteGoalId)?.nombre}
+        advertencia="Se eliminará el objetivo y el progreso asociado."
+      />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -379,7 +398,7 @@ function AhorrosScreen({ user }) {
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      onClick={() => handleDeleteGoal(goal.id)}
+                      onClick={() => setDeleteGoalId(goal.id)}
                       className="p-1 text-red-400 hover:text-red-600"
                     >
                       <Trash2 className="w-4 h-4" />

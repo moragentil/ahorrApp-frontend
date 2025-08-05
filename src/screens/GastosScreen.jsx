@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Filter, Plus, Edit, Trash2, Calendar } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
 import BtnLoading from '../components/BtnLoading';
+import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function GastosScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ function GastosScreen({ user, onLogout }) {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
+  const [deleteExpenseId, setDeleteExpenseId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     gastosService.getAll().then(data => {
@@ -66,6 +69,14 @@ function GastosScreen({ user, onLogout }) {
     navigate('/gastos/nuevo');
   };
 
+  const handleDeleteExpense = async (id) => {
+    setDeleteLoading(true);
+    await gastosService.delete(id);
+    setExpenses(expenses.filter(e => e.id !== id));
+    setDeleteLoading(false);
+    setDeleteExpenseId(null);
+  };
+
   function formatDate(dateString) {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -87,6 +98,19 @@ function GastosScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <ConfirmDeleteModal
+        isOpen={!!deleteExpenseId}
+        onClose={() => setDeleteExpenseId(null)}
+        onConfirm={() => handleDeleteExpense(deleteExpenseId)}
+        loading={deleteLoading}
+        accionTitulo="eliminación"
+        accion="Eliminar"
+        pronombre="el"
+        entidad="gasto"
+        accionando="Eliminando"
+        nombreElemento={expenses.find(e => e.id === deleteExpenseId)?.descripcion}
+        advertencia="Esta acción eliminará el gasto permanentemente."
+      />
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -203,7 +227,10 @@ function GastosScreen({ user, onLogout }) {
                     <button className="p-1 text-gray-400 hover:text-gray-600">
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="p-1 text-red-400 hover:text-red-600">
+                    <button
+                      className="p-1 text-red-400 hover:text-red-600"
+                      onClick={() => setDeleteExpenseId(expense.id)}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -260,7 +287,10 @@ function GastosScreen({ user, onLogout }) {
                           <button className="p-1 text-gray-400 hover:text-gray-600">
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="p-1 text-red-400 hover:text-red-600">
+                          <button
+                            className="p-1 text-red-400 hover:text-red-600"
+                            onClick={() => setDeleteExpenseId(expense.id)}
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>

@@ -5,6 +5,7 @@ import { categoriasService } from '../services/categoriasService';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { parseISO } from 'date-fns';
 import BtnLoading from '../components/BtnLoading';
+import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function IngresosScreen({ user }) {
   const [incomes, setIncomes] = useState([]);
@@ -30,6 +31,8 @@ function IngresosScreen({ user }) {
 
   // Loading state
   const [loading, setLoading] = useState(true);
+  const [deleteIncomeId, setDeleteIncomeId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Cargar ingresos y categorías del backend
   useEffect(() => {
@@ -96,8 +99,11 @@ function IngresosScreen({ user }) {
   };
 
   const handleDeleteIncome = async (id) => {
+    setDeleteLoading(true);
     await ingresosService.delete(id);
     setIncomes(incomes.filter(i => i.id !== id));
+    setDeleteLoading(false);
+    setDeleteIncomeId(null);
   };
 
   const openEditDialog = (income) => {
@@ -187,6 +193,19 @@ function IngresosScreen({ user }) {
 
   return (
     <div className="min-h-screen bg-gray-100 ">
+      <ConfirmDeleteModal
+        isOpen={!!deleteIncomeId}
+        onClose={() => setDeleteIncomeId(null)}
+        onConfirm={() => handleDeleteIncome(deleteIncomeId)}
+        loading={deleteLoading}
+        accionTitulo="eliminación"
+        accion="Eliminar"
+        pronombre="el"
+        entidad="ingreso"
+        accionando="Eliminando"
+        nombreElemento={incomes.find(i => i.id === deleteIncomeId)?.descripcion}
+        advertencia="Esta acción eliminará el ingreso permanentemente."
+      />
       {/* Modal para agregar ingreso */}
         {isAddDialogOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -545,7 +564,7 @@ function IngresosScreen({ user }) {
                     </button>
                     <button
                       className="p-1 text-red-400 hover:text-red-600"
-                      onClick={() => handleDeleteIncome(income.id)}
+                      onClick={() => setDeleteIncomeId(income.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -606,7 +625,7 @@ function IngresosScreen({ user }) {
                         </button>
                         <button
                           className="p-1 text-red-400 hover:text-red-600"
-                          onClick={() => handleDeleteIncome(income.id)}
+                          onClick={() => setDeleteIncomeId(income.id)}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

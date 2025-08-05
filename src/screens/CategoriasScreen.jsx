@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Tag, DollarSign, X } from 'lucide-react';
 import { categoriasService } from '../services/categoriasService';
 import BtnLoading from '../components/BtnLoading';
+import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 function CategoriasScreen({ user, onLogout }) {
   const [categories, setCategories] = useState([]);
@@ -13,6 +14,8 @@ function CategoriasScreen({ user, onLogout }) {
   const [newCategoryType, setNewCategoryType] = useState("gasto"); // Nuevo estado para tipo
   const [viewMode, setViewMode] = useState("cards");
   const [loading, setLoading] = useState(true);
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const colorOptions = [
     "#3b82f6", "#10b981", "#8b5cf6", "#ef4444", "#f59e0b",
@@ -82,8 +85,11 @@ function CategoriasScreen({ user, onLogout }) {
   };
 
   const handleDeleteCategory = async (id) => {
-    setCategories(categories.filter((cat) => cat.id !== id));
+    setDeleteLoading(true);
     await categoriasService.delete(id);
+    setCategories(categories.filter(cat => cat.id !== id));
+    setDeleteLoading(false);
+    setDeleteCategoryId(null);
   };
 
   const openEditDialog = (category) => {
@@ -114,6 +120,19 @@ function CategoriasScreen({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <ConfirmDeleteModal
+        isOpen={!!deleteCategoryId}
+        onClose={() => setDeleteCategoryId(null)}
+        onConfirm={() => handleDeleteCategory(deleteCategoryId)}
+        loading={deleteLoading}
+        accionTitulo="eliminación"
+        accion="Eliminar"
+        pronombre="la"
+        entidad="categoría"
+        accionando="Eliminando"
+        nombreElemento={categories.find(cat => cat.id === deleteCategoryId)?.nombre}
+        advertencia="Se eliminará la categoría y sus datos asociados."
+      />
        {/* Add Category Modal */}
         {isAddDialogOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -358,7 +377,7 @@ function CategoriasScreen({ user, onLogout }) {
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => handleDeleteCategory(category.id)}
+                        onClick={() => setDeleteCategoryId(category.id)}
                         className="p-1 text-red-400 hover:text-red-600"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -453,7 +472,7 @@ function CategoriasScreen({ user, onLogout }) {
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeleteCategory(category.id)}
+                          onClick={() => setDeleteCategoryId(category.id)}
                           className="p-1 text-red-400 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
