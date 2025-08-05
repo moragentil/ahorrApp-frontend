@@ -44,13 +44,13 @@ function ConfiguracionScreen({ user, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
       <main className="max-w-lg mx-auto p-4 lg:p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Configuración de Perfil</h1>
-        <p className="text-gray-600 mb-6">Edita tus datos personales y preferencias</p>
-        <form className="bg-white rounded-lg shadow-md p-6 space-y-4" onSubmit={handleSave}>
+        <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-2">Configuración de Perfil</h1>
+        <p className="text-sm lg:text-base text-gray-600 mb-6">Edita tus datos personales y preferencias</p>
+        <form className="bg-white rounded-lg shadow-md p-4 lg:p-6 space-y-4" onSubmit={handleSave}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 mb-1">
               <User className="inline w-4 h-4 mr-1 text-blue-900" />
               Nombre
             </label>
@@ -63,7 +63,7 @@ function ConfiguracionScreen({ user, onLogout }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 mb-1">
               <Mail className="inline w-4 h-4 mr-1 text-blue-900" />
               Email
             </label>
@@ -76,7 +76,7 @@ function ConfiguracionScreen({ user, onLogout }) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm lg:text-base font-medium text-gray-700 mb-1">
               <Lock className="inline w-4 h-4 mr-1 text-blue-900" />
               Nueva Contraseña
             </label>
@@ -87,11 +87,11 @@ function ConfiguracionScreen({ user, onLogout }) {
               className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
               placeholder="••••••••"
             />
-            <p className="text-xs text-gray-500 mt-1">Deja en blanco para no cambiarla</p>
+            <p className="text-xs lg:text-sm text-gray-500 mt-1">Deja en blanco para no cambiarla</p>
           </div>
           {password && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm lg:text-base font-medium text-gray-700 mb-1">
                 Confirmar Contraseña
               </label>
               <input
@@ -105,13 +105,13 @@ function ConfiguracionScreen({ user, onLogout }) {
           )}
           <button
             type="submit"
-            className="w-full bg-blue-900 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full bg-blue-900 text-white py-2 px-4 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2 disabled:opacity-50 text-sm lg:text-base"
             disabled={loading}
           >
             {loading ? <BtnLoading color="white" /> : <><Save className="w-4 h-4" /> Guardar Cambios</>}
           </button>
-          {success && <div className="text-green-600 text-sm mt-2">{success}</div>}
-          {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
+          {success && <div className="text-green-600 text-sm lg:text-base mt-2">{success}</div>}
+          {error && <div className="text-red-600 text-sm lg:text-base mt-2">{error}</div>}
         </form>
       </main>
     </div>
