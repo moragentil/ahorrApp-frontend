@@ -54,7 +54,7 @@ function Navbar({ user, onLogout }) {
         accionando="Cerrando sesión"
       />
       {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-50 flex items-center justify-between px-4">
+      <div className={`${isMobileMenuOpen ? "hidden" : "lg:hidden fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-50 flex items-center justify-between px-4"}`}>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="bg-white rounded-lg p-2 text-blue-900"
@@ -81,12 +81,12 @@ function Navbar({ user, onLogout }) {
           fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-lg z-50
           transform transition-transform duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-          lg:translate-x-0
+          lg:translate-x-0 overflow-y-auto
         `}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
+          <div className="p-4 lg:p-6 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-900 rounded-full flex items-center justify-center">
                 <PiggyBank className="w-7 h-7 text-white" />
@@ -99,7 +99,7 @@ function Navbar({ user, onLogout }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-2 lg:p-4 space-y-1 lg:space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.id;
@@ -107,7 +107,7 @@ function Navbar({ user, onLogout }) {
                 <button
                   key={item.id}
                   onClick={() => handleNavigate(item.id)}
-                  className={`w-full flex items-center gap-3 h-12 rounded-lg px-3 text-left transition-colors ${
+                  className={`lg:text-base text-sm w-full flex items-center gap-3 h-12 rounded-lg px-3 text-left transition-colors ${
                     isActive
                       ? 'bg-blue-100 text-blue-700 font-medium'
                       : 'text-gray-700 hover:bg-blue-200'
