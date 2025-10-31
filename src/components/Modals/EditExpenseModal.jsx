@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import BtnLoading from '../BtnLoading';
 
 export default function EditExpenseModal({
   isOpen,
@@ -13,27 +14,27 @@ export default function EditExpenseModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg p-4 lg:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border rounded-lg p-4 lg:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-lg lg:text-xl font-semibold text-gray-900">Editar Gasto</h2>
+          <h2 className="text-lg lg:text-xl font-semibold text-foreground">Editar Gasto</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-gray-600 mb-4 text-sm lg:text-base">Modifica los datos del gasto</p>
+        <p className="text-muted-foreground mb-4 text-sm lg:text-base">Modifica los datos del gasto</p>
         <div className="space-y-2">
           <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-foreground">
               Categoría
             </label>
             <select
               value={editForm.categoria_id}
               onChange={e => setEditForm(f => ({ ...f, categoria_id: e.target.value }))}
-              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="">Selecciona una categoría</option>
               {categorias.map(cat => (
@@ -44,18 +45,18 @@ export default function EditExpenseModal({
             </select>
           </div>
           <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-foreground">
               Descripción
             </label>
             <input
               type="text"
               value={editForm.descripcion}
               onChange={e => setEditForm(f => ({ ...f, descripcion: e.target.value }))}
-              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
           <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-foreground">
               Monto
             </label>
             <input
@@ -63,25 +64,25 @@ export default function EditExpenseModal({
               min="0"
               value={editForm.monto}
               onChange={e => setEditForm(f => ({ ...f, monto: e.target.value }))}
-              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
           <div>
-            <label className="block text-sm lg:text-base font-medium text-gray-700 ">
+            <label className="block text-sm lg:text-base font-medium text-foreground">
               Fecha
             </label>
             <input
               type="date"
               value={editForm.fecha}
               onChange={e => setEditForm(f => ({ ...f, fecha: e.target.value }))}
-              className="w-full px-2 py-1 border border-gray-300 rounded-md focus:outline-none"
+              className="w-full px-2 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </div>
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="lg:text-base text-sm flex-1 px-1 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            className="lg:text-base text-sm flex-1 px-1 py-2 border border-border rounded-md text-foreground hover:bg-muted transition-colors"
           >
             Cancelar
           </button>
@@ -94,9 +95,9 @@ export default function EditExpenseModal({
               !editForm.fecha ||
               loading
             }
-            className="lg:text-base text-sm  flex-1 px-2 py-2 bg-blue-900 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="lg:text-base text-sm flex-1 px-2 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
           >
-            Guardar Cambios
+            {loading ? <BtnLoading text="Guardando..." /> : "Guardar Cambios"}
           </button>
         </div>
       </div>

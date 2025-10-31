@@ -26,7 +26,6 @@ function GastosScreen({ user, onLogout }) {
     fecha: '',
   });
 
-  // Estado para detectar si la pantalla es lg o mayor
   const [isLg, setIsLg] = useState(window.innerWidth > 768);
 
   useEffect(() => {
@@ -47,7 +46,6 @@ function GastosScreen({ user, onLogout }) {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
-  // Si tu backend usa otros nombres de campos, mapea aquí
   const categories = ["Todas", ...Array.from(new Set(expenses.map(e => e.category || e.categoria?.nombre)))];
 
   const getCategoryColor = (category) => {
@@ -61,7 +59,6 @@ function GastosScreen({ user, onLogout }) {
     return colors[category] || "bg-gray-100 text-gray-800";
   };
 
-  // Filtrar gastos por mes y año seleccionados
   const filteredExpenses = expenses.filter((expense) => {
     const desc = expense.description || expense.descripcion || '';
     const cat = expense.category || expense.categoria?.nombre || '';
@@ -133,19 +130,18 @@ function GastosScreen({ user, onLogout }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <BtnLoading color="#1e3a8a" height={40} />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <BtnLoading height={40} />
       </div>
     );
   }
 
-  // Extrae las categorías únicas para el modal de edición
   const categoriasUnicas = expenses
     .map(e => e.categoria)
     .filter((cat, idx, arr) => cat && arr.findIndex(c => c?.id === cat?.id) === idx);
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
+    <div className="min-h-screen bg-background mt-14 lg:mt-0">
       <ConfirmDeleteModal
         isOpen={!!deleteExpenseId}
         onClose={() => setDeleteExpenseId(null)}
@@ -171,16 +167,16 @@ function GastosScreen({ user, onLogout }) {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">
+            <h1 className="text-xl lg:text-3xl font-bold text-foreground mb-1 lg:mb-2">
               Mis Gastos
             </h1>
-            <p className="lg:text-base text-sm text-gray-600">
+            <p className="lg:text-base text-sm text-muted-foreground">
               Gestiona y revisa todos tus gastos
             </p>
           </div>
           <button 
             onClick={handleNewExpense}
-            className="text-sm lg:text-base bg-blue-900 text-white px-2 text-center justify-center lg:px-4 py-2 w-1/2 md:w-fit rounded-lg hover:bg-blue-700 flex items-center gap-2"
+            className="text-sm lg:text-base bg-primary text-primary-foreground px-2 text-center justify-center lg:px-4 py-2 w-1/2 md:w-fit rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nuevo Gasto
@@ -192,7 +188,7 @@ function GastosScreen({ user, onLogout }) {
           <select
             value={selectedMonth}
             onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            className="lg:text-base text-sm border border-border rounded-md px-2 py-1 bg-input text-foreground"
           >
             {months.map((m, idx) => (
               <option key={m} value={idx}>{m}</option>
@@ -201,7 +197,7 @@ function GastosScreen({ user, onLogout }) {
           <select
             value={selectedYear}
             onChange={e => setSelectedYear(Number(e.target.value))}
-            className="lg:text-base text-sm border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-900"
+            className="lg:text-base text-sm border border-border rounded-md px-2 py-1 bg-input text-foreground"
           >
             {[2023, 2024, 2025].map(y => (
               <option key={y} value={y}>{y}</option>
@@ -210,24 +206,24 @@ function GastosScreen({ user, onLogout }) {
         </div>
 
         {/* Filters and Search */}
-        <div className="flex flex-row gap-4 ">
+        <div className="flex flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Buscar gastos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-8 pr-4 py-1 border border-gray-300 rounded-md focus:outline-none"
+                className="w-full pl-8 pr-4 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
-          <div className="flex gap-2 ">
+          <div className="flex gap-2">
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="lg:text-base text-sm px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="lg:text-base text-sm px-3 py-1 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
             >
               {categories.map((category) => (
                 <option key={category} value={category}>
@@ -237,18 +233,18 @@ function GastosScreen({ user, onLogout }) {
             </select>
             {isLg && (
               <>
-            <button
-              onClick={() => setViewMode("cards")}
-              className={`px-3 py-1 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-            >
-              Tarjetas
-            </button>
-              <button
-                onClick={() => setViewMode("table")}
-                className={`px-3 py-1 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
-              >
-                Tabla
-              </button>
+                <button
+                  onClick={() => setViewMode("cards")}
+                  className={`px-3 py-1 rounded-md transition-colors ${viewMode === "cards" ? "bg-primary text-primary-foreground" : "bg-card text-primary border border-border"}`}
+                >
+                  Tarjetas
+                </button>
+                <button
+                  onClick={() => setViewMode("table")}
+                  className={`px-3 py-1 rounded-md transition-colors ${viewMode === "table" ? "bg-primary text-primary-foreground" : "bg-card text-primary border border-border"}`}
+                >
+                  Tabla
+                </button>
               </>
             )}
           </div>
@@ -256,17 +252,17 @@ function GastosScreen({ user, onLogout }) {
 
         {/* Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">{filteredExpenses.length}</div>
-            <p className="text-sm text-gray-700">Gastos encontrados</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">{filteredExpenses.length}</div>
+            <p className="text-sm text-muted-foreground">Gastos encontrados</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">${totalAmount.toFixed(2)}</div>
-            <p className="text-sm text-gray-700">Total filtrado</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">${totalAmount.toFixed(2)}</div>
+            <p className="text-sm text-muted-foreground">Total filtrado</p>
           </div>
-          <div className="bg-white rounded-lg shadow-md px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">${averageAmount}</div>
-            <p className="text-sm text-gray-700">Promedio por gasto</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">${averageAmount}</div>
+            <p className="text-sm text-muted-foreground">Promedio por gasto</p>
           </div>
         </div>
 
@@ -276,25 +272,25 @@ function GastosScreen({ user, onLogout }) {
             {filteredExpenses.map((expense) => (
               <div
                 key={expense.id}
-                className="bg-white rounded-lg shadow-md p-4 hover:shadow-md transition-shadow"
+                className="bg-card border border-border rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{expense.descripcion}</h3>
+                    <h3 className="font-semibold text-foreground">{expense.descripcion}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <Calendar className="w-3 h-3 text-gray-400" />
-                      <span className="text-sm text-gray-600">{formatDate(expense.fecha)}</span>
+                      <Calendar className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-sm text-muted-foreground">{formatDate(expense.fecha)}</span>
                     </div>
                   </div>
                   <div className="flex gap-1">
                     <button
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                       onClick={() => openEditDialog(expense)}
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
-                      className="p-1 text-red-400 hover:text-red-600"
+                      className="p-1 text-destructive/60 hover:text-destructive transition-colors"
                       onClick={() => setDeleteExpenseId(expense.id)}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -303,15 +299,15 @@ function GastosScreen({ user, onLogout }) {
                 </div>
                 <div className="flex justify-between items-center">
                   <div className='flex items-center gap-2'>
-                  <span className="inline-block w-4 h-4 rounded-full border border-gray-300 "
-                    style={{ backgroundColor: expense.categoria?.color || "#e5e7eb" }}
-                    title={expense.categoria?.nombre}
-                  />
-                  <span className=" rounded-full text-xs font-medium">
-                    {expense.categoria?.nombre}
-                  </span>
+                    <span className="inline-block w-4 h-4 rounded-full border border-border"
+                      style={{ backgroundColor: expense.categoria?.color || "#e5e7eb" }}
+                      title={expense.categoria?.nombre}
+                    />
+                    <span className="rounded-full text-xs font-medium text-foreground">
+                      {expense.categoria?.nombre}
+                    </span>
                   </div>
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-lg font-bold text-foreground">
                     ${Number(expense.monto ?? 0).toFixed(2)}
                   </span>
                 </div>
@@ -319,45 +315,45 @@ function GastosScreen({ user, onLogout }) {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div className="bg-card border border-border rounded-lg shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+                <thead className="bg-muted border-b border-border">
                   <tr>
-                    <th className="text-left p-4 font-semibold text-gray-900">Descripción</th>
-                    <th className="text-left p-4 font-semibold text-gray-900">Categoría</th>
-                    <th className="text-left p-4 font-semibold text-gray-900">Fecha</th>
-                    <th className="text-left p-4 font-semibold text-gray-900">Monto</th>
-                    <th className="text-center p-4 font-semibold text-gray-900">Acciones</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Descripción</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Categoría</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Fecha</th>
+                    <th className="text-left p-4 font-semibold text-foreground">Monto</th>
+                    <th className="text-center p-4 font-semibold text-foreground">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredExpenses.map((expense) => (
-                    <tr key={expense.id} className="border-b hover:bg-gray-50">
-                      <td className="p-4 text-gray-900">{expense.descripcion}</td>
+                    <tr key={expense.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                      <td className="p-4 text-foreground">{expense.descripcion}</td>
                       <td className="p-4 flex items-center">
-                        <span className="inline-block w-4 h-4 rounded-full border border-gray-300"
+                        <span className="inline-block w-4 h-4 rounded-full border border-border"
                           style={{ backgroundColor: expense.categoria?.color || "#e5e7eb" }}
                           title={expense.categoria?.nombre}
                         />
-                        <span className="px-2 py-1 rounded-full text-xs font-medium">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium text-foreground">
                           {expense.categoria?.nombre}
                         </span>
                       </td>
-                      <td className="p-4 text-gray-600">{formatDate(expense.fecha)}</td>
-                      <td className="p-4 text-left font-semibold text-gray-900">
+                      <td className="p-4 text-muted-foreground">{formatDate(expense.fecha)}</td>
+                      <td className="p-4 text-left font-semibold text-foreground">
                         ${Number(expense.monto ?? 0).toFixed(2)}
                       </td>
                       <td className="p-4 text-center">
                         <div className="flex justify-center gap-1">
                           <button
-                            className="p-1 text-gray-400 hover:text-gray-600"
+                            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                             onClick={() => openEditDialog(expense)}
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           <button
-                            className="p-1 text-red-400 hover:text-red-600"
+                            className="p-1 text-destructive/60 hover:text-destructive transition-colors"
                             onClick={() => setDeleteExpenseId(expense.id)}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -373,13 +369,13 @@ function GastosScreen({ user, onLogout }) {
         )}
 
         {filteredExpenses.length === 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
             <div className="text-6xl mb-4">💸</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No se encontraron gastos</h3>
-            <p className="text-gray-600 mb-4">Intenta ajustar los filtros o agregar un nuevo gasto</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">No se encontraron gastos</h3>
+            <p className="text-muted-foreground mb-4">Intenta ajustar los filtros o agregar un nuevo gasto</p>
             <button 
               onClick={handleNewExpense}
-              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 mx-auto transition-colors"
             >
               <Plus className="w-4 h-4" />
               Agregar Gasto

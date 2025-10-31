@@ -150,14 +150,14 @@ function AhorrosScreen({ user }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <BtnLoading color="#1e3a8a" height={40} />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <BtnLoading height={40} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
+    <div className="min-h-screen bg-background mt-14 lg:mt-0">
       {/* MODALS FUERA DEL MAIN */}
       <AddGoalModal
         isOpen={isAddDialogOpen}
@@ -230,10 +230,10 @@ function AhorrosScreen({ user }) {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 flex items-center gap-2 mb-1 lg:mb-2">
+            <h1 className="text-xl lg:text-3xl font-bold text-foreground flex items-center gap-2 mb-1 lg:mb-2">
               Ahorros y Metas
             </h1>
-            <p className="text-sm lg:text-base text-gray-600">Registra tus objetivos y el dinero ahorrado para cada uno</p>
+            <p className="text-sm lg:text-base text-muted-foreground">Registra tus objetivos y el dinero ahorrado para cada uno</p>
           </div>
           <div className="flex items-center w-full  lg:justify-end justify-between gap-4">
             <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -241,15 +241,15 @@ function AhorrosScreen({ user }) {
                 type="checkbox"
                 checked={showAllGoals}
                 onChange={e => setShowAllGoals(e.target.checked)}
-                className="accent-blue-900"
+                className="accent-primary"
               />
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-foreground">
                 Mostrar todos
               </span>
             </label>
             <button
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-blue-900 text-white px-2 lg:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm lg:text-base"
+              className="bg-primary text-primary-foreground px-2 lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm lg:text-base transition-colors"
             >
               <Plus className="w-4 h-4" />
               Nuevo Objetivo
@@ -259,17 +259,17 @@ function AhorrosScreen({ user }) {
 
         {/* Summary Stats SOLO ACTIVOS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 lg:gap-4">
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">{activeGoals.length}</div>
-            <p className="text-sm lg:text-base text-gray-700">Objetivos activos</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">{activeGoals.length}</div>
+            <p className="text-sm lg:text-base text-muted-foreground">Objetivos activos</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">${totalActiveSaved.toLocaleString()}</div>
-            <p className="text-sm lg:text-base text-gray-700">Total ahorrado (activos)</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">${totalActiveSaved.toLocaleString()}</div>
+            <p className="text-sm lg:text-base text-muted-foreground">Total ahorrado (activos)</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">{percentActiveTotal}%</div>
-            <p className="text-sm lg:text-base text-gray-700">Porcentaje global (activos)</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-foreground">{percentActiveTotal}%</div>
+            <p className="text-sm lg:text-base text-muted-foreground">Porcentaje global (activos)</p>
           </div>
         </div>
 
@@ -278,49 +278,49 @@ function AhorrosScreen({ user }) {
           {filteredGoals.map(goal => {
             const percent = ((goal.monto_actual / goal.monto_objetivo) * 100).toFixed(1);
             return (
-              <div key={goal.id} className="bg-white rounded-lg shadow-sm p-4 lg:p-6 flex flex-col">
+              <div key={goal.id} className="bg-card border border-border rounded-lg shadow-sm p-4 lg:p-6 flex flex-col hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div
-                      className="w-4 h-4 rounded-full border border-gray-300"
+                      className="w-4 h-4 rounded-full border border-border"
                       style={{ backgroundColor: goal.color || "#e5e7eb" }}
                       title={goal.color}
                     />
-                    <h3 className="text-base lg:text-lg font-semibold text-gray-900">{goal.nombre}</h3>
+                    <h3 className="text-base lg:text-lg font-semibold text-foreground">{goal.nombre}</h3>
                   </div>
                   <div className="flex gap-1">
                     <button
                       onClick={() => openEditDialog(goal)}
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      className="p-1 text-muted-foreground hover:text-foreground transition-colors"
                     >
                       <Edit className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => setDeleteGoalId(goal.id)}
-                      className="p-1 text-red-400 hover:text-red-600"
+                      className="p-1 text-destructive/60 hover:text-destructive transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm lg:text-base text-gray-600">Meta: ${goal.monto_objetivo.toLocaleString()}</span>
-                  <span className="text-sm lg:text-base text-green-700 font-bold flex items-center gap-1">
+                  <span className="text-sm lg:text-base text-muted-foreground">Meta: ${goal.monto_objetivo.toLocaleString()}</span>
+                  <span className="text-sm lg:text-base text-success font-bold flex items-center gap-1">
                     <TrendingUp className="w-4 h-4" />
                     ${goal.monto_actual.toLocaleString()}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                <div className="w-full bg-muted rounded-full h-2 mb-2">
                   <div
                     className="h-2 rounded-full transition-all duration-300"
                     style={{ backgroundColor: goal.color, width: `${Math.min(percent, 100)}%` }}
                   />
                 </div>
-                <p className="text-xs lg:text-sm text-gray-600 text-center mb-2">{percent}% alcanzado</p>
+                <p className="text-xs lg:text-sm text-muted-foreground text-center mb-2">{percent}% alcanzado</p>
                 <div className="flex gap-2 mt-auto">
                   <button
                     onClick={() => openAddAmount(goal.id)}
-                    className="flex-1 bg-green-600 text-white py-2 px-2 lg:px-4 rounded-md hover:bg-green-700 text-sm lg:text-base"
+                    className="flex-1 bg-primary text-success-foreground py-2 px-2 lg:px-4 rounded-md hover:bg-primary/70 text-sm lg:text-base transition-colors"
                   >
                     Agregar dinero
                   </button>
@@ -328,7 +328,7 @@ function AhorrosScreen({ user }) {
                     <button
                       onClick={() => handleCompleteGoal(goal.id)}
                       disabled={completeLoadingId === goal.id}
-                      className="flex-1 bg-gray-300 text-gray-700 py-2 px-2 lg:px-4 rounded-md hover:bg-gray-400 text-sm lg:text-base flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 bg-muted text-foreground py-2 px-2 lg:px-4 rounded-md hover:bg-muted/80 text-sm lg:text-base flex items-center justify-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       {completeLoadingId === goal.id ? (
                         <BtnLoading text="Completando..." />
@@ -341,7 +341,7 @@ function AhorrosScreen({ user }) {
                     </button>
                   )}
                   {goal.estado === "Completado" && (
-                    <span className="flex-1 bg-gray-100 text-green-600 py-2 px-4 rounded-md text-sm lg:text-base flex items-center justify-center gap-1">
+                    <span className="flex-1 bg-success/20 text-success py-2 px-4 rounded-md text-sm lg:text-base flex items-center justify-center gap-1">
                       <CheckCircle2 className="w-4 h-4" />
                       Completado
                     </span>
@@ -354,15 +354,15 @@ function AhorrosScreen({ user }) {
 
         {/* Empty State */}
         {filteredGoals.length === 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
             <div className="text-6xl mb-4">🐷</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No tienes objetivos de ahorro</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No tienes objetivos de ahorro</h3>
+            <p className="text-muted-foreground mb-4">
               Crea tu primer objetivo para empezar a ahorrar
             </p>
             <button
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 mx-auto transition-colors"
             >
               <Plus className="w-4 h-4" />
               Crear Objetivo

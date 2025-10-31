@@ -1,13 +1,13 @@
 import { ClipLoader } from 'react-spinners';
 
-function BtnLoading({ color = "#1e3a8a", height = 40 }) {
+function BtnLoading({ color = "hsl(var(--primary))", height = 40 }) {
   return (
     <button
       type="button"
       disabled
-      className="flex items-center justify-center gap-2 px-4 py-2 rounded-md cursor-not-allowed"
+      className="flex items-center justify-center gap-2 px-4 py-2 rounded-md cursor-not-allowed bg-muted"
     >
-      <ClipLoader  height={height} color={color} />
+      <ClipLoader height={height} color={color} />
     </button>
   );
 }

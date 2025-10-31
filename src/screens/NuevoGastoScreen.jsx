@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DollarSign, FileText, Tag, Save, X, CalendarIcon } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
-import { categoriasService } from '../services/categoriasService'; // Importa el servicio
+import { categoriasService } from '../services/categoriasService';
 import BtnLoading from '../components/BtnLoading';
 import AddCategoryModal from '../components/Modals/AddCategoryModal';
 
@@ -91,7 +91,7 @@ function NuevoGastoScreen({ user, onLogout }) {
     console.log('Intentando crear categoría...');
     try {
       const nueva = await categoriasService.create({
-        user_id: user.id, // <-- Agrega el user_id aquí
+        user_id: user.id,
         nombre: newCategoryName.trim(),
         tipo: newCategoryType,
         color: newCategoryColor,
@@ -111,7 +111,7 @@ function NuevoGastoScreen({ user, onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-background mt-14 lg:mt-0">
       <AddCategoryModal
         isOpen={isAddCategoryOpen}
         onClose={() => setIsAddCategoryOpen(false)}
@@ -129,28 +129,28 @@ function NuevoGastoScreen({ user, onLogout }) {
         {/* Header */}
         <div className="flex items-center">
           <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-gray-900">Nuevo Gasto</h1>
-            <p className="text-sm lg:text-base text-gray-600">Registra un nuevo gasto en tu presupuesto</p>
+            <h1 className="text-xl lg:text-3xl font-bold text-foreground">Nuevo Gasto</h1>
+            <p className="text-sm lg:text-base text-muted-foreground">Registra un nuevo gasto en tu presupuesto</p>
           </div>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow-lg p-4 lg:p-6">
+        <div className="bg-card border border-border rounded-lg shadow-lg p-4 lg:p-6">
           <div className="mb-4">
-            <h2 className="text-lg lg:text-xl font-semibold text-gray-900 flex items-center gap-2 mb-1">
+            <h2 className="text-lg lg:text-xl font-semibold text-foreground flex items-center gap-2 mb-1">
               Detalles del Gasto
             </h2>
-            <p className="text-sm lg:text-base text-gray-600">Completa la información del gasto que deseas registrar</p>
+            <p className="text-sm lg:text-base text-muted-foreground">Completa la información del gasto que deseas registrar</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Amount */}
             <div>
-              <label htmlFor="amount" className="block text-sm lg:text-base font-medium text-gray-700">
+              <label htmlFor="amount" className="block text-sm lg:text-base font-medium text-foreground">
                 Monto *
               </label>
               <div className="relative">
-                <DollarSign className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+                <DollarSign className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="amount"
                   type="number"
@@ -158,7 +158,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1 h-10 text-lg border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full pl-8 pr-2 py-1 h-10 text-lg border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                   required
                 />
               </div>
@@ -166,18 +166,18 @@ function NuevoGastoScreen({ user, onLogout }) {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm lg:text-base font-medium text-gray-700">
+              <label htmlFor="description" className="block text-sm lg:text-base font-medium text-foreground">
                 Descripción *
               </label>
               <div className="relative">
-                <FileText className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+                <FileText className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
                 <input
                   id="description"
                   type="text"
                   placeholder="Ej: Supermercado, Gasolina, Cine..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
+                  className="w-full pl-8 pr-2 py-1 h-10 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                   required
                 />
               </div>
@@ -187,9 +187,9 @@ function NuevoGastoScreen({ user, onLogout }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Category */}
               <div>
-                <label className="block text-sm lg:text-base font-medium text-gray-700">Categoría *</label>
+                <label className="block text-sm lg:text-base font-medium text-foreground">Categoría *</label>
                 <div className="relative">
-                  <Tag className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+                  <Tag className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
                   <select
                     value={category}
                     onChange={e => {
@@ -199,7 +199,7 @@ function NuevoGastoScreen({ user, onLogout }) {
                         setCategory(e.target.value);
                       }
                     }}
-                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                     required
                   >
                     <option value="">Selecciona una categoría</option>
@@ -213,14 +213,14 @@ function NuevoGastoScreen({ user, onLogout }) {
 
               {/* Date */}
               <div>
-                <label className="block text-sm lg:text-base font-medium text-gray-700">Fecha *</label>
+                <label className="block text-sm lg:text-base font-medium text-foreground">Fecha *</label>
                 <div className="relative">
-                  <CalendarIcon className="absolute left-2 top-3 h-4 w-4 text-gray-400" />
+                  <CalendarIcon className="absolute left-2 top-3 h-4 w-4 text-muted-foreground" />
                   <input
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-8 pr-2 py-1 h-10 border border-gray-300 rounded-md focus:outline-none"
+                    className="w-full pl-8 pr-2 py-1 h-10 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                     required
                   />
                 </div>
@@ -229,16 +229,16 @@ function NuevoGastoScreen({ user, onLogout }) {
 
             {/* Preview */}
             {amount && description && category && (
-              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-2">Vista previa</h3>
+              <div className="bg-muted/50 border-2 border-dashed border-border rounded-lg p-4">
+                <h3 className="font-semibold text-foreground mb-2">Vista previa</h3>
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="font-medium text-gray-900">{description}</p>
-                    <p className="text-sm lg:text-base text-gray-600">
+                    <p className="font-medium text-foreground">{description}</p>
+                    <p className="text-sm lg:text-base text-muted-foreground">
                       {category} • {formatDate(date)}
                     </p>
                   </div>
-                  <span className="text-xl lg:text-2xl font-bold text-gray-900">
+                  <span className="text-xl lg:text-2xl font-bold text-foreground">
                     ${parseFloat(amount || "0").toFixed(2)}
                   </span>
                 </div>
@@ -250,7 +250,7 @@ function NuevoGastoScreen({ user, onLogout }) {
               <button
                 type="submit"
                 disabled={!amount || !description || !category || loadingSave}
-                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 lg:text-base text-sm"
+                className="flex-1 bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 lg:text-base text-sm transition-colors"
               >
                 <Save className="w-4 h-4" />
                 {loadingSave ? <BtnLoading text="Guardando..." /> : "Guardar Gasto"}
@@ -258,7 +258,7 @@ function NuevoGastoScreen({ user, onLogout }) {
               <button 
                 type="button" 
                 onClick={handleCancel}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 lg:text-base text-sm"
+                className="flex-1 bg-muted text-foreground py-2 px-4 rounded-lg hover:bg-muted/80 lg:text-base text-sm transition-colors"
                 disabled={loadingSave}
               >
                 Cancelar
@@ -268,8 +268,8 @@ function NuevoGastoScreen({ user, onLogout }) {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow-sm p-4 lg:p-6">
-          <h3 className="text-lg lg:text-xl font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+        <div className="bg-card border border-border rounded-lg shadow-sm p-4 lg:p-6">
+          <h3 className="text-lg lg:text-xl font-semibold text-foreground mb-4">Acciones Rápidas</h3>
           {loadingQuick ? (
             <div className="flex justify-center items-center h-20">
               <BtnLoading text="Cargando..." />
@@ -282,12 +282,12 @@ function NuevoGastoScreen({ user, onLogout }) {
                   onClick={() => setQuickExpense({
                     name: quick.descripcion,
                     amount: quick.total,
-                    category: "", // Puedes sugerir una categoría si tienes el dato
+                    category: "",
                   })}
-                  className="p-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex flex-col items-start text-left"
+                  className="p-3 border border-border rounded-lg hover:bg-muted/50 flex flex-col items-start text-left transition-colors"
                 >
-                  <span className="font-medium text-gray-900">{quick.descripcion}</span>
-                  <span className="text-sm lg:text-base text-gray-600">${Number(quick.total).toLocaleString()}</span>
+                  <span className="font-medium text-foreground">{quick.descripcion}</span>
+                  <span className="text-sm lg:text-base text-muted-foreground">${Number(quick.total).toLocaleString()}</span>
                 </button>
               ))}
             </div>

@@ -1,7 +1,7 @@
 import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target, BanknoteArrowUp } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { authService } from '../services/authService'; // Importa el servicio
+import { authService } from '../services/authService';
 import ConfirmDeleteModal from './Modals/ConfirmDeleteModal';
 
 const menuItems = [
@@ -54,17 +54,17 @@ function Navbar({ user, onLogout }) {
         accionando="Cerrando sesión"
       />
       {/* Mobile Menu Button */}
-      <div className={`${isMobileMenuOpen ? "hidden" : "lg:hidden fixed top-0 left-0 w-full h-16 bg-white border-b border-gray-200 z-50 flex items-center justify-between px-4"}`}>
+      <div className={`${isMobileMenuOpen ? "hidden" : "lg:hidden fixed top-0 left-0 w-full h-16 bg-card border-b border-border z-50 flex items-center justify-between px-4"}`}>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="bg-white rounded-lg p-2 text-blue-900"
+          className="bg-card rounded-lg p-2 text-primary"
         >
           {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
-        <span className="font-bold text-blue-900 text-2xl flex items-center">
+        <span className="font-bold text-primary text-2xl flex items-center">
           <PiggyBank className="inline-block w-6 h-6 mr-1" />
           AhorrApp</span>
-        <div className="w-10" /> {/* Espacio para centrar el título */}
+        <div className="w-10" />
       </div>
 
       {/* Mobile Overlay */}
@@ -78,7 +78,7 @@ function Navbar({ user, onLogout }) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-lg z-50
+          fixed left-0 top-0 h-full w-64 bg-card border-r border-border shadow-lg z-50
           transform transition-transform duration-300 ease-in-out
           ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 overflow-y-auto
@@ -86,14 +86,14 @@ function Navbar({ user, onLogout }) {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-4 lg:p-6 border-b border-gray-200">
+          <div className="p-4 lg:p-6 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-blue-900 rounded-full flex items-center justify-center">
-                <PiggyBank className="w-7 h-7 text-white" />
+              <div className="p-3 bg-primary rounded-full flex items-center justify-center">
+                <PiggyBank className="w-7 h-7 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-blue-900">AhorrApp</h1>
-                <p className="text-sm text-gray-600">Gestor de finanzas</p>
+                <h1 className="text-xl font-bold text-primary">AhorrApp</h1>
+                <p className="text-sm text-muted-foreground">Gestor de finanzas</p>
               </div>
             </div>
           </div>
@@ -109,8 +109,8 @@ function Navbar({ user, onLogout }) {
                   onClick={() => handleNavigate(item.id)}
                   className={`lg:text-base text-sm w-full flex items-center gap-3 h-12 rounded-lg px-3 text-left transition-colors ${
                     isActive
-                      ? 'bg-blue-100 text-blue-700 font-medium'
-                      : 'text-gray-700 hover:bg-blue-200'
+                      ? 'bg-primary/20 text-primary font-medium'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
@@ -121,26 +121,26 @@ function Navbar({ user, onLogout }) {
           </nav>
 
           {/* User Section */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-border">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 bg-blue-900 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-bold">
                 {user?.name?.slice(0, 2).toUpperCase() || 'US'}
               </div>
               <div className="flex-1 min-w-0">
                 <button
                   type="button"
                   onClick={() => handleNavigate('/configuracion')}
-                  className="font-medium text-gray-900 truncate text-left w-full hover:underline"
+                  className="font-medium text-foreground truncate text-left w-full hover:underline"
                   title="Editar perfil"
                 >
                   {user?.name}
                 </button>
-                <p className="text-sm text-gray-600 truncate">{user?.email}</p>
+                <p className="text-sm text-muted-foreground truncate">{user?.email}</p>
               </div>
             </div>
             <button
               onClick={handleLogoutClick}
-              className="w-full flex items-center gap-3 text-red-600 hover:text-red-700 hover:bg-red-50 bg-transparent px-3 py-2 rounded-lg"
+              className="w-full flex items-center gap-3 text-destructive hover:text-destructive/90 hover:bg-destructive/10 bg-transparent px-3 py-2 rounded-lg"
             >
               <LogOut className="w-4 h-4" />
               Cerrar Sesión

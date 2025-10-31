@@ -119,14 +119,14 @@ function CategoriasScreen({ user, onLogout }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <BtnLoading color="#1e3a8a" height={40} />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <BtnLoading height={40} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 mt-14 lg:mt-0">
+    <div className="min-h-screen bg-background mt-14 lg:mt-0">
       <ConfirmDeleteModal
         isOpen={!!deleteCategoryId}
         onClose={() => setDeleteCategoryId(null)}
@@ -169,13 +169,13 @@ function CategoriasScreen({ user, onLogout }) {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-xl lg:text-3xl font-bold text-gray-900 mb-1 lg:mb-2">Gestión de Categorías</h1>
-            <p className="text-sm lg:text-base text-gray-600">Organiza y personaliza tus categorías de gastos e ingresos</p>
+            <h1 className="text-xl lg:text-3xl font-bold text-foreground mb-1 lg:mb-2">Gestión de Categorías</h1>
+            <p className="text-sm lg:text-base text-muted-foreground">Organiza y personaliza tus categorías de gastos e ingresos</p>
           </div>
           <div className="flex gap-2">
             <button 
               onClick={() => setIsAddDialogOpen(true)}
-              className="text-sm lg:text-base bg-blue-900 text-white px-2 lg:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="text-sm lg:text-base bg-primary text-primary-foreground px-2 lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
             >
               <Plus className="w-4 h-4" />
               Nueva Categoría
@@ -184,13 +184,13 @@ function CategoriasScreen({ user, onLogout }) {
               <>
                 <button
                   onClick={() => setViewMode("cards")}
-                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md ${viewMode === "cards" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md transition-colors ${viewMode === "cards" ? "bg-primary text-primary-foreground" : "bg-card text-primary border border-border"}`}
                 >
                   Tarjetas
                 </button>
                 <button
                   onClick={() => setViewMode("table")}
-                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md ${viewMode === "table" ? "bg-blue-900 text-white" : "bg-white text-blue-900"}`}
+                  className={`text-sm lg:text-base px-3 lg:px-4 py-2 rounded-md transition-colors ${viewMode === "table" ? "bg-primary text-primary-foreground" : "bg-card text-primary border border-border"}`}
                 >
                   Tabla
                 </button>
@@ -201,21 +201,21 @@ function CategoriasScreen({ user, onLogout }) {
 
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 lg:gap-4">
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">{categories.length}</div>
-            <p className="text-sm lg:text-base text-gray-700">Categorías activas</p>
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-primary">{categories.length}</div>
+            <p className="text-sm lg:text-base text-muted-foreground">Categorías activas</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               ${Number(totalSpent).toFixed(2)}
             </div>
-            <p className="text-sm lg:text-base text-gray-700">Total gastado</p>
+            <p className="text-sm lg:text-base text-muted-foreground">Total gastado</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm px-3 py-2">
-            <div className="text-xl lg:text-2xl font-bold text-blue-900">
+          <div className="bg-card border border-border rounded-lg shadow-sm px-3 py-2">
+            <div className="text-xl lg:text-2xl font-bold text-primary">
               ${Number(totalIngresado).toFixed(2)}
             </div>
-            <p className="text-sm lg:text-base text-gray-700">Total ingresado</p>
+            <p className="text-sm lg:text-base text-muted-foreground">Total ingresado</p>
           </div>
         </div>
 
@@ -233,7 +233,7 @@ function CategoriasScreen({ user, onLogout }) {
               return (
                 <div
                   key={category.id}
-                  className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 lg:p-6"
+                  className="bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 lg:p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
@@ -241,21 +241,21 @@ function CategoriasScreen({ user, onLogout }) {
                         className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: category.color }}
                       />
-                      <h3 className="text-lg font-semibold text-gray-900">{category.nombre}</h3>
-                      <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                      <h3 className="text-lg font-semibold text-foreground">{category.nombre}</h3>
+                      <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
                         {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
                       </span>
                     </div>
                     <div className="flex gap-1">
                       <button 
                         onClick={() => openEditDialog(category)}
-                        className="p-1 text-gray-400 hover:text-gray-600"
+                        className="p-1 text-muted-foreground hover:text-foreground"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => setDeleteCategoryId(category.id)}
-                        className="p-1 text-red-400 hover:text-red-600"
+                        className="p-1 text-destructive/60 hover:text-destructive"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -265,27 +265,27 @@ function CategoriasScreen({ user, onLogout }) {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm lg:text-base text-gray-600">
+                        <DollarSign className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm lg:text-base text-muted-foreground">
                           {category.tipo === "ingreso" ? "Total ingresado" : "Total gastado"}
                         </span>
                       </div>
-                      <span className="font-bold text-gray-900">
+                      <span className="font-bold text-foreground">
                         ${Number(category.totalSpent ?? 0).toFixed(2)}
                       </span>
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Tag className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm lg:text-base text-gray-600">Transacciones</span>
+                        <Tag className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-sm lg:text-base text-muted-foreground">Transacciones</span>
                       </div>
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                      <span className="bg-muted text-foreground px-2 py-1 rounded-full text-xs font-medium">
                         {category.transactionCount ?? 0}
                       </span>
                     </div>
                     
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
                         className="h-2 rounded-full transition-all duration-300"
                         style={{
@@ -295,7 +295,7 @@ function CategoriasScreen({ user, onLogout }) {
                       />
                     </div>
                     
-                    <p className="text-xs lg:text-sm text-gray-600 text-center">
+                    <p className="text-xs lg:text-sm text-muted-foreground text-center">
                       {percent.toFixed(1)}% del total
                     </p>
                   </div>
@@ -304,39 +304,39 @@ function CategoriasScreen({ user, onLogout }) {
             })}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+          <div className="bg-card border border-border rounded-lg shadow-sm overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="text-left p-4 font-semibold text-gray-900">Nombre</th>
-                  <th className="text-left p-4 font-semibold text-gray-900">Tipo</th>
-                  <th className="text-left p-4 font-semibold text-gray-900">Color</th>
-                  <th className="text-left p-4 font-semibold text-gray-900">Total gastado</th>
-                  <th className="text-center p-4 font-semibold text-gray-900">Transacciones</th>
-                  <th className="text-center p-4 font-semibold text-gray-900">Acciones</th>
+                  <th className="text-left p-4 font-semibold text-foreground">Nombre</th>
+                  <th className="text-left p-4 font-semibold text-foreground">Tipo</th>
+                  <th className="text-left p-4 font-semibold text-foreground">Color</th>
+                  <th className="text-left p-4 font-semibold text-foreground">Total gastado</th>
+                  <th className="text-center p-4 font-semibold text-foreground">Transacciones</th>
+                  <th className="text-center p-4 font-semibold text-foreground">Acciones</th>
                 </tr>
               </thead>
               <tbody>
                 {categories.map((category) => (
-                  <tr key={category.id} className="border-b hover:bg-gray-50">
-                    <td className="p-4 text-gray-900">{category.nombre}</td>
+                  <tr key={category.id} className="border-b border-border hover:bg-muted/50">
+                    <td className="p-4 text-foreground">{category.nombre}</td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${category.tipo === "ingreso" ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
                         {category.tipo === "ingreso" ? "Ingreso" : "Gasto"}
                       </span>
                     </td>
                     <td className="p-4">
                       <span
-                        className="inline-block w-4 h-4 rounded-full border border-gray-300"
+                        className="inline-block w-4 h-4 rounded-full border border-border"
                         style={{ backgroundColor: category.color }}
                         title={category.color}
                       />
                     </td>
-                    <td className="p-4 text-left font-semibold text-gray-900">
+                    <td className="p-4 text-left font-semibold text-foreground">
                       ${Number(category.totalSpent ?? 0).toFixed(2)}
                     </td>
                     <td className="p-4 text-center">
-                      <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+                      <span className="bg-muted text-foreground px-2 py-1 rounded-full text-xs font-medium">
                         {category.transactionCount}
                       </span>
                     </td>
@@ -344,13 +344,13 @@ function CategoriasScreen({ user, onLogout }) {
                       <div className="flex justify-center gap-1">
                         <button
                           onClick={() => openEditDialog(category)}
-                          className="p-1 text-gray-400 hover:text-gray-600"
+                          className="p-1 text-muted-foreground hover:text-foreground"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteCategoryId(category.id)}
-                          className="p-1 text-red-400 hover:text-red-600"
+                          className="p-1 text-destructive/60 hover:text-destructive"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -365,15 +365,15 @@ function CategoriasScreen({ user, onLogout }) {
 
         {/* Empty State */}
         {categories.length === 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
             <div className="text-6xl mb-4">🏷️</div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay categorías</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold text-foreground mb-2">No hay categorías</h3>
+            <p className="text-muted-foreground mb-4">
               Crea tu primera categoría para comenzar a organizar tus gastos e ingresos
             </p>
             <button 
               onClick={() => setIsAddDialogOpen(true)}
-              className="bg-blue-900 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 mx-auto"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 mx-auto transition-colors"
             >
               <Plus className="w-4 h-4" />
               Crear Primera Categoría
