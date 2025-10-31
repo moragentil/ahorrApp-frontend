@@ -38,9 +38,23 @@ function GrupoDetalleScreen({ user }) {
   const [addParticipanteLoading, setAddParticipanteLoading] = useState(false);
 
   useEffect(() => {
-    loadGrupo();
-    loadParticipantes();
-    loadGastos();
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        await Promise.all([
+          loadGrupo(),
+          loadParticipantes(),
+          loadGastos()
+        ]);
+      } catch (err) {
+        console.error('Error al cargar datos:', err);
+        alert('Error al cargar los datos del grupo');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
   }, [id]);
 
   useEffect(() => {
@@ -50,21 +64,32 @@ function GrupoDetalleScreen({ user }) {
   }, [activeTab]);
 
   const loadGrupo = async () => {
-    setLoading(true);
     const data = await grupoGastoService.getById(id);
     setGrupo(data);
-    setLoading(false);
   };
 
   const loadParticipantes = async () => {
-    const data = await participanteService.getAll(id);
-    setParticipantes(data);
-    setSelectedParticipantes(data.map(p => p.id));
+    try {
+      const data = await participanteService.getAll(id);
+      console.log('Participantes cargados:', data); // Para debug
+      setParticipantes(data);
+      // Seleccionar todos por defecto
+      if (data && data.length > 0) {
+        setSelectedParticipantes(data.map(p => p.id));
+      }
+    } catch (err) {
+      console.error('Error al cargar participantes:', err);
+    }
   };
 
   const loadGastos = async () => {
-    const data = await gastoCompartidoService.getAll(id);
-    setGastosCompartidos(data);
+    try {
+      const data = await gastoCompartidoService.getAll(id);
+      console.log('Gastos cargados:', data); // Para debug
+      setGastosCompartidos(data);
+    } catch (err) {
+      console.error('Error al cargar gastos:', err);
+    }
   };
 
   const loadInvitacionesPendientes = async () => {
