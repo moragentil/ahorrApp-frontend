@@ -9,6 +9,8 @@ import ConfiguracionScreen from '../screens/ConfiguracionScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import AhorrosScreen from '../screens/AhorrosScreen';
 import IngresosScreen from '../screens/IngresosScreen';
+import GruposGastosScreen from '../screens/GruposGastosScreen';
+import GrupoDetalleScreen from '../screens/GrupoDetalleScreen';
 
 // Componente para proteger rutas que requieren autenticación
 function ProtectedRoute({ children }) {
@@ -124,6 +126,25 @@ function AppRoutes({ user, onLogin, onLogout }) {
           </ProtectedRoute>
         }
       />
+
+      {/* Rutas para gastos compartidos */}
+      <Route 
+        path="/grupos-gastos" 
+        element={
+          <ProtectedRoute>
+            <GruposGastosScreen user={user} />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/grupos-gastos/:id" 
+        element={
+          <ProtectedRoute>
+            <GrupoDetalleScreen user={user} />
+          </ProtectedRoute>
+        } 
+      />
       
       {/* Rutas futuras para otras pantallas */}
       <Route 
@@ -166,13 +187,13 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route 
         path="*" 
         element={
-          <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="min-h-screen bg-background flex items-center justify-center">
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
-              <p className="text-gray-600 mb-4">Página no encontrada</p>
+              <h1 className="text-4xl font-bold text-foreground mb-4">404</h1>
+              <p className="text-muted-foreground mb-4">Página no encontrada</p>
               <button 
                 onClick={() => window.history.back()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
               >
                 Volver
               </button>

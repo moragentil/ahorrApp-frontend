@@ -1,4 +1,4 @@
-import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target, BanknoteArrowUp } from 'lucide-react';
+import { PiggyBank, Home, CreditCard, Tag, Plus, LogOut, Menu, X, Target, BanknoteArrowUp, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -11,6 +11,7 @@ const menuItems = [
   { id: '/ingresos', label: 'Ingresos', icon: BanknoteArrowUp },
   { id: '/categorias', label: 'Categorías', icon: Tag },
   { id: '/ahorros', label: 'Ahorros', icon: Target },
+  { id: '/grupos-gastos', label: 'Gastos Compartidos', icon: Users },
 ];
 
 function Navbar({ user, onLogout }) {
