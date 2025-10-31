@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Trash2, ChevronRight, Mail, Check, X, Clock } from 'lucide-react';
+import { Users, Plus, Trash2, ChevronRight, Mail, Check, X, Clock, UserPlus } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import BtnLoading from '../components/BtnLoading';
@@ -17,6 +17,8 @@ function GruposGastosScreen({ user }) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newGrupoNombre, setNewGrupoNombre] = useState('');
   const [newGrupoDesc, setNewGrupoDesc] = useState('');
+  const [participantesExternos, setParticipantesExternos] = useState([]);
+  const [nuevoParticipante, setNuevoParticipante] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
 
@@ -43,20 +45,38 @@ function GruposGastosScreen({ user }) {
     setInvitacionesLoading(false);
   };
 
+  const handleAddParticipante = () => {
+    if (nuevoParticipante.trim() && !participantesExternos.includes(nuevoParticipante.trim())) {
+      setParticipantesExternos([...participantesExternos, nuevoParticipante.trim()]);
+      setNuevoParticipante('');
+    }
+  };
+
+  const handleRemoveParticipante = (index) => {
+    setParticipantesExternos(participantesExternos.filter((_, i) => i !== index));
+  };
+
   const handleAddGrupo = async () => {
-    if (!newGrupoNombre.trim()) return;
+    if (!newGrupoNombre.trim()) {
+      alert('El nombre del grupo es obligatorio');
+      return;
+    }
+    
     setAddLoading(true);
     try {
       const newGrupo = await grupoGastoService.create({
         nombre: newGrupoNombre,
         descripcion: newGrupoDesc,
+        participantes_externos: participantesExternos,
       });
       setGrupos([...grupos, newGrupo]);
       setIsAddDialogOpen(false);
       setNewGrupoNombre('');
       setNewGrupoDesc('');
+      setParticipantesExternos([]);
+      alert('Grupo creado correctamente');
     } catch (err) {
-      alert('Error al crear el grupo');
+      alert(err.response?.data?.message || 'Error al crear el grupo');
     }
     setAddLoading(false);
   };
@@ -74,7 +94,7 @@ function GruposGastosScreen({ user }) {
     try {
       await invitacionGrupoService.aceptar(token);
       setInvitaciones(invitaciones.filter(inv => inv.token !== token));
-      await loadGrupos(); // Recargar grupos
+      await loadGrupos();
       alert('¡Te has unido al grupo exitosamente!');
     } catch (err) {
       alert(err.response?.data?.message || 'Error al aceptar la invitación');
@@ -119,9 +139,10 @@ function GruposGastosScreen({ user }) {
       {/* Add Group Modal */}
       {isAddDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Nuevo Grupo</h2>
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-foreground mb-4">Nuevo Grupo de Gastos</h2>
             <div className="space-y-4">
+              {/* Nombre */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
                   Nombre del Grupo *
@@ -130,34 +151,111 @@ function GruposGastosScreen({ user }) {
                   type="text"
                   value={newGrupoNombre}
                   onChange={e => setNewGrupoNombre(e.target.value)}
-                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Ej: Viaje a la playa"
                 />
               </div>
+
+              {/* Participantes */}
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  Descripción
+                  Participantes
+                </label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Agrega los nombres de las personas que compartirán gastos
+                </p>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={nuevoParticipante}
+                    onChange={e => setNuevoParticipante(e.target.value)}
+                    onKeyPress={e => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddParticipante();
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Nombre del participante"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddParticipante}
+                    className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors flex items-center gap-1"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">Agregar</span>
+                  </button>
+                </div>
+                
+                {/* Lista de participantes */}
+                {participantesExternos.length > 0 && (
+                  <div className="space-y-1 mt-3">
+                    <p className="text-xs font-medium text-foreground mb-2">
+                      Participantes agregados ({participantesExternos.length}):
+                    </p>
+                    <div className="max-h-32 overflow-y-auto space-y-1">
+                      {participantesExternos.map((nombre, index) => (
+                        <div key={index} className="flex items-center justify-between bg-muted/30 px-3 py-2 rounded-md group">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-medium">
+                              {nombre.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="text-sm text-foreground">{nombre}</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveParticipante(index)}
+                            className="text-destructive hover:bg-destructive/10 p-1 rounded transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {participantesExternos.length === 0 && (
+                  <p className="text-xs text-muted-foreground mt-2 text-center py-3 bg-muted/20 rounded-md">
+                    No hay participantes agregados
+                  </p>
+                )}
+              </div>
+
+              {/* Descripción */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Descripción (Opcional)
                 </label>
                 <textarea
                   value={newGrupoDesc}
                   onChange={e => setNewGrupoDesc(e.target.value)}
-                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                   rows={3}
-                  placeholder="Descripción opcional..."
+                  placeholder="Descripción del grupo..."
                 />
               </div>
             </div>
+
+            {/* Botones */}
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleAddGrupo}
                 disabled={!newGrupoNombre.trim() || addLoading}
-                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {addLoading ? <BtnLoading text="Creando..." /> : 'Crear Grupo'}
               </button>
               <button
-                onClick={() => setIsAddDialogOpen(false)}
-                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
+                onClick={() => {
+                  setIsAddDialogOpen(false);
+                  setNewGrupoNombre('');
+                  setNewGrupoDesc('');
+                  setParticipantesExternos([]);
+                  setNuevoParticipante('');
+                }}
+                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80 transition-colors"
                 disabled={addLoading}
               >
                 Cancelar
@@ -286,7 +384,7 @@ function GruposGastosScreen({ user }) {
                     <div className="flex-1">
                       <h3 className="font-semibold text-foreground text-lg">{grupo.nombre}</h3>
                       {grupo.descripcion && (
-                        <p className="text-sm text-muted-foreground mt-1">{grupo.descripcion}</p>
+                        <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{grupo.descripcion}</p>
                       )}
                     </div>
                     <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
@@ -301,7 +399,7 @@ function GruposGastosScreen({ user }) {
                   <div className="flex items-center justify-between pt-3 border-t border-border">
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Users className="w-4 h-4" />
-                      <span className="text-sm">{grupo.participantes?.length || 0} miembros</span>
+                      <span className="text-sm">{grupo.participantes?.length || 0} participantes</span>
                     </div>
                     <ChevronRight className="w-5 h-5 text-muted-foreground" />
                   </div>

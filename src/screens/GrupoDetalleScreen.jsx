@@ -1,24 +1,27 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, DollarSign, Calculator, CheckCircle, Mail } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
+import { participanteService } from '../services/participanteService';
+import { gastoCompartidoService } from '../services/gastoCompartidoService';
 import BtnLoading from '../components/BtnLoading';
 
 function GrupoDetalleScreen({ user }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [grupo, setGrupo] = useState(null);
+  const [participantes, setParticipantes] = useState([]);
+  const [gastosCompartidos, setGastosCompartidos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [balances, setBalances] = useState(null);
-  const [pagos, setPagos] = useState([]);
-  const [activeTab, setActiveTab] = useState('gastos'); // gastos, balances, pagos, miembros
+  const [activeTab, setActiveTab] = useState('gastos');
   
   // Add expense modal
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [newExpenseDesc, setNewExpenseDesc] = useState('');
   const [newExpenseMonto, setNewExpenseMonto] = useState('');
   const [newExpenseFecha, setNewExpenseFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedPagador, setSelectedPagador] = useState('');
   const [selectedParticipantes, setSelectedParticipantes] = useState([]);
   const [addExpenseLoading, setAddExpenseLoading] = useState(false);
 
@@ -28,8 +31,16 @@ function GrupoDetalleScreen({ user }) {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [invitacionesPendientes, setInvitacionesPendientes] = useState([]);
 
+  // Add participant modal
+  const [isAddParticipanteOpen, setIsAddParticipanteOpen] = useState(false);
+  const [newParticipanteNombre, setNewParticipanteNombre] = useState('');
+  const [newParticipanteEmail, setNewParticipanteEmail] = useState('');
+  const [addParticipanteLoading, setAddParticipanteLoading] = useState(false);
+
   useEffect(() => {
     loadGrupo();
+    loadParticipantes();
+    loadGastos();
   }, [id]);
 
   useEffect(() => {
@@ -42,13 +53,18 @@ function GrupoDetalleScreen({ user }) {
     setLoading(true);
     const data = await grupoGastoService.getById(id);
     setGrupo(data);
-    setSelectedParticipantes(data.miembros?.map(m => m.id) || []);
     setLoading(false);
   };
 
-  const loadBalances = async () => {
-    const data = await grupoGastoService.getBalances(id);
-    setBalances(data);
+  const loadParticipantes = async () => {
+    const data = await participanteService.getAll(id);
+    setParticipantes(data);
+    setSelectedParticipantes(data.map(p => p.id));
+  };
+
+  const loadGastos = async () => {
+    const data = await gastoCompartidoService.getAll(id);
+    setGastosCompartidos(data);
   };
 
   const loadInvitacionesPendientes = async () => {
@@ -61,44 +77,40 @@ function GrupoDetalleScreen({ user }) {
   };
 
   const handleAddExpense = async () => {
-    if (!newExpenseDesc.trim() || !newExpenseMonto || selectedParticipantes.length === 0) return;
+    if (!newExpenseDesc.trim() || !newExpenseMonto || !selectedPagador || selectedParticipantes.length === 0) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
     setAddExpenseLoading(true);
     try {
-      await grupoGastoService.addGasto(id, {
-        pagador_id: user.id,
+      await gastoCompartidoService.create({
+        grupo_gasto_id: id,
+        pagado_por_participante_id: parseInt(selectedPagador),
         descripcion: newExpenseDesc,
         monto_total: parseFloat(newExpenseMonto),
         fecha: newExpenseFecha,
         participantes: selectedParticipantes,
       });
+
       setIsAddExpenseOpen(false);
       setNewExpenseDesc('');
       setNewExpenseMonto('');
+      setSelectedPagador('');
       setNewExpenseFecha(new Date().toISOString().split('T')[0]);
-      await loadGrupo();
+      await loadGastos();
+      alert('Gasto agregado correctamente');
     } catch (err) {
-      alert('Error al agregar el gasto');
+      alert(err.response?.data?.message || 'Error al agregar el gasto');
     }
     setAddExpenseLoading(false);
   };
 
-  const handleGenerarPagos = async () => {
-    const generados = await grupoGastoService.generarPagos(id);
-    setPagos(generados);
-    setActiveTab('pagos');
-  };
-
-  const handleCompletarPago = async (pagoId) => {
-    await grupoGastoService.completarPago(pagoId);
-    const generados = await grupoGastoService.generarPagos(id);
-    setPagos(generados);
-  };
-
-  const toggleParticipante = (userId) => {
-    if (selectedParticipantes.includes(userId)) {
-      setSelectedParticipantes(selectedParticipantes.filter(id => id !== userId));
+  const toggleParticipante = (participanteId) => {
+    if (selectedParticipantes.includes(participanteId)) {
+      setSelectedParticipantes(selectedParticipantes.filter(id => id !== participanteId));
     } else {
-      setSelectedParticipantes([...selectedParticipantes, userId]);
+      setSelectedParticipantes([...selectedParticipantes, participanteId]);
     }
   };
 
@@ -108,6 +120,7 @@ function GrupoDetalleScreen({ user }) {
     try {
       await invitacionGrupoService.enviarInvitacion(id, inviteEmail);
       setInviteEmail('');
+      setIsInviteModalOpen(false);
       alert('Invitación enviada correctamente');
       await loadInvitacionesPendientes();
     } catch (err) {
@@ -123,6 +136,53 @@ function GrupoDetalleScreen({ user }) {
       await loadInvitacionesPendientes();
     } catch (err) {
       alert('Error al cancelar la invitación');
+    }
+  };
+
+  const handleAddParticipante = async () => {
+    if (!newParticipanteNombre.trim()) {
+      alert('El nombre es obligatorio');
+      return;
+    }
+
+    setAddParticipanteLoading(true);
+    try {
+      await participanteService.create({
+        grupo_gasto_id: id,
+        nombre: newParticipanteNombre,
+        email: newParticipanteEmail || null,
+      });
+
+      setIsAddParticipanteOpen(false);
+      setNewParticipanteNombre('');
+      setNewParticipanteEmail('');
+      await loadParticipantes();
+      alert('Participante agregado correctamente');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al agregar el participante');
+    }
+    setAddParticipanteLoading(false);
+  };
+
+  const handleDeleteParticipante = async (participanteId) => {
+    if (!confirm('¿Deseas eliminar este participante?')) return;
+    try {
+      await participanteService.delete(participanteId);
+      await loadParticipantes();
+      alert('Participante eliminado');
+    } catch (err) {
+      alert('Error al eliminar el participante');
+    }
+  };
+
+  const handleDeleteGasto = async (gastoId) => {
+    if (!confirm('¿Deseas eliminar este gasto?')) return;
+    try {
+      await gastoCompartidoService.delete(gastoId);
+      await loadGastos();
+      alert('Gasto eliminado');
+    } catch (err) {
+      alert('Error al eliminar el gasto');
     }
   };
 
@@ -179,19 +239,38 @@ function GrupoDetalleScreen({ user }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  Participantes *
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Pagado por *
                 </label>
-                <div className="space-y-2">
-                  {grupo.miembros?.map(miembro => (
-                    <label key={miembro.id} className="flex items-center gap-2 cursor-pointer">
+                <select
+                  value={selectedPagador}
+                  onChange={e => setSelectedPagador(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                >
+                  <option value="">Seleccionar...</option>
+                  {participantes.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} {p.usuario ? '(Usuario)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Dividir entre *
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {participantes.map(p => (
+                    <label key={p.id} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={selectedParticipantes.includes(miembro.id)}
-                        onChange={() => toggleParticipante(miembro.id)}
+                        checked={selectedParticipantes.includes(p.id)}
+                        onChange={() => toggleParticipante(p.id)}
                         className="w-4 h-4"
                       />
-                      <span className="text-foreground">{miembro.name}</span>
+                      <span className="text-foreground">
+                        {p.nombre} {p.usuario ? '(Usuario)' : ''}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -200,7 +279,7 @@ function GrupoDetalleScreen({ user }) {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleAddExpense}
-                disabled={!newExpenseDesc.trim() || !newExpenseMonto || selectedParticipantes.length === 0 || addExpenseLoading}
+                disabled={addExpenseLoading}
                 className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
               >
                 {addExpenseLoading ? <BtnLoading text="Guardando..." /> : 'Agregar Gasto'}
@@ -221,7 +300,10 @@ function GrupoDetalleScreen({ user }) {
       {isInviteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Invitar Miembro</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Invitar Usuario</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Invita a un usuario registrado para que pueda ver y gestionar el grupo
+            </p>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
@@ -264,6 +346,64 @@ function GrupoDetalleScreen({ user }) {
         </div>
       )}
 
+      {/* Add Participant Modal */}
+      {isAddParticipanteOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-foreground mb-4">Agregar Participante</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Agrega a alguien que compartirá gastos (no necesita ser usuario)
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Nombre *
+                </label>
+                <input
+                  type="text"
+                  value={newParticipanteNombre}
+                  onChange={e => setNewParticipanteNombre(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  placeholder="Nombre del participante"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Email (opcional)
+                </label>
+                <input
+                  type="email"
+                  value={newParticipanteEmail}
+                  onChange={e => setNewParticipanteEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  placeholder="email@ejemplo.com"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleAddParticipante}
+                disabled={!newParticipanteNombre.trim() || addParticipanteLoading}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+              >
+                {addParticipanteLoading ? <BtnLoading text="Agregando..." /> : 'Agregar'}
+              </button>
+              <button
+                onClick={() => {
+                  setIsAddParticipanteOpen(false);
+                  setNewParticipanteNombre('');
+                  setNewParticipanteEmail('');
+                }}
+                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
+                disabled={addParticipanteLoading}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -284,7 +424,7 @@ function GrupoDetalleScreen({ user }) {
             className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Nuevo Gasto
+            <span className="hidden sm:inline">Nuevo Gasto</span>
           </button>
         </div>
 
@@ -301,27 +441,14 @@ function GrupoDetalleScreen({ user }) {
             Gastos
           </button>
           <button
-            onClick={() => {
-              setActiveTab('balances');
-              loadBalances();
-            }}
+            onClick={() => setActiveTab('participantes')}
             className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
-              activeTab === 'balances'
+              activeTab === 'participantes'
                 ? 'text-primary border-b-2 border-primary'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Balances
-          </button>
-          <button
-            onClick={() => setActiveTab('pagos')}
-            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
-              activeTab === 'pagos'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Pagos Sugeridos
+            Participantes
           </button>
           <button
             onClick={() => setActiveTab('miembros')}
@@ -331,134 +458,148 @@ function GrupoDetalleScreen({ user }) {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Miembros
+            Usuarios
           </button>
         </div>
 
         {/* Content */}
         {activeTab === 'gastos' && (
           <div className="space-y-4">
-            {grupo.gastosCompartidos?.length === 0 ? (
+            {gastosCompartidos.length === 0 ? (
               <div className="bg-card border border-border rounded-lg p-8 text-center">
-                <p className="text-muted-foreground">No hay gastos registrados</p>
+                <p className="text-muted-foreground mb-4">No hay gastos registrados</p>
+                <button
+                  onClick={() => setIsAddExpenseOpen(true)}
+                  className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 inline-flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Agregar primer gasto
+                </button>
               </div>
             ) : (
-              grupo.gastosCompartidos?.map(gasto => (
+              gastosCompartidos.map(gasto => (
                 <div key={gasto.id} className="bg-card border border-border rounded-lg p-4">
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold text-foreground">{gasto.descripcion}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Pagado por {gasto.pagador?.name}
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Pagado por: {gasto.pagador?.nombre}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {new Date(gasto.fecha).toLocaleDateString('es-ES')}
                       </p>
+                      <div className="mt-2">
+                        <p className="text-xs text-muted-foreground">
+                          Dividido entre: {gasto.aportes?.map(a => a.participante?.nombre).join(', ')}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex flex-col items-end gap-2">
                       <p className="text-xl font-bold text-foreground">
                         ${parseFloat(gasto.monto_total).toFixed(2)}
                       </p>
-                      <p className="text-sm text-muted-foreground">
-                        {gasto.participantes?.length} participantes
-                      </p>
+                      <button
+                        onClick={() => handleDeleteGasto(gasto.id)}
+                        className="text-destructive hover:underline text-sm"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
+                  
+                  {/* Mostrar aportes */}
+                  {gasto.aportes && gasto.aportes.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-border">
+                      <p className="text-sm font-medium text-foreground mb-2">Aportes:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {gasto.aportes.map(aporte => (
+                          <div key={aporte.id} className="text-sm">
+                            <span className="text-foreground">{aporte.participante?.nombre}:</span>{' '}
+                            <span className={`font-medium ${
+                              aporte.estado === 'pagado' ? 'text-success' : 'text-muted-foreground'
+                            }`}>
+                              ${parseFloat(aporte.monto_asignado).toFixed(2)}
+                              {aporte.estado === 'pagado' && ' ✓'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))
             )}
           </div>
         )}
 
-        {activeTab === 'balances' && (
+        {activeTab === 'participantes' && (
           <div className="space-y-4">
-            {balances ? (
-              <>
-                {Object.values(balances).map(balance => (
-                  <div key={balance.user.id} className="bg-card border border-border rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-semibold text-foreground">{balance.user.name}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Pagó: ${balance.pagado.toFixed(2)} | Debe: ${balance.debe.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className={`text-xl font-bold ${
-                        balance.balance > 0 ? 'text-success' : balance.balance < 0 ? 'text-destructive' : 'text-muted-foreground'
-                      }`}>
-                        {balance.balance > 0 ? '+' : ''}${balance.balance.toFixed(2)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                <button
-                  onClick={handleGenerarPagos}
-                  className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
-                >
-                  <Calculator className="w-5 h-5" />
-                  Generar Pagos para Equilibrar
-                </button>
-              </>
-            ) : (
-              <div className="bg-card border border-border rounded-lg p-8 text-center">
-                <BtnLoading text="Cargando balances..." />
-              </div>
-            )}
-          </div>
-        )}
+            <button
+              onClick={() => setIsAddParticipanteOpen(true)}
+              className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-5 h-5" />
+              Agregar Participante
+            </button>
 
-        {activeTab === 'pagos' && (
-          <div className="space-y-4">
-            {pagos.length === 0 ? (
-              <div className="bg-card border border-border rounded-lg p-8 text-center">
-                <p className="text-muted-foreground">Genera los pagos desde la pestaña de Balances</p>
-              </div>
-            ) : (
-              pagos.map(pago => (
-                <div key={pago.id} className="bg-card border border-border rounded-lg p-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold text-foreground">
-                        {pago.pagador?.name} → {pago.receptor?.name}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Estado: {pago.estado === 'completado' ? 'Completado ✓' : 'Pendiente'}
-                      </p>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Participantes ({participantes.length})
+              </h3>
+              {participantes.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">No hay participantes</p>
+              ) : (
+                <div className="space-y-2">
+                  {participantes.map(p => (
+                    <div key={p.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {p.nombre.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{p.nombre}</p>
+                          {p.email && (
+                            <p className="text-sm text-muted-foreground">{p.email}</p>
+                          )}
+                          {p.usuario && (
+                            <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                              Usuario del sistema
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteParticipante(p.id)}
+                        className="text-destructive hover:bg-destructive/10 p-2 rounded transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <p className="text-xl font-bold text-foreground">
-                        ${parseFloat(pago.monto).toFixed(2)}
-                      </p>
-                      {pago.estado === 'pendiente' && (
-                        <button
-                          onClick={() => handleCompletarPago(pago.id)}
-                          className="p-2 bg-success text-success-foreground rounded-lg hover:bg-success/90"
-                        >
-                          <CheckCircle className="w-5 h-5" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              ))
-            )}
+              )}
+            </div>
           </div>
         )}
 
         {activeTab === 'miembros' && (
           <div className="space-y-4">
-            {/* Botón para invitar */}
             <button
               onClick={() => setIsInviteModalOpen(true)}
               className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
             >
-              <UserPlus className="w-5 h-5" />
-              Invitar Nuevo Miembro
+              <Mail className="w-5 h-5" />
+              Invitar Usuario
             </button>
 
-            {/* Lista de miembros actuales */}
             <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-foreground mb-3">Miembros Actuales</h3>
+              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+                <UsersIcon className="w-5 h-5" />
+                Usuarios con Acceso
+              </h3>
               <div className="space-y-2">
                 {grupo.miembros?.map(miembro => (
                   <div key={miembro.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
@@ -466,9 +607,9 @@ function GrupoDetalleScreen({ user }) {
                       <p className="font-medium text-foreground">{miembro.name}</p>
                       <p className="text-sm text-muted-foreground">{miembro.email}</p>
                     </div>
-                    {miembro.pivot?.rol === 'admin' && (
+                    {grupo.creador_id === miembro.id && (
                       <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
-                        Admin
+                        Creador
                       </span>
                     )}
                   </div>
@@ -476,7 +617,6 @@ function GrupoDetalleScreen({ user }) {
               </div>
             </div>
 
-            {/* Invitaciones pendientes */}
             {invitacionesPendientes.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4">
                 <h3 className="font-semibold text-foreground mb-3">Invitaciones Pendientes</h3>
