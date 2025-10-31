@@ -1,8 +1,12 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://20.197.225.62:8000/api', // Cambia la URL por la de tu backend Laravel
-  withCredentials: true,
+  baseURL: 'http://localhost:8000/api',
+  withCredentials: false, // Cambiar a false
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+  }
 });
 
 // Interceptor para agregar el token a cada request
@@ -13,5 +17,17 @@ api.interceptors.request.use(config => {
   }
   return config;
 });
+
+// Interceptor para manejar errores de autenticación
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
 
 export default api;
