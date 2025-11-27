@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, Plus, Trash2, ChevronRight, Mail, Check, X, Clock, UserPlus } from 'lucide-react';
+import { Users, Plus, Trash2, ChevronRight, Mail, Check, X, Clock, UserPlus, Shield } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import BtnLoading from '../components/BtnLoading';
@@ -161,9 +161,28 @@ function GruposGastosScreen({ user }) {
                 <label className="block text-sm font-medium text-foreground mb-1">
                   Participantes
                 </label>
-                <p className="text-xs text-muted-foreground mb-2">
+                <p className="text-xs text-muted-foreground mb-3">
                   Agrega los nombres de las personas que compartirán gastos
                 </p>
+
+                {/* Usuario actual (siempre visible) */}
+                <div className="mb-3 p-3 bg-primary/10 border border-primary/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
+                      {user?.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">{user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{user?.email}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs bg-primary text-primary-foreground px-2 py-1 rounded-full font-medium">
+                      <Shield className="w-3 h-3" />
+                      Tú
+                    </div>
+                  </div>
+                </div>
+
+                {/* Agregar otros participantes */}
                 <div className="flex gap-2 mb-2">
                   <input
                     type="text"
@@ -188,17 +207,17 @@ function GruposGastosScreen({ user }) {
                   </button>
                 </div>
                 
-                {/* Lista de participantes */}
+                {/* Lista de otros participantes */}
                 {participantesExternos.length > 0 && (
                   <div className="space-y-1 mt-3">
                     <p className="text-xs font-medium text-foreground mb-2">
-                      Participantes agregados ({participantesExternos.length}):
+                      Otros participantes ({participantesExternos.length}):
                     </p>
                     <div className="max-h-32 overflow-y-auto space-y-1">
                       {participantesExternos.map((nombre, index) => (
                         <div key={index} className="flex items-center justify-between bg-muted/30 px-3 py-2 rounded-md group">
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-primary/20 text-primary flex items-center justify-center text-sm font-medium">
+                            <div className="w-7 h-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
                               {nombre.charAt(0).toUpperCase()}
                             </div>
                             <span className="text-sm text-foreground">{nombre}</span>
@@ -218,7 +237,7 @@ function GruposGastosScreen({ user }) {
                 
                 {participantesExternos.length === 0 && (
                   <p className="text-xs text-muted-foreground mt-2 text-center py-3 bg-muted/20 rounded-md">
-                    No hay participantes agregados
+                    No hay otros participantes agregados
                   </p>
                 )}
               </div>
