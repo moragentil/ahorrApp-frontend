@@ -415,21 +415,20 @@ function GrupoDetalleScreen({ user }) {
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-foreground mb-4">Nuevo Gasto Compartido</h2>
             <div className="space-y-4">
+              <div className="flex gap-2 items-center">
               <IconSelector
                 selectedIcon={newExpenseIcon}
                 onSelectIcon={setNewExpenseIcon}
               />
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Descripción *
-                </label>
                 <input
                   type="text"
                   value={newExpenseDesc}
                   onChange={e => setNewExpenseDesc(e.target.value)}
-                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
-                  placeholder="Ej: Cena en restaurante"
+                  className="w-full px-3 py-1 border border-border bg-input text-foreground rounded-md"
+                  placeholder="Título del gasto"
                 />
+              </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">

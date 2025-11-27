@@ -57,20 +57,14 @@ function IconSelector({ selectedIcon, onSelectIcon }) {
 
   return (
     <div className="relative">
-      <label className="block text-sm font-medium text-foreground mb-1">
-        Icono
-      </label>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md hover:bg-muted/50 transition-colors flex items-center gap-3"
+        className="w-fit px-3 py-2 border border-border bg-input text-foreground rounded-md hover:bg-muted/50 transition-colors flex items-center gap-3"
       >
-        <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center">
-          <SelectedIconComponent className="w-3 h-3 text-primary" />
+        <div className="w-full h-full rounded-lg bg-primary/10 flex items-center justify-center">
+          <SelectedIconComponent className="w-5 h-5 text-primary" />
         </div>
-        <span className="text-sm flex-1 text-left">
-          {selectedIconData?.label || 'Seleccionar icono'}
-        </span>
       </button>
 
       {isOpen && (
