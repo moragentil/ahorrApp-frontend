@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -13,6 +13,7 @@ function GrupoDetalleScreen({ user }) {
   const [grupo, setGrupo] = useState(null);
   const [participantes, setParticipantes] = useState([]);
   const [gastosCompartidos, setGastosCompartidos] = useState([]);
+  const [balances, setBalances] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('gastos');
   
@@ -44,7 +45,8 @@ function GrupoDetalleScreen({ user }) {
         await Promise.all([
           loadGrupo(),
           loadParticipantes(),
-          loadGastos()
+          loadGastos(),
+          loadBalances()
         ]);
       } catch (err) {
         console.error('Error al cargar datos:', err);
@@ -91,6 +93,22 @@ function GrupoDetalleScreen({ user }) {
       console.error('Error al cargar gastos:', err);
     }
   };
+
+  const loadBalances = async () => {
+    try {
+      const data = await grupoGastoService.getBalances(id);
+      setBalances(data);
+    } catch (err) {
+      console.error('Error al cargar balances:', err);
+    }
+  };
+
+  // Recargar balances cuando cambian los gastos
+  useEffect(() => {
+    if (activeTab === 'balances') {
+      loadBalances();
+    }
+  }, [activeTab, gastosCompartidos]);
 
   const loadInvitacionesPendientes = async () => {
     try {
@@ -466,6 +484,19 @@ function GrupoDetalleScreen({ user }) {
             Gastos
           </button>
           <button
+            onClick={() => setActiveTab('balances')}
+            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
+              activeTab === 'balances'
+                ? 'text-primary border-b-2 border-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Balances
+            </div>
+          </button>
+          <button
             onClick={() => setActiveTab('participantes')}
             className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
               activeTab === 'participantes'
@@ -553,6 +584,127 @@ function GrupoDetalleScreen({ user }) {
                   )}
                 </div>
               ))
+            )}
+          </div>
+        )}
+
+        {activeTab === 'balances' && balances && (
+          <div className="space-y-6">
+            {/* Resumen de Balances */}
+            <div className="bg-card border border-border rounded-lg p-4 lg:p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                Balance por Participante
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {balances.balances?.map(balance => (
+                  <div 
+                    key={balance.participante_id}
+                    className={`p-4 rounded-lg border ${
+                      balance.balance > 0 
+                        ? 'bg-success/10 border-success/30' 
+                        : balance.balance < 0 
+                        ? 'bg-destructive/10 border-destructive/30'
+                        : 'bg-muted/30 border-border'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        balance.es_usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        {balance.nombre.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-foreground">{balance.nombre}</p>
+                        {balance.email && (
+                          <p className="text-xs text-muted-foreground">{balance.email}</p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Pagó:</span>
+                        <span className="font-medium text-foreground">${balance.total_pagado.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Debe:</span>
+                        <span className="font-medium text-foreground">${balance.total_debe.toFixed(2)}</span>
+                      </div>
+                      <div className="pt-2 border-t border-border/50 flex justify-between">
+                        <span className="font-semibold text-foreground">Balance:</span>
+                        <span className={`font-bold ${
+                          balance.balance > 0 
+                            ? 'text-success' 
+                            : balance.balance < 0 
+                            ? 'text-destructive'
+                            : 'text-muted-foreground'
+                        }`}>
+                          {balance.balance > 0 ? '+' : ''}${balance.balance.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Transacciones Sugeridas */}
+            {balances.transacciones && balances.transacciones.length > 0 && (
+              <div className="bg-card border border-border rounded-lg p-4 lg:p-6">
+                <h3 className="text-lg font-semibold text-foreground mb-4">
+                  Transacciones para Equilibrar
+                </h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Estas son las transferencias mínimas necesarias para saldar todas las deudas:
+                </p>
+                <div className="space-y-3">
+                  {balances.transacciones.map((transaccion, index) => (
+                    <div 
+                      key={index}
+                      className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-destructive/20 text-destructive flex items-center justify-center text-sm font-medium">
+                            {transaccion.de_nombre.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="font-medium text-foreground">
+                            {transaccion.de_nombre}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold">
+                          ${transaccion.monto.toFixed(2)}
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                      </div>
+
+                      <div className="flex-1 flex justify-end">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-foreground">
+                            {transaccion.para_nombre}
+                          </span>
+                          <div className="w-8 h-8 rounded-full bg-success/20 text-success flex items-center justify-center text-sm font-medium">
+                            {transaccion.para_nombre.charAt(0).toUpperCase()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {balances.transacciones && balances.transacciones.length === 0 && (
+              <div className="bg-card border border-border rounded-lg p-8 text-center">
+                <div className="text-6xl mb-4">✅</div>
+                <h3 className="text-lg font-semibold text-foreground mb-2">¡Todo equilibrado!</h3>
+                <p className="text-muted-foreground">No hay deudas pendientes en este grupo</p>
+              </div>
             )}
           </div>
         )}
