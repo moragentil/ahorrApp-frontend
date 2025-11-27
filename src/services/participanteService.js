@@ -36,4 +36,10 @@ export const participanteService = {
     const res = await api.post(`/participantes/${participanteId}/vincular`, { user_id: userId });
     return res.data;
   },
+
+  // Asociar email a participante
+  asociarEmail: async (participanteId, email) => {
+    const response = await api.post(`/participantes/${participanteId}/asociar-email`, { email });
+    return response.data;
+  },
 };

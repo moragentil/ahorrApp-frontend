@@ -55,6 +55,12 @@ function GrupoDetalleScreen({ user }) {
   const [isDetalleGastoOpen, setIsDetalleGastoOpen] = useState(false);
   const [selectedGasto, setSelectedGasto] = useState(null);
 
+  // Nuevo estado para asociar email a participante
+  const [isAssociateEmailOpen, setIsAssociateEmailOpen] = useState(false);
+  const [selectedParticipante, setSelectedParticipante] = useState(null);
+  const [associateEmail, setAssociateEmail] = useState('');
+  const [associateLoading, setAssociateLoading] = useState(false);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -328,6 +334,39 @@ const handleUpdateExpense = async () => {
     setSelectedGasto(null);
   };
 
+  const handleOpenAssociateEmail = (participante) => {
+    setSelectedParticipante(participante);
+    setAssociateEmail(participante.email || '');
+    setIsAssociateEmailOpen(true);
+  };
+
+  const handleAssociateEmail = async () => {
+    if (!associateEmail.trim()) {
+      alert('El email es obligatorio');
+      return;
+    }
+
+    setAssociateLoading(true);
+    try {
+      const response = await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
+      
+      // Enviar invitación
+      await invitacionGrupoService.enviarInvitacion(id, associateEmail);
+      
+      setIsAssociateEmailOpen(false);
+      setSelectedParticipante(null);
+      setAssociateEmail('');
+      
+      await loadParticipantes();
+      await loadInvitacionesPendientes();
+      
+      alert('Email asociado e invitación enviada correctamente');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al asociar email');
+    }
+    setAssociateLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -574,6 +613,67 @@ const handleUpdateExpense = async () => {
           onClose={handleCloseDetalleGasto}
           gasto={selectedGasto}
         />
+      )}
+
+      {/* Associate Email Modal */}
+      {isAssociateEmailOpen && selectedParticipante && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-foreground mb-4">Asociar Email a Participante</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Asocia un email a <span className="font-semibold">{selectedParticipante.nombre}</span> para invitarlo al grupo como usuario registrado
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Email del usuario
+                </label>
+                <input
+                  type="email"
+                  value={associateEmail}
+                  onChange={e => setAssociateEmail(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  placeholder="usuario@ejemplo.com"
+                />
+              </div>
+              <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
+                <p className="text-xs text-foreground">
+                  💡 <strong>¿Qué sucederá?</strong>
+                </p>
+                <ul className="text-xs text-muted-foreground mt-2 space-y-1 ml-4">
+                  <li>• Se actualizará el email del participante</li>
+                  <li>• Se enviará una invitación al email indicado</li>
+                  <li>• Al aceptar, se vincularán todos los gastos existentes</li>
+                </ul>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleAssociateEmail}
+                disabled={!associateEmail.trim() || associateLoading}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {associateLoading ? <BtnLoading text="Enviando..." /> : (
+                  <>
+                    <Mail className="w-4 h-4" />
+                    Asociar y Enviar Invitación
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setIsAssociateEmailOpen(false);
+                  setSelectedParticipante(null);
+                  setAssociateEmail('');
+                }}
+                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
+                disabled={associateLoading}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
@@ -948,33 +1048,50 @@ const handleUpdateExpense = async () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {participantes.map(p => (
-                    <div key={p.id} className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/40 transition-colors">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                          p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                        }`}>
-                          {p.nombre.charAt(0).toUpperCase()}
+                    <div key={p.id} className="bg-muted/30 border border-border rounded-lg hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center justify-between p-3">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                            p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                          }`}>
+                            {p.nombre.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-foreground truncate">{p.nombre}</p>
+                            {p.email ? (
+                              <p className="text-sm text-muted-foreground truncate">{p.email}</p>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">Sin email asociado</p>
+                            )}
+                            {p.usuario && (
+                              <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mt-1">
+                                <Shield className="w-3 h-3" />
+                                Usuario del sistema
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground truncate">{p.nombre}</p>
-                          {p.email && (
-                            <p className="text-sm text-muted-foreground truncate">{p.email}</p>
-                          )}
-                          {p.usuario && (
-                            <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mt-1">
-                              <Shield className="w-3 h-3" />
-                              Usuario del sistema
-                            </span>
-                          )}
-                        </div>
+                        <button
+                          onClick={() => handleDeleteParticipante(p.id)}
+                          className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
+                          title="Eliminar participante"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button
-                        onClick={() => handleDeleteParticipante(p.id)}
-                        className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
-                        title="Eliminar participante"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      
+                      {/* Botón de asociar email - solo si NO tiene usuario vinculado */}
+                      {!p.usuario && (
+                        <div className="border-t border-border px-3 py-2 bg-muted/10">
+                          <button
+                            onClick={() => handleOpenAssociateEmail(p)}
+                            className="w-full text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                          >
+                            <Mail className="w-4 h-4" />
+                            {p.email ? 'Actualizar email e invitar' : 'Asociar email e invitar'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
