@@ -715,7 +715,7 @@ const handleUpdateExpense = async () => {
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <p className="text-xl font-bold text-foreground">
-                            ${parseFloat(gasto.monto_total).toFixed(2)}
+                            ${Math.round(parseFloat(gasto.monto_total || 0)).toLocaleString('es-ES')}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(gasto.fecha).toLocaleDateString('es-ES')}
@@ -792,11 +792,11 @@ const handleUpdateExpense = async () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Pagó:</span>
-                        <span className="font-medium text-foreground">${balance.total_pagado.toFixed(2)}</span>
+                        <span className="font-medium text-foreground">${Math.round(parseFloat(balance.total_pagado || 0)).toLocaleString('es-ES')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Debe:</span>
-                        <span className="font-medium text-foreground">${balance.total_debe.toFixed(2)}</span>
+                        <span className="font-medium text-foreground">${Math.round(parseFloat(balance.total_debe || 0)).toLocaleString('es-ES')}</span>
                       </div>
                       <div className="pt-2 border-t border-border/50 flex justify-between">
                         <span className="font-semibold text-foreground">Balance:</span>
@@ -807,7 +807,7 @@ const handleUpdateExpense = async () => {
                             ? 'text-destructive'
                             : 'text-muted-foreground'
                         }`}>
-                          {balance.balance > 0 ? '+' : ''}${balance.balance.toFixed(2)}
+                          {balance.balance > 0 ? '+' : ''}${Math.round(parseFloat(balance.balance || 0)).toLocaleString('es-ES')}
                         </span>
                       </div>
                     </div>
@@ -845,7 +845,7 @@ const handleUpdateExpense = async () => {
                       <div className="flex items-center gap-2">
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
                         <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold">
-                          ${transaccion.monto.toFixed(2)}
+                           ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
                         </div>
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
                       </div>

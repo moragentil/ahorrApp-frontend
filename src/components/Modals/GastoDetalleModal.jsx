@@ -30,7 +30,7 @@ export default function GastoDetalleModal({ isOpen, onClose, gasto }) {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Monto Total</p>
                 <p className="text-2xl font-bold text-primary">
-                  ${parseFloat(gasto.monto_total).toFixed(2)}
+                  ${Math.round(parseFloat(gasto.monto_total || 0)).toLocaleString('es-ES')}
                 </p>
               </div>
               <div>
@@ -98,7 +98,7 @@ export default function GastoDetalleModal({ isOpen, onClose, gasto }) {
                       <p className={`font-bold ${
                         aporte.estado === 'pagado' ? 'text-success' : 'text-foreground'
                       }`}>
-                        ${parseFloat(aporte.monto_asignado).toFixed(2)}
+                        ${parseFloat(aporte.monto_asignado).toFixed(2)} 
                       </p>
                       {aporte.monto_pagado > 0 && aporte.monto_pagado < aporte.monto_asignado && (
                         <p className="text-xs text-muted-foreground">
