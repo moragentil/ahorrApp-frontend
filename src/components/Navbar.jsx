@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import ConfirmDeleteModal from './Modals/ConfirmDeleteModal';
+import { useInvitacionesPendientes } from '../hooks/useInvitacionesPendientes';
 
 const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
@@ -11,7 +12,7 @@ const menuItems = [
   { id: '/ingresos', label: 'Ingresos', icon: BanknoteArrowUp },
   { id: '/categorias', label: 'Categorías', icon: Tag },
   { id: '/ahorros', label: 'Ahorros', icon: Target },
-  { id: '/grupos-gastos', label: 'Gastos Compartidos', icon: Users },
+  { id: '/grupos-gastos', label: 'DivirrApp', icon: Users, showNotification: true },
 ];
 
 function Navbar({ user, onLogout }) {
@@ -20,6 +21,7 @@ function Navbar({ user, onLogout }) {
   const [loadingLogout, setLoadingLogout] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const cantidadInvitaciones = useInvitacionesPendientes(user);
 
   const handleNavigate = (path) => {
     navigate(path);
@@ -64,8 +66,23 @@ function Navbar({ user, onLogout }) {
         </button>
         <span className="font-bold text-primary text-2xl flex items-center">
           <PiggyBank className="inline-block w-6 h-6 mr-1" />
-          AhorrApp</span>
-        <div className="w-10" />
+          AhorrApp
+        </span>
+        {/* Notification Badge for Mobile */}
+        {cantidadInvitaciones > 0 && (
+          <div className="relative">
+            <button
+              onClick={() => handleNavigate('/grupos-gastos')}
+              className="relative p-2 text-primary"
+            >
+              <Users className="w-5 h-5" />
+              <span className="absolute -top-1 -right-1 bg-destructive text-primary-foreground text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {cantidadInvitaciones > 9 ? '9+' : cantidadInvitaciones}
+              </span>
+            </button>
+          </div>
+        )}
+        {cantidadInvitaciones === 0 && <div className="w-10" />}
       </div>
 
       {/* Mobile Overlay */}
@@ -104,18 +121,25 @@ function Navbar({ user, onLogout }) {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.id;
+              const showBadge = item.showNotification && cantidadInvitaciones > 0;
+              
               return (
                 <button
                   key={item.id}
                   onClick={() => handleNavigate(item.id)}
-                  className={`lg:text-base text-sm w-full flex items-center gap-3 h-11 rounded-lg px-3 text-left transition-colors ${
+                  className={`lg:text-base text-sm w-full flex items-center gap-3 h-11 rounded-lg px-3 text-left transition-colors relative ${
                     isActive
                       ? 'bg-primary/20 text-primary font-medium'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   }`}
                 >
                   <Icon className="w-5 h-5" />
-                  {item.label}
+                  <span className="flex-1">{item.label}</span>
+                  {showBadge && (
+                    <span className="bg-primary text-white text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1.5">
+                      {cantidadInvitaciones > 9 ? '9+' : cantidadInvitaciones}
+                    </span>
+                  )}
                 </button>
               );
             })}
