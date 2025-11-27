@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
 import { gastoCompartidoService } from '../services/gastoCompartidoService';
 import BtnLoading from '../components/BtnLoading';
 import EditGroupExpenseModal from '../components/Modals/EditGroupExpenseModal';
+import GastoDetalleModal from '../components/Modals/GastoDetalleModal';
+
 
 function GrupoDetalleScreen({ user }) {
   const { id } = useParams();
@@ -48,6 +50,11 @@ function GrupoDetalleScreen({ user }) {
   const [editSelectedPagador, setEditSelectedPagador] = useState('');
   const [editSelectedParticipantes, setEditSelectedParticipantes] = useState([]);
   const [editLoading, setEditLoading] = useState(false);
+
+  // Detalle gasto modal
+  const [isDetalleGastoOpen, setIsDetalleGastoOpen] = useState(false);
+  const [selectedGasto, setSelectedGasto] = useState(null);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -343,6 +350,16 @@ const handleUpdateExpense = async () => {
     );
   }
 
+  const handleOpenDetalleGasto = (gasto) => {
+    setSelectedGasto(gasto);
+    setIsDetalleGastoOpen(true);
+  };
+
+  const handleCloseDetalleGasto = () => {
+    setIsDetalleGastoOpen(false);
+    setSelectedGasto(null);
+  };
+
   return (
     <div className="min-h-screen bg-background mt-14 lg:mt-0">
       {/* Add Expense Modal */}
@@ -573,6 +590,15 @@ const handleUpdateExpense = async () => {
           editLoading={editLoading}
         />
       )}
+      
+      {/* Detalle Gasto Modal */}
+      {isDetalleGastoOpen && selectedGasto && (
+        <GastoDetalleModal
+          isOpen={isDetalleGastoOpen}
+          onClose={handleCloseDetalleGasto}
+          gasto={selectedGasto}
+        />
+      )}
 
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
@@ -647,7 +673,7 @@ const handleUpdateExpense = async () => {
 
         {/* Content */}
         {activeTab === 'gastos' && (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {gastosCompartidos.length === 0 ? (
               <div className="bg-card border border-border rounded-lg p-8 text-center">
                 <p className="text-muted-foreground mb-4">No hay gastos registrados</p>
@@ -661,64 +687,68 @@ const handleUpdateExpense = async () => {
               </div>
             ) : (
               gastosCompartidos.map(gasto => (
-                <div key={gasto.id} className="bg-card border border-border rounded-lg p-4">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground">{gasto.descripcion}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Pagado por: {gasto.pagador?.nombre}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(gasto.fecha).toLocaleDateString('es-ES')}
-                      </p>
-                      <div className="mt-2">
-                        <p className="text-xs text-muted-foreground">
-                          Dividido entre: {gasto.aportes?.map(a => a.participante?.nombre).join(', ')}
-                        </p>
+                <div
+                  key={gasto.id}
+                  className="bg-card border border-border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {/* Tarjeta clickeable */}
+                  <div
+                    onClick={() => handleOpenDetalleGasto(gasto)}
+                    className="p-4 cursor-pointer hover:bg-muted/20 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                            <span className="text-2xl">🍔</span>
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground text-lg">
+                              {gasto.descripcion}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              Pagado por {gasto.pagador?.nombre}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-right flex flex-col items-end gap-2">
-                      <p className="text-xl font-bold text-foreground">
-                        ${parseFloat(gasto.monto_total).toFixed(2)}
-                      </p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleEditGasto(gasto)}
-                          className="text-primary hover:bg-primary/10 p-2 rounded transition-colors"
-                          title="Editar gasto"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteGasto(gasto.id)}
-                          className="text-destructive hover:bg-destructive/10 p-2 rounded transition-colors"
-                          title="Eliminar gasto"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <p className="text-xl font-bold text-foreground">
+                            ${parseFloat(gasto.monto_total).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(gasto.fecha).toLocaleDateString('es-ES')}
+                          </p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-muted-foreground" />
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Mostrar aportes */}
-                  {gasto.aportes && gasto.aportes.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-border">
-                      <p className="text-sm font-medium text-foreground mb-2">Aportes:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {gasto.aportes.map(aporte => (
-                          <div key={aporte.id} className="text-sm">
-                            <span className="text-foreground">{aporte.participante?.nombre}:</span>{' '}
-                            <span className={`font-medium ${
-                              aporte.estado === 'pagado' ? 'text-success' : 'text-muted-foreground'
-                            }`}>
-                              ${parseFloat(aporte.monto_asignado).toFixed(2)}
-                              {aporte.estado === 'pagado' && ' ✓'}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+
+                  {/* Botones de acción */}
+                  <div className="border-t border-border px-4 py-2 bg-muted/5 flex gap-2 justify-end">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleEditGasto(gasto);
+                      }}
+                      className="text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Editar
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteGasto(gasto.id);
+                      }}
+                      className="text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Eliminar
+                    </button>
+                  </div>
                 </div>
               ))
             )}
