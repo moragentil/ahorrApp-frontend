@@ -36,4 +36,12 @@ export const invitacionGrupoService = {
     const res = await api.delete(`/invitaciones/${invitacionId}`);
     return res.data;
   },
+
+  // Generar enlace de invitación
+  generarEnlaceInvitacion: async (grupoId) => {
+    const response = await api.post(`/grupos-gastos/${grupoId}/generar-enlace-invitacion`);
+    return response.data;
+  },
 };
+
+export default invitacionGrupoService;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield, Copy, Check, MessageCircle, Link } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -29,10 +29,11 @@ function GrupoDetalleScreen({ user }) {
   const [selectedParticipantes, setSelectedParticipantes] = useState([]);
   const [addExpenseLoading, setAddExpenseLoading] = useState(false);
 
-  // Invite modal
+  // Invite modal - cambiar a modal de enlace
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteLink, setInviteLink] = useState('');
+  const [inviteLinkLoading, setInviteLinkLoading] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [invitacionesPendientes, setInvitacionesPendientes] = useState([]);
 
   // Add participant modal
@@ -250,6 +251,31 @@ const handleUpdateExpense = async () => {
     setEditExpenseFecha('');
     setEditSelectedPagador('');
     setEditSelectedParticipantes([]);
+  };
+
+  const handleGenerarEnlace = async () => {
+    setInviteLinkLoading(true);
+    try {
+      const response = await invitacionGrupoService.generarEnlaceInvitacion(id);
+      setInviteLink(response.url);
+      await loadInvitacionesPendientes();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al generar enlace');
+    }
+    setInviteLinkLoading(false);
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
+
+  const handleOpenInviteModal = async () => {
+    setIsInviteModalOpen(true);
+    setInviteLink('');
+    setLinkCopied(false);
+    await handleGenerarEnlace();
   };
 
   const handleInvitar = async () => {
@@ -477,50 +503,95 @@ const handleUpdateExpense = async () => {
         </div>
       )}
 
-      {/* Invite Modal */}
+      {/* Invite Link Modal */}
       {isInviteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Invitar Usuario</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Invitar al Grupo</h2>
             <p className="text-sm text-muted-foreground mb-4">
-              Invita a un usuario registrado para que pueda ver y gestionar el grupo
+              Comparte este enlace con usuarios registrados para que puedan unirse al grupo
             </p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Email del usuario
-                </label>
-                <input
-                  type="email"
-                  value={inviteEmail}
-                  onChange={e => setInviteEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
-                  placeholder="usuario@ejemplo.com"
-                />
+            
+            {inviteLinkLoading ? (
+              <div className="flex justify-center py-8">
+                <BtnLoading text="Generando enlace..." />
               </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleInvitar}
-                disabled={!inviteEmail.trim() || inviteLoading}
-                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {inviteLoading ? <BtnLoading text="Enviando..." /> : (
-                  <>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Enlace de invitación
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inviteLink}
+                      readOnly
+                      className="flex-1 px-3 py-2 border border-border bg-input text-foreground rounded-md text-sm"
+                    />
+                    <button
+                      onClick={handleCopyLink}
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 whitespace-nowrap"
+                    >
+                      {linkCopied ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Copiado
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          Copiar
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
+                  <p className="text-xs text-foreground">
+                    ℹ️ <strong>Importante:</strong>
+                  </p>
+                  <ul className="text-xs text-muted-foreground mt-2 space-y-1 ml-4">
+                    <li>• El enlace es válido por 30 días</li>
+                    <li>• Solo usuarios con cuenta pueden usarlo</li>
+                    <li>• Se les vinculará automáticamente como participantes</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      window.open(`https://wa.me/?text=${encodeURIComponent('¡Únete a nuestro grupo de gastos! ' + inviteLink)}`, '_blank');
+                    }}
+                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </button>
+                  <button
+                    onClick={() => {
+                      window.open(`mailto:?subject=Invitación al grupo ${grupo.nombre}&body=${encodeURIComponent('Te invito a unirte a nuestro grupo de gastos compartidos:\n\n' + inviteLink)}`, '_blank');
+                    }}
+                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                  >
                     <Mail className="w-4 h-4" />
-                    Enviar Invitación
-                  </>
-                )}
-              </button>
+                    Email
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 mt-6">
               <button
                 onClick={() => {
                   setIsInviteModalOpen(false);
-                  setInviteEmail('');
+                  setInviteLink('');
+                  setLinkCopied(false);
                 }}
                 className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
-                disabled={inviteLoading}
               >
-                Cancelar
+                Cerrar
               </button>
             </div>
           </div>
@@ -954,11 +1025,11 @@ const handleUpdateExpense = async () => {
                   Usuarios con Acceso al Grupo
                 </h3>
                 <button
-                  onClick={() => setIsInviteModalOpen(true)}
+                  onClick={handleOpenInviteModal}
                   className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm"
                 >
-                  <Mail className="w-4 h-4" />
-                  Invitar Usuario
+                  <Link className="w-4 h-4" />
+                  Obtener Enlace
                 </button>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
@@ -989,18 +1060,32 @@ const handleUpdateExpense = async () => {
               {/* Invitaciones Pendientes */}
               {invitacionesPendientes.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-sm font-semibold text-foreground mb-3">Invitaciones Pendientes</h4>
+                  <h4 className="text-sm font-semibold text-foreground mb-3">Invitaciones Activas</h4>
                   <div className="space-y-2">
                     {invitacionesPendientes.map(inv => (
                       <div key={inv.id} className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg">
-                        <div>
-                          <p className="font-medium text-foreground flex items-center gap-2">
-                            <Mail className="w-4 h-4 text-muted-foreground" />
-                            {inv.email}
-                          </p>
-                          <p className="text-xs text-muted-foreground ml-6">
-                            Invitado por {inv.invitador?.name}
-                          </p>
+                        <div className="flex-1">
+                          {inv.es_enlace ? (
+                            <>
+                              <p className="font-medium text-foreground flex items-center gap-2">
+                                <Link className="w-4 h-4 text-primary" />
+                                Enlace de invitación
+                              </p>
+                              <p className="text-xs text-muted-foreground ml-6">
+                                Creado por {inv.invitador?.name} • Expira: {new Date(inv.expira_en).toLocaleDateString('es-ES')}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="font-medium text-foreground flex items-center gap-2">
+                                <Mail className="w-4 h-4 text-muted-foreground" />
+                                {inv.email}
+                              </p>
+                              <p className="text-xs text-muted-foreground ml-6">
+                                Invitado por {inv.invitador?.name}
+                              </p>
+                            </>
+                          )}
                         </div>
                         <button
                           onClick={() => handleCancelarInvitacion(inv.id)}
