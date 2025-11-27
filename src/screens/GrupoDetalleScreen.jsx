@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -91,7 +91,6 @@ function GrupoDetalleScreen({ user }) {
   const loadParticipantes = async () => {
     try {
       const data = await participanteService.getAll(id);
-      console.log('Participantes cargados:', data); // Para debug
       setParticipantes(data);
       // Seleccionar todos por defecto
       if (data && data.length > 0) {
@@ -105,7 +104,6 @@ function GrupoDetalleScreen({ user }) {
   const loadGastos = async () => {
     try {
       const data = await gastoCompartidoService.getAll(id);
-      console.log('Gastos cargados:', data); // Para debug
       setGastosCompartidos(data);
     } catch (err) {
       console.error('Error al cargar gastos:', err);
@@ -168,10 +166,6 @@ function GrupoDetalleScreen({ user }) {
   };
 
 const handleEditGasto = (gasto) => {
-  console.log('=== INICIANDO EDICIÓN ===');
-  console.log('Gasto completo:', gasto);
-  console.log('Aportes del gasto:', gasto.aportes);
-  
   setEditingGasto(gasto);
   setEditExpenseDesc(gasto.descripcion);
   setEditExpenseMonto(gasto.monto_total.toString());
@@ -180,23 +174,14 @@ const handleEditGasto = (gasto) => {
   
   // CRÍTICO: Extraer correctamente los IDs de participantes
   const participantesIds = gasto.aportes?.map(a => {
-    console.log('Aporte:', a);
-    console.log('Participante ID:', a.participante_id);
     return parseInt(a.participante_id);
   }) || [];
   
-  console.log('Participantes IDs extraídos:', participantesIds);
   setEditSelectedParticipantes(participantesIds);
   setIsEditExpenseOpen(true);
 };
 
 const handleUpdateExpense = async () => {
-  console.log('=== ACTUALIZANDO GASTO ===');
-  console.log('Descripción:', editExpenseDesc);
-  console.log('Monto:', editExpenseMonto);
-  console.log('Pagador:', editSelectedPagador);
-  console.log('Participantes seleccionados:', editSelectedParticipantes);
-  
   if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador || editSelectedParticipantes.length === 0) {
     alert('Por favor completa todos los campos y selecciona al menos un participante');
     return;
@@ -214,10 +199,7 @@ const handleUpdateExpense = async () => {
       participantes: participantesIds,
     };
     
-    console.log('Datos a enviar:', dataToSend);
-    
-    const response = await gastoCompartidoService.update(editingGasto.id, dataToSend);
-    console.log('Respuesta del servidor:', response);
+    await gastoCompartidoService.update(editingGasto.id, dataToSend);
 
     setIsEditExpenseOpen(false);
     setEditingGasto(null);
@@ -231,8 +213,6 @@ const handleUpdateExpense = async () => {
     await loadBalances();
     alert('Gasto actualizado correctamente');
   } catch (err) {
-    console.error('Error completo:', err);
-    console.error('Respuesta del error:', err.response);
     alert(err.response?.data?.message || 'Error al actualizar el gasto');
   }
   setEditLoading(false);
@@ -248,14 +228,10 @@ const handleUpdateExpense = async () => {
 
   const toggleEditParticipante = (participanteId) => {
     const id = parseInt(participanteId);
-    console.log('Toggle participante:', id);
-    console.log('Lista actual:', editSelectedParticipantes);
-    
     setEditSelectedParticipantes(prev => {
       const newList = prev.includes(id) 
         ? prev.filter(pid => pid !== id)
         : [...prev, id];
-      console.log('Nueva lista:', newList);
       return newList;
     });
   };
@@ -342,14 +318,6 @@ const handleUpdateExpense = async () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <BtnLoading height={40} />
-      </div>
-    );
-  }
-
   const handleOpenDetalleGasto = (gasto) => {
     setSelectedGasto(gasto);
     setIsDetalleGastoOpen(true);
@@ -359,6 +327,14 @@ const handleUpdateExpense = async () => {
     setIsDetalleGastoOpen(false);
     setSelectedGasto(null);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <BtnLoading height={40} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background mt-14 lg:mt-0">
@@ -644,19 +620,7 @@ const handleUpdateExpense = async () => {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <div className="flex items-center gap-2">
-              Balances
-            </div>
-          </button>
-          <button
-            onClick={() => setActiveTab('participantes')}
-            className={`px-4 py-2 font-medium transition-colors whitespace-nowrap ${
-              activeTab === 'participantes'
-                ? 'text-primary border-b-2 border-primary'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            Participantes
+            Balances
           </button>
           <button
             onClick={() => setActiveTab('miembros')}
@@ -666,7 +630,10 @@ const handleUpdateExpense = async () => {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            Usuarios
+            <div className="flex items-center gap-2">
+              <UsersIcon className="w-4 h-4" />
+              Miembros
+            </div>
           </button>
         </div>
 
@@ -699,7 +666,7 @@ const handleUpdateExpense = async () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-2xl">🍔</span>
+                            <span className="text-2xl">💰</span>
                           </div>
                           <div className="flex-1">
                             <h3 className="font-semibold text-foreground text-lg">
@@ -877,40 +844,125 @@ const handleUpdateExpense = async () => {
           </div>
         )}
 
-        {activeTab === 'participantes' && (
-          <div className="space-y-4">
-            <button
-              onClick={() => setIsAddParticipanteOpen(true)}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
-            >
-              <UserPlus className="w-5 h-5" />
-              Agregar Participante
-            </button>
+        {activeTab === 'miembros' && (
+          <div className="space-y-6">
+            {/* Usuarios con Acceso */}
+            <div className="bg-card border border-border rounded-lg p-4 lg:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <Shield className="w-5 h-5" />
+                  Usuarios con Acceso al Grupo
+                </h3>
+                <button
+                  onClick={() => setIsInviteModalOpen(true)}
+                  className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm"
+                >
+                  <Mail className="w-4 h-4" />
+                  Invitar Usuario
+                </button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Usuarios registrados en la aplicación que pueden administrar este grupo
+              </p>
+              <div className="space-y-2">
+                {grupo.miembros?.map(miembro => (
+                  <div key={miembro.id} className="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
+                        {miembro.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{miembro.name}</p>
+                        <p className="text-sm text-muted-foreground">{miembro.email}</p>
+                      </div>
+                    </div>
+                    {grupo.creador_id === miembro.id && (
+                      <span className="text-xs bg-primary text-primary-foreground px-3 py-1 rounded-full font-medium flex items-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        Creador
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
 
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                Participantes ({participantes.length})
-              </h3>
+              {/* Invitaciones Pendientes */}
+              {invitacionesPendientes.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="text-sm font-semibold text-foreground mb-3">Invitaciones Pendientes</h4>
+                  <div className="space-y-2">
+                    {invitacionesPendientes.map(inv => (
+                      <div key={inv.id} className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg">
+                        <div>
+                          <p className="font-medium text-foreground flex items-center gap-2">
+                            <Mail className="w-4 h-4 text-muted-foreground" />
+                            {inv.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground ml-6">
+                            Invitado por {inv.invitador?.name}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => handleCancelarInvitacion(inv.id)}
+                          className="text-destructive hover:bg-destructive/10 px-3 py-1 rounded-lg transition-colors text-sm"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Participantes */}
+            <div className="bg-card border border-border rounded-lg p-4 lg:p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                  <UsersIcon className="w-5 h-5" />
+                  Participantes del Grupo ({participantes.length})
+                </h3>
+                <button
+                  onClick={() => setIsAddParticipanteOpen(true)}
+                  className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Agregar Participante
+                </button>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Personas que comparten gastos (pueden ser usuarios registrados o no)
+              </p>
               {participantes.length === 0 ? (
-                <p className="text-muted-foreground text-center py-4">No hay participantes</p>
+                <div className="text-center py-8">
+                  <User className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-50" />
+                  <p className="text-muted-foreground mb-4">No hay participantes en este grupo</p>
+                  <button
+                    onClick={() => setIsAddParticipanteOpen(true)}
+                    className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 inline-flex items-center gap-2"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Agregar Primer Participante
+                  </button>
+                </div>
               ) : (
-                <div className="space-y-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {participantes.map(p => (
-                    <div key={p.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div key={p.id} className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg hover:bg-muted/40 transition-colors">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                           p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
                         }`}>
                           {p.nombre.charAt(0).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-medium text-foreground">{p.nombre}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate">{p.nombre}</p>
                           {p.email && (
-                            <p className="text-sm text-muted-foreground">{p.email}</p>
+                            <p className="text-sm text-muted-foreground truncate">{p.email}</p>
                           )}
                           {p.usuario && (
-                            <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+                            <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mt-1">
+                              <Shield className="w-3 h-3" />
                               Usuario del sistema
                             </span>
                           )}
@@ -918,7 +970,8 @@ const handleUpdateExpense = async () => {
                       </div>
                       <button
                         onClick={() => handleDeleteParticipante(p.id)}
-                        className="text-destructive hover:bg-destructive/10 p-2 rounded transition-colors"
+                        className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
+                        title="Eliminar participante"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -929,65 +982,36 @@ const handleUpdateExpense = async () => {
             </div>
           </div>
         )}
-
-        {activeTab === 'miembros' && (
-          <div className="space-y-4">
-            <button
-              onClick={() => setIsInviteModalOpen(true)}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"
-            >
-              <Mail className="w-5 h-5" />
-              Invitar Usuario
-            </button>
-
-            <div className="bg-card border border-border rounded-lg p-4">
-              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                <UsersIcon className="w-5 h-5" />
-                Usuarios con Acceso
-              </h3>
-              <div className="space-y-2">
-                {grupo.miembros?.map(miembro => (
-                  <div key={miembro.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                    <div>
-                      <p className="font-medium text-foreground">{miembro.name}</p>
-                      <p className="text-sm text-muted-foreground">{miembro.email}</p>
-                    </div>
-                    {grupo.creador_id === miembro.id && (
-                      <span className="text-xs bg-primary text-primary-foreground px-2 py-1 rounded">
-                        Creador
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {invitacionesPendientes.length > 0 && (
-              <div className="bg-card border border-border rounded-lg p-4">
-                <h3 className="font-semibold text-foreground mb-3">Invitaciones Pendientes</h3>
-                <div className="space-y-2">
-                  {invitacionesPendientes.map(inv => (
-                    <div key={inv.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
-                      <div>
-                        <p className="font-medium text-foreground">{inv.email}</p>
-                        <p className="text-xs text-muted-foreground">
-                          Invitado por {inv.invitador?.name}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => handleCancelarInvitacion(inv.id)}
-                        className="text-destructive hover:underline text-sm"
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </main>
+
+      {/* Modals */}
+      {isEditExpenseOpen && editingGasto && (
+        <EditGroupExpenseModal
+          isOpen={isEditExpenseOpen}
+          onClose={handleCloseEditModal}
+          participantes={participantes}
+          editExpenseDesc={editExpenseDesc}
+          setEditExpenseDesc={setEditExpenseDesc}
+          editExpenseMonto={editExpenseMonto}
+          setEditExpenseMonto={setEditExpenseMonto}
+          editExpenseFecha={editExpenseFecha}
+          setEditExpenseFecha={setEditExpenseFecha}
+          editSelectedPagador={editSelectedPagador}
+          setEditSelectedPagador={setEditSelectedPagador}
+          editSelectedParticipantes={editSelectedParticipantes}
+          toggleEditParticipante={toggleEditParticipante}
+          handleUpdateExpense={handleUpdateExpense}
+          editLoading={editLoading}
+        />
+      )}
+      
+      {isDetalleGastoOpen && selectedGasto && (
+        <GastoDetalleModal
+          isOpen={isDetalleGastoOpen}
+          onClose={handleCloseDetalleGasto}
+          gasto={selectedGasto}
+        />
+      )}
     </div>
   );
 }
