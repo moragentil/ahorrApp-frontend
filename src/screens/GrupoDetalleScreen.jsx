@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -37,6 +37,15 @@ function GrupoDetalleScreen({ user }) {
   const [newParticipanteNombre, setNewParticipanteNombre] = useState('');
   const [newParticipanteEmail, setNewParticipanteEmail] = useState('');
   const [addParticipanteLoading, setAddParticipanteLoading] = useState(false);
+
+  // Edit expense modal
+  const [isEditExpenseOpen, setIsEditExpenseOpen] = useState(false);
+  const [editingGasto, setEditingGasto] = useState(null);
+  const [editExpenseDesc, setEditExpenseDesc] = useState('');
+  const [editExpenseMonto, setEditExpenseMonto] = useState('');
+  const [editExpenseFecha, setEditExpenseFecha] = useState('');
+  const [editSelectedPagador, setEditSelectedPagador] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     const loadData = async () => {
@@ -147,6 +156,45 @@ function GrupoDetalleScreen({ user }) {
       alert(err.response?.data?.message || 'Error al agregar el gasto');
     }
     setAddExpenseLoading(false);
+  };
+
+  const handleEditGasto = (gasto) => {
+    setEditingGasto(gasto);
+    setEditExpenseDesc(gasto.descripcion);
+    setEditExpenseMonto(gasto.monto_total);
+    setEditExpenseFecha(gasto.fecha);
+    setEditSelectedPagador(gasto.pagador?.id || '');
+    setIsEditExpenseOpen(true);
+  };
+
+  const handleUpdateExpense = async () => {
+    if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador) {
+      alert('Por favor completa todos los campos');
+      return;
+    }
+
+    setEditLoading(true);
+    try {
+      await gastoCompartidoService.update(editingGasto.id, {
+        descripcion: editExpenseDesc,
+        monto_total: parseFloat(editExpenseMonto),
+        fecha: editExpenseFecha,
+        pagado_por_participante_id: parseInt(editSelectedPagador),
+      });
+
+      setIsEditExpenseOpen(false);
+      setEditingGasto(null);
+      setEditExpenseDesc('');
+      setEditExpenseMonto('');
+      setEditExpenseFecha('');
+      setEditSelectedPagador('');
+      await loadGastos();
+      await loadBalances(); // Recargar balances también
+      alert('Gasto actualizado correctamente');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al actualizar el gasto');
+    }
+    setEditLoading(false);
   };
 
   const toggleParticipante = (participanteId) => {
@@ -447,6 +495,101 @@ function GrupoDetalleScreen({ user }) {
         </div>
       )}
 
+      {/* Edit Expense Modal */}
+      {isEditExpenseOpen && editingGasto && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold text-foreground mb-4">Editar Gasto Compartido</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Descripción *
+                </label>
+                <input
+                  type="text"
+                  value={editExpenseDesc}
+                  onChange={e => setEditExpenseDesc(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  placeholder="Ej: Cena en restaurante"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Monto Total *
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editExpenseMonto}
+                  onChange={e => setEditExpenseMonto(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Fecha *
+                </label>
+                <input
+                  type="date"
+                  value={editExpenseFecha}
+                  onChange={e => setEditExpenseFecha(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  Pagado por *
+                </label>
+                <select
+                  value={editSelectedPagador}
+                  onChange={e => setEditSelectedPagador(e.target.value)}
+                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
+                >
+                  <option value="">Seleccionar...</option>
+                  {participantes.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} {p.usuario ? '(Usuario)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="bg-muted/30 p-3 rounded-md">
+                <p className="text-sm text-muted-foreground mb-2">
+                  <strong>Nota:</strong> Al cambiar el monto, se redistribuirá automáticamente entre los participantes actuales.
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Dividido entre: {editingGasto.aportes?.map(a => a.participante?.nombre).join(', ')}
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleUpdateExpense}
+                disabled={editLoading}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
+              >
+                {editLoading ? <BtnLoading text="Guardando..." /> : 'Guardar Cambios'}
+              </button>
+              <button
+                onClick={() => {
+                  setIsEditExpenseOpen(false);
+                  setEditingGasto(null);
+                  setEditExpenseDesc('');
+                  setEditExpenseMonto('');
+                  setEditExpenseFecha('');
+                  setEditSelectedPagador('');
+                }}
+                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
+                disabled={editLoading}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -554,12 +697,22 @@ function GrupoDetalleScreen({ user }) {
                       <p className="text-xl font-bold text-foreground">
                         ${parseFloat(gasto.monto_total).toFixed(2)}
                       </p>
-                      <button
-                        onClick={() => handleDeleteGasto(gasto.id)}
-                        className="text-destructive hover:underline text-sm"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditGasto(gasto)}
+                          className="text-primary hover:bg-primary/10 p-2 rounded transition-colors"
+                          title="Editar gasto"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteGasto(gasto.id)}
+                          className="text-destructive hover:bg-destructive/10 p-2 rounded transition-colors"
+                          title="Eliminar gasto"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   
