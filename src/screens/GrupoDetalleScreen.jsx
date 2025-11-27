@@ -45,6 +45,7 @@ function GrupoDetalleScreen({ user }) {
   const [editExpenseMonto, setEditExpenseMonto] = useState('');
   const [editExpenseFecha, setEditExpenseFecha] = useState('');
   const [editSelectedPagador, setEditSelectedPagador] = useState('');
+  const [editSelectedParticipantes, setEditSelectedParticipantes] = useState([]);
   const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
@@ -158,44 +159,76 @@ function GrupoDetalleScreen({ user }) {
     setAddExpenseLoading(false);
   };
 
-  const handleEditGasto = (gasto) => {
-    setEditingGasto(gasto);
-    setEditExpenseDesc(gasto.descripcion);
-    setEditExpenseMonto(gasto.monto_total);
-    setEditExpenseFecha(gasto.fecha);
-    setEditSelectedPagador(gasto.pagador?.id || '');
-    setIsEditExpenseOpen(true);
-  };
+const handleEditGasto = (gasto) => {
+  console.log('=== INICIANDO EDICIÓN ===');
+  console.log('Gasto completo:', gasto);
+  console.log('Aportes del gasto:', gasto.aportes);
+  
+  setEditingGasto(gasto);
+  setEditExpenseDesc(gasto.descripcion);
+  setEditExpenseMonto(gasto.monto_total.toString());
+  setEditExpenseFecha(gasto.fecha);
+  setEditSelectedPagador(gasto.pagador?.id || '');
+  
+  // CRÍTICO: Extraer correctamente los IDs de participantes
+  const participantesIds = gasto.aportes?.map(a => {
+    console.log('Aporte:', a);
+    console.log('Participante ID:', a.participante_id);
+    return parseInt(a.participante_id);
+  }) || [];
+  
+  console.log('Participantes IDs extraídos:', participantesIds);
+  setEditSelectedParticipantes(participantesIds);
+  setIsEditExpenseOpen(true);
+};
 
-  const handleUpdateExpense = async () => {
-    if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador) {
-      alert('Por favor completa todos los campos');
-      return;
-    }
+const handleUpdateExpense = async () => {
+  console.log('=== ACTUALIZANDO GASTO ===');
+  console.log('Descripción:', editExpenseDesc);
+  console.log('Monto:', editExpenseMonto);
+  console.log('Pagador:', editSelectedPagador);
+  console.log('Participantes seleccionados:', editSelectedParticipantes);
+  
+  if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador || editSelectedParticipantes.length === 0) {
+    alert('Por favor completa todos los campos y selecciona al menos un participante');
+    return;
+  }
 
-    setEditLoading(true);
-    try {
-      await gastoCompartidoService.update(editingGasto.id, {
-        descripcion: editExpenseDesc,
-        monto_total: parseFloat(editExpenseMonto),
-        fecha: editExpenseFecha,
-        pagado_por_participante_id: parseInt(editSelectedPagador),
-      });
+  setEditLoading(true);
+  try {
+    const participantesIds = editSelectedParticipantes.map(id => parseInt(id));
+    
+    const dataToSend = {
+      descripcion: editExpenseDesc,
+      monto_total: parseFloat(editExpenseMonto),
+      fecha: editExpenseFecha,
+      pagado_por_participante_id: parseInt(editSelectedPagador),
+      participantes: participantesIds,
+    };
+    
+    console.log('Datos a enviar:', dataToSend);
+    
+    const response = await gastoCompartidoService.update(editingGasto.id, dataToSend);
+    console.log('Respuesta del servidor:', response);
 
-      setIsEditExpenseOpen(false);
-      setEditingGasto(null);
-      setEditExpenseDesc('');
-      setEditExpenseMonto('');
-      setEditExpenseFecha('');
-      setEditSelectedPagador('');
-      await loadGastos();
-      await loadBalances(); // Recargar balances también
-      alert('Gasto actualizado correctamente');
-    } catch (err) {
-      alert(err.response?.data?.message || 'Error al actualizar el gasto');
-    }
-    setEditLoading(false);
-  };
+    setIsEditExpenseOpen(false);
+    setEditingGasto(null);
+    setEditExpenseDesc('');
+    setEditExpenseMonto('');
+    setEditExpenseFecha('');
+    setEditSelectedPagador('');
+    setEditSelectedParticipantes([]);
+    
+    await loadGastos();
+    await loadBalances();
+    alert('Gasto actualizado correctamente');
+  } catch (err) {
+    console.error('Error completo:', err);
+    console.error('Respuesta del error:', err.response);
+    alert(err.response?.data?.message || 'Error al actualizar el gasto');
+  }
+  setEditLoading(false);
+};
 
   const toggleParticipante = (participanteId) => {
     if (selectedParticipantes.includes(participanteId)) {
@@ -204,6 +237,20 @@ function GrupoDetalleScreen({ user }) {
       setSelectedParticipantes([...selectedParticipantes, participanteId]);
     }
   };
+
+  const toggleEditParticipante = (participanteId) => {
+  const id = parseInt(participanteId);
+  console.log('Toggle participante:', id);
+  console.log('Lista actual:', editSelectedParticipantes);
+  
+  setEditSelectedParticipantes(prev => {
+    const newList = prev.includes(id) 
+      ? prev.filter(pid => pid !== id)
+      : [...prev, id];
+    console.log('Nueva lista:', newList);
+    return newList;
+  });
+};
 
   const handleInvitar = async () => {
     if (!inviteEmail.trim()) return;
@@ -554,19 +601,41 @@ function GrupoDetalleScreen({ user }) {
                   ))}
                 </select>
               </div>
-              <div className="bg-muted/30 p-3 rounded-md">
-                <p className="text-sm text-muted-foreground mb-2">
-                  <strong>Nota:</strong> Al cambiar el monto, se redistribuirá automáticamente entre los participantes actuales.
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Dividido entre: {editingGasto.aportes?.map(a => a.participante?.nombre).join(', ')}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Dividir entre * ({editSelectedParticipantes.length} seleccionados)
+                </label>
+                <div className="space-y-2 max-h-40 overflow-y-auto border border-border rounded-md p-2">
+                  {participantes.map(p => (
+                    <label key={p.id} className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-2 rounded">
+                      <input
+                        type="checkbox"
+                        checked={editSelectedParticipantes.includes(p.id)}
+                        onChange={() => toggleEditParticipante(p.id)}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-foreground flex-1">
+                        {p.nombre} {p.usuario ? '(Usuario)' : ''}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {editSelectedParticipantes.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Monto por persona: ${(parseFloat(editExpenseMonto || 0) / editSelectedParticipantes.length).toFixed(2)}
+                  </p>
+                )}
+              </div>
+              <div className="bg-primary/10 border border-primary/20 p-3 rounded-md">
+                <p className="text-sm text-foreground">
+                  <strong>💡 Nota:</strong> Puedes cambiar quiénes participan en este gasto. El monto se redistribuirá equitativamente entre los seleccionados.
                 </p>
               </div>
             </div>
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleUpdateExpense}
-                disabled={editLoading}
+                disabled={editLoading || editSelectedParticipantes.length === 0}
                 className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
               >
                 {editLoading ? <BtnLoading text="Guardando..." /> : 'Guardar Cambios'}
@@ -579,6 +648,7 @@ function GrupoDetalleScreen({ user }) {
                   setEditExpenseMonto('');
                   setEditExpenseFecha('');
                   setEditSelectedPagador('');
+                  setEditSelectedParticipantes([]);
                 }}
                 className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
                 disabled={editLoading}
