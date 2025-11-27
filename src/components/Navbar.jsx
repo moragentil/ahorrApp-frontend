@@ -100,7 +100,7 @@ function Navbar({ user, onLogout }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-2 lg:p-4 space-y-1 lg:space-y-2">
+          <nav className="flex-1 p-2 lg:p-4 space-y-1">
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.id;
@@ -108,7 +108,7 @@ function Navbar({ user, onLogout }) {
                 <button
                   key={item.id}
                   onClick={() => handleNavigate(item.id)}
-                  className={`lg:text-base text-sm w-full flex items-center gap-3 h-12 rounded-lg px-3 text-left transition-colors ${
+                  className={`lg:text-base text-sm w-full flex items-center gap-3 h-11 rounded-lg px-3 text-left transition-colors ${
                     isActive
                       ? 'bg-primary/20 text-primary font-medium'
                       : 'text-muted-foreground hover:bg-muted hover:text-foreground'
