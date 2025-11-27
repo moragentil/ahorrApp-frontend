@@ -65,7 +65,7 @@ function LoginScreen({ onLogin }) {
               onChange={handleChange}
               required
               className="w-full px-2 py-1 bg-input border border-border text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm sm:text-base"
-              placeholder="admin@ahorrapp.com"
+              placeholder="tu@email.com"
             />
           </div>
 
@@ -81,7 +81,7 @@ function LoginScreen({ onLogin }) {
               onChange={handleChange}
               required
               className="w-full px-2 py-1 bg-input border border-border text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm sm:text-base"
-              placeholder="123456"
+              placeholder="Tu contraseña"
             />
           </div>
 

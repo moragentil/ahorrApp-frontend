@@ -19,7 +19,15 @@ export const authService = {
   register: async (name, email, password) => {
     try {
       const res = await api.post('/register', { name, email, password });
-      return { success: true, user: res.data };
+      const { access_token, token_type, user } = res.data;
+      
+      // Guardar token en localStorage
+      localStorage.setItem('token', access_token);
+      
+      // Guardar usuario en localStorage
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { success: true, user };
     } catch (err) {
       return { success: false, error: err.response?.data?.message || 'Error al registrar' };
     }

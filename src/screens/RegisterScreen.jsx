@@ -28,7 +28,12 @@ function RegisterScreen({ onRegister }) {
 
     const result = await authService.register(formData.name, formData.email, formData.password);
     if (result.success) {
-      navigate('/login');
+      // Llamar al callback con el usuario registrado
+      if (onRegister) {
+        onRegister(result.user);
+      }
+      // Redirigir al home en lugar de login
+      navigate('/home');
     } else {
       setError(result.error);
     }
@@ -79,7 +84,7 @@ function RegisterScreen({ onRegister }) {
               onChange={handleChange}
               required
               className="w-full px-2 py-1 bg-input border border-border text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm sm:text-base"
-              placeholder="admin@ahorrapp.com"
+              placeholder="tu@email.com"
             />
           </div>
           <div>
@@ -93,8 +98,9 @@ function RegisterScreen({ onRegister }) {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={6}
               className="w-full px-2 py-1 bg-input border border-border text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm sm:text-base"
-              placeholder="123456"
+              placeholder="Mínimo 6 caracteres"
             />
           </div>
           <button
@@ -102,7 +108,7 @@ function RegisterScreen({ onRegister }) {
             disabled={loading}
             className="w-full bg-primary text-primary-foreground py-2 px-4 rounded-md hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium transition-colors"
           >
-            {loading ? 'Registrando...' : 'Registrarse'}
+            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
           </button>
         </form>
 
