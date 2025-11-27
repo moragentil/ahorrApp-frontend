@@ -3,6 +3,7 @@ import { BrowserRouter, useLocation } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { authService } from './services/authService';
 import Navbar from './components/Navbar';
+import { Toaster } from './components/ui/sonner';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -36,6 +37,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className="flex min-h-screen bg-gray-100">
+        <Toaster position="top-right" richColors />
         {user && <Navbar user={user} onLogout={handleLogout} />}
         <main className={`flex-1 ${user ? 'ml-0 lg:ml-64' : ''}`}>
           <AppRoutes 

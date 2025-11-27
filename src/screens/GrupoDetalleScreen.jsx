@@ -8,6 +8,9 @@ import { gastoCompartidoService } from '../services/gastoCompartidoService';
 import BtnLoading from '../components/BtnLoading';
 import EditGroupExpenseModal from '../components/Modals/EditGroupExpenseModal';
 import GastoDetalleModal from '../components/Modals/GastoDetalleModal';
+import IconSelector from '../components/IconSelector';
+import { renderIcon } from '../utils/iconHelper';
+import { toast } from 'sonner';
 
 
 function GrupoDetalleScreen({ user }) {
@@ -25,6 +28,7 @@ function GrupoDetalleScreen({ user }) {
   const [newExpenseDesc, setNewExpenseDesc] = useState('');
   const [newExpenseMonto, setNewExpenseMonto] = useState('');
   const [newExpenseFecha, setNewExpenseFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [newExpenseIcon, setNewExpenseIcon] = useState('Coins');
   const [selectedPagador, setSelectedPagador] = useState('');
   const [selectedParticipantes, setSelectedParticipantes] = useState([]);
   const [addExpenseLoading, setAddExpenseLoading] = useState(false);
@@ -48,6 +52,7 @@ function GrupoDetalleScreen({ user }) {
   const [editExpenseDesc, setEditExpenseDesc] = useState('');
   const [editExpenseMonto, setEditExpenseMonto] = useState('');
   const [editExpenseFecha, setEditExpenseFecha] = useState('');
+  const [editExpenseIcon, setEditExpenseIcon] = useState('Coins');
   const [editSelectedPagador, setEditSelectedPagador] = useState('');
   const [editSelectedParticipantes, setEditSelectedParticipantes] = useState([]);
   const [editLoading, setEditLoading] = useState(false);
@@ -75,7 +80,7 @@ function GrupoDetalleScreen({ user }) {
         ]);
       } catch (err) {
         console.error('Error al cargar datos:', err);
-        alert('Error al cargar los datos del grupo');
+        toast.error('Error al cargar los datos del grupo');
       } finally {
         setLoading(false);
       }
@@ -144,7 +149,7 @@ function GrupoDetalleScreen({ user }) {
 
   const handleAddExpense = async () => {
     if (!newExpenseDesc.trim() || !newExpenseMonto || !selectedPagador || selectedParticipantes.length === 0) {
-      alert('Por favor completa todos los campos');
+      toast.error('Por favor completa todos los campos');
       return;
     }
 
@@ -154,6 +159,7 @@ function GrupoDetalleScreen({ user }) {
         grupo_gasto_id: id,
         pagado_por_participante_id: parseInt(selectedPagador),
         descripcion: newExpenseDesc,
+        icono: newExpenseIcon,
         monto_total: parseFloat(newExpenseMonto),
         fecha: newExpenseFecha,
         participantes: selectedParticipantes,
@@ -162,68 +168,68 @@ function GrupoDetalleScreen({ user }) {
       setIsAddExpenseOpen(false);
       setNewExpenseDesc('');
       setNewExpenseMonto('');
+      setNewExpenseIcon('Coins');
       setSelectedPagador('');
       setNewExpenseFecha(new Date().toISOString().split('T')[0]);
       await loadGastos();
-      alert('Gasto agregado correctamente');
+      toast.success('Gasto agregado correctamente');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al agregar el gasto');
+      toast.error(err.response?.data?.message || 'Error al agregar el gasto');
     }
     setAddExpenseLoading(false);
   };
 
-const handleEditGasto = (gasto) => {
-  setEditingGasto(gasto);
-  setEditExpenseDesc(gasto.descripcion);
-  setEditExpenseMonto(gasto.monto_total.toString());
-  setEditExpenseFecha(gasto.fecha);
-  setEditSelectedPagador(gasto.pagador?.id || '');
-  
-  // CRÍTICO: Extraer correctamente los IDs de participantes
-  const participantesIds = gasto.aportes?.map(a => {
-    return parseInt(a.participante_id);
-  }) || [];
-  
-  setEditSelectedParticipantes(participantesIds);
-  setIsEditExpenseOpen(true);
-};
-
-const handleUpdateExpense = async () => {
-  if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador || editSelectedParticipantes.length === 0) {
-    alert('Por favor completa todos los campos y selecciona al menos un participante');
-    return;
-  }
-
-  setEditLoading(true);
-  try {
-    const participantesIds = editSelectedParticipantes.map(id => parseInt(id));
+  const handleEditGasto = (gasto) => {
+    setEditingGasto(gasto);
+    setEditExpenseDesc(gasto.descripcion);
+    setEditExpenseMonto(gasto.monto_total.toString());
+    setEditExpenseFecha(gasto.fecha);
+    setEditExpenseIcon(gasto.icono || 'Coins');
+    setEditSelectedPagador(gasto.pagador?.id || '');
     
-    const dataToSend = {
-      descripcion: editExpenseDesc,
-      monto_total: parseFloat(editExpenseMonto),
-      fecha: editExpenseFecha,
-      pagado_por_participante_id: parseInt(editSelectedPagador),
-      participantes: participantesIds,
-    };
-    
-    await gastoCompartidoService.update(editingGasto.id, dataToSend);
+    const participantesIds = gasto.aportes?.map(a => parseInt(a.participante_id)) || [];
+    setEditSelectedParticipantes(participantesIds);
+    setIsEditExpenseOpen(true);
+  };
 
-    setIsEditExpenseOpen(false);
-    setEditingGasto(null);
-    setEditExpenseDesc('');
-    setEditExpenseMonto('');
-    setEditExpenseFecha('');
-    setEditSelectedPagador('');
-    setEditSelectedParticipantes([]);
-    
-    await loadGastos();
-    await loadBalances();
-    alert('Gasto actualizado correctamente');
-  } catch (err) {
-    alert(err.response?.data?.message || 'Error al actualizar el gasto');
-  }
-  setEditLoading(false);
-};
+  const handleUpdateExpense = async () => {
+    if (!editExpenseDesc.trim() || !editExpenseMonto || !editSelectedPagador || editSelectedParticipantes.length === 0) {
+      toast.error('Por favor completa todos los campos y selecciona al menos un participante');
+      return;
+    }
+
+    setEditLoading(true);
+    try {
+      const participantesIds = editSelectedParticipantes.map(id => parseInt(id));
+      
+      const dataToSend = {
+        descripcion: editExpenseDesc,
+        icono: editExpenseIcon,
+        monto_total: parseFloat(editExpenseMonto),
+        fecha: editExpenseFecha,
+        pagado_por_participante_id: parseInt(editSelectedPagador),
+        participantes: participantesIds,
+      };
+      
+      await gastoCompartidoService.update(editingGasto.id, dataToSend);
+
+      setIsEditExpenseOpen(false);
+      setEditingGasto(null);
+      setEditExpenseDesc('');
+      setEditExpenseMonto('');
+      setEditExpenseFecha('');
+      setEditExpenseIcon('Coins');
+      setEditSelectedPagador('');
+      setEditSelectedParticipantes([]);
+      
+      await loadGastos();
+      await loadBalances();
+      toast.success('Gasto actualizado correctamente');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al actualizar el gasto');
+    }
+    setEditLoading(false);
+  };
 
   const toggleParticipante = (participanteId) => {
     if (selectedParticipantes.includes(participanteId)) {
@@ -260,7 +266,7 @@ const handleUpdateExpense = async () => {
       setInviteLink(response.url);
       await loadInvitacionesPendientes();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al generar enlace');
+      toast.error(err.response?.data?.message || 'Error al generar enlace');
     }
     setInviteLinkLoading(false);
   };
@@ -269,6 +275,7 @@ const handleUpdateExpense = async () => {
     navigator.clipboard.writeText(inviteLink);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
+    toast.success('Enlace copiado al portapapeles');
   };
 
   const handleOpenInviteModal = async () => {
@@ -285,10 +292,10 @@ const handleUpdateExpense = async () => {
       await invitacionGrupoService.enviarInvitacion(id, inviteEmail);
       setInviteEmail('');
       setIsInviteModalOpen(false);
-      alert('Invitación enviada correctamente');
+      toast.success('Invitación enviada correctamente');
       await loadInvitacionesPendientes();
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al enviar la invitación');
+      toast.error(err.response?.data?.message || 'Error al enviar la invitación');
     }
     setInviteLoading(false);
   };
@@ -298,14 +305,15 @@ const handleUpdateExpense = async () => {
     try {
       await invitacionGrupoService.cancelar(invitacionId);
       await loadInvitacionesPendientes();
+      toast.success('Invitación cancelada');
     } catch (err) {
-      alert('Error al cancelar la invitación');
+      toast.error('Error al cancelar la invitación');
     }
   };
 
   const handleAddParticipante = async () => {
     if (!newParticipanteNombre.trim()) {
-      alert('El nombre es obligatorio');
+      toast.error('El nombre es obligatorio');
       return;
     }
 
@@ -321,9 +329,9 @@ const handleUpdateExpense = async () => {
       setNewParticipanteNombre('');
       setNewParticipanteEmail('');
       await loadParticipantes();
-      alert('Participante agregado correctamente');
+      toast.success('Participante agregado correctamente');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al agregar el participante');
+      toast.error(err.response?.data?.message || 'Error al agregar el participante');
     }
     setAddParticipanteLoading(false);
   };
@@ -333,9 +341,9 @@ const handleUpdateExpense = async () => {
     try {
       await participanteService.delete(participanteId);
       await loadParticipantes();
-      alert('Participante eliminado');
+      toast.success('Participante eliminado');
     } catch (err) {
-      alert('Error al eliminar el participante');
+      toast.error('Error al eliminar el participante');
     }
   };
 
@@ -344,9 +352,9 @@ const handleUpdateExpense = async () => {
     try {
       await gastoCompartidoService.delete(gastoId);
       await loadGastos();
-      alert('Gasto eliminado');
+      toast.success('Gasto eliminado');
     } catch (err) {
-      alert('Error al eliminar el gasto');
+      toast.error('Error al eliminar el gasto');
     }
   };
 
@@ -368,15 +376,13 @@ const handleUpdateExpense = async () => {
 
   const handleAssociateEmail = async () => {
     if (!associateEmail.trim()) {
-      alert('El email es obligatorio');
+      toast.error('El email es obligatorio');
       return;
     }
 
     setAssociateLoading(true);
     try {
-      const response = await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
-      
-      // Enviar invitación
+      await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
       await invitacionGrupoService.enviarInvitacion(id, associateEmail);
       
       setIsAssociateEmailOpen(false);
@@ -386,9 +392,9 @@ const handleUpdateExpense = async () => {
       await loadParticipantes();
       await loadInvitacionesPendientes();
       
-      alert('Email asociado e invitación enviada correctamente');
+      toast.success('Email asociado e invitación enviada correctamente');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al asociar email');
+      toast.error(err.response?.data?.message || 'Error al asociar email');
     }
     setAssociateLoading(false);
   };
@@ -409,6 +415,10 @@ const handleUpdateExpense = async () => {
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-foreground mb-4">Nuevo Gasto Compartido</h2>
             <div className="space-y-4">
+              <IconSelector
+                selectedIcon={newExpenseIcon}
+                onSelectIcon={setNewExpenseIcon}
+              />
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
                   Descripción *
@@ -668,6 +678,8 @@ const handleUpdateExpense = async () => {
           setEditExpenseMonto={setEditExpenseMonto}
           editExpenseFecha={editExpenseFecha}
           setEditExpenseFecha={setEditExpenseFecha}
+          editExpenseIcon={editExpenseIcon}
+          setEditExpenseIcon={setEditExpenseIcon}
           editSelectedPagador={editSelectedPagador}
           setEditSelectedPagador={setEditSelectedPagador}
           editSelectedParticipantes={editSelectedParticipantes}
@@ -837,7 +849,7 @@ const handleUpdateExpense = async () => {
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-2xl">💰</span>
+                            {renderIcon(gasto.icono || 'Coins', 'w-6 h-6 text-primary')}
                           </div>
                           <div className="flex-1">
                             <h3 className="font-semibold text-foreground text-lg">
@@ -1198,6 +1210,8 @@ const handleUpdateExpense = async () => {
           setEditExpenseMonto={setEditExpenseMonto}
           editExpenseFecha={editExpenseFecha}
           setEditExpenseFecha={setEditExpenseFecha}
+          editExpenseIcon={editExpenseIcon}
+          setEditExpenseIcon={setEditExpenseIcon}
           editSelectedPagador={editSelectedPagador}
           setEditSelectedPagador={setEditSelectedPagador}
           editSelectedParticipantes={editSelectedParticipantes}
