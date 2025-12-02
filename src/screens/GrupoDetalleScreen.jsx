@@ -8,6 +8,7 @@ import { gastoCompartidoService } from '../services/gastoCompartidoService';
 import BtnLoading from '../components/BtnLoading';
 import EditGroupExpenseModal from '../components/Modals/EditGroupExpenseModal';
 import GastoDetalleModal from '../components/Modals/GastoDetalleModal';
+import ConfirmarPagoModal from '../components/Modals/ConfirmarPagoModal';
 import IconSelector from '../components/IconSelector';
 import { renderIcon } from '../utils/iconHelper';
 import { toast } from 'sonner';
@@ -66,6 +67,11 @@ function GrupoDetalleScreen({ user }) {
   const [selectedParticipante, setSelectedParticipante] = useState(null);
   const [associateEmail, setAssociateEmail] = useState('');
   const [associateLoading, setAssociateLoading] = useState(false);
+
+  // Confirmar pago balance modal
+  const [isConfirmarPagoOpen, setIsConfirmarPagoOpen] = useState(false);
+  const [selectedTransaccion, setSelectedTransaccion] = useState(null);
+  const [pagoLoading, setPagoLoading] = useState(false);
 
 
   useEffect(() => {
@@ -397,6 +403,37 @@ function GrupoDetalleScreen({ user }) {
       toast.error(err.response?.data?.message || 'Error al asociar email');
     }
     setAssociateLoading(false);
+  };
+
+  const handleOpenConfirmarPago = (transaccion) => {
+    setSelectedTransaccion(transaccion);
+    setIsConfirmarPagoOpen(true);
+  };
+
+  const handleConfirmarPago = async () => {
+    if (!selectedTransaccion) return;
+
+    setPagoLoading(true);
+    try {
+      await grupoGastoService.registrarPagoBalance(id, {
+        de_participante_id: selectedTransaccion.de_participante_id,
+        para_participante_id: selectedTransaccion.para_participante_id,
+        monto: parseFloat(selectedTransaccion.monto),
+      });
+
+      setIsConfirmarPagoOpen(false);
+      setSelectedTransaccion(null);
+      
+      await Promise.all([
+        loadBalances(),
+        loadGastos()
+      ]);
+      
+      toast.success('Pago registrado correctamente');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al registrar el pago');
+    }
+    setPagoLoading(false);
   };
 
   if (loading) {
@@ -758,6 +795,18 @@ function GrupoDetalleScreen({ user }) {
         </div>
       )}
 
+      {/* Confirmar Pago Modal */}
+      <ConfirmarPagoModal
+        isOpen={isConfirmarPagoOpen}
+        onClose={() => {
+          setIsConfirmarPagoOpen(false);
+          setSelectedTransaccion(null);
+        }}
+        transaccion={selectedTransaccion}
+        onConfirm={handleConfirmarPago}
+        loading={pagoLoading}
+      />
+
       <main className="max-w-7xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -914,13 +963,14 @@ function GrupoDetalleScreen({ user }) {
                   Transacciones para Equilibrar
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Estas son las transferencias mínimas necesarias para saldar todas las deudas:
+                  Estas son las transferencias mínimas necesarias para saldar todas las deudas. Toca una transacción para marcarla como pagada.
                 </p>
                 <div className="space-y-3">
                   {balances.transacciones.map((transaccion, index) => (
-                    <div 
+                    <button
                       key={index}
-                      className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg"
+                      onClick={() => handleOpenConfirmarPago(transaccion)}
+                      className="w-full flex items-center gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border hover:border-primary/50"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
@@ -936,7 +986,7 @@ function GrupoDetalleScreen({ user }) {
                       <div className="flex items-center gap-2">
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
                         <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold">
-                           ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
+                          ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
                         </div>
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
                       </div>
@@ -951,7 +1001,7 @@ function GrupoDetalleScreen({ user }) {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>

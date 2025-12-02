@@ -165,7 +165,7 @@ function Navbar({ user, onLogout }) {
             </div>
             <button
               onClick={handleLogoutClick}
-              className="w-full flex items-center gap-3 text-destructive hover:text-destructive/90 hover:bg-destructive/10 bg-transparent px-3 py-2 rounded-lg"
+              className="w-full flex items-center gap-3 text-white hover:bg-muted hover:text-foreground bg-transparent px-3 py-2 rounded-lg"
             >
               <LogOut className="w-4 h-4" />
               Cerrar Sesión

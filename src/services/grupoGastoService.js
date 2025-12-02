@@ -68,4 +68,9 @@ export const grupoGastoService = {
     const res = await api.put(`/pagos-grupos/${pagoId}/completar`);
     return res.data;
   },
+
+  registrarPagoBalance: async (grupoId, data) => {
+    const response = await api.post(`/grupos-gastos/${grupoId}/registrar-pago-balance`, data);
+    return response.data;
+  },
 };
