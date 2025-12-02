@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield, Copy, Check, MessageCircle, Link } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield, Copy, Check, MessageCircle, Link, CheckCheck } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -954,8 +954,6 @@ function GrupoDetalleScreen({ user }) {
 
         {activeTab === 'balances' && balances && (
           <div className="space-y-6">
-            
-
             {/* Transacciones Sugeridas */}
             {balances.transacciones && balances.transacciones.length > 0 && (
               <div className="bg-card border border-border rounded-lg p-4 lg:p-6">
@@ -1008,8 +1006,8 @@ function GrupoDetalleScreen({ user }) {
             )}
 
             {balances.transacciones && balances.transacciones.length === 0 && (
-              <div className="bg-card border border-border rounded-lg p-8 text-center">
-                <div className="text-6xl mb-4">✅</div>
+              <div className="bg-card border border-border w-full flex flex-col justify-center items-center rounded-lg p-8 text-center">
+                <div className="text-6xl text-center mb-4"><CheckCheck size={40}/></div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">¡Todo equilibrado!</h3>
                 <p className="text-muted-foreground">No hay deudas pendientes en este grupo</p>
               </div>
@@ -1022,55 +1020,64 @@ function GrupoDetalleScreen({ user }) {
                 Balance por Participante
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {balances.balances?.map(balance => (
-                  <div 
-                    key={balance.participante_id}
-                    className={`p-4 rounded-lg border ${
-                      balance.balance > 0 
-                        ? 'bg-success/10 border-success/30' 
-                        : balance.balance < 0 
-                        ? 'bg-destructive/10 border-destructive/30'
-                        : 'bg-muted/30 border-border'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                        balance.es_usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                      }`}>
-                        {balance.nombre.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-foreground">{balance.nombre}</p>
-                        {balance.email && (
-                          <p className="text-xs text-muted-foreground">{balance.email}</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Pagó:</span>
-                        <span className="font-medium text-foreground">${Math.round(parseFloat(balance.total_pagado || 0)).toLocaleString('es-ES')}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Debe:</span>
-                        <span className="font-medium text-foreground">${Math.round(parseFloat(balance.total_debe || 0)).toLocaleString('es-ES')}</span>
-                      </div>
-                      <div className="pt-2 border-t border-border/50 flex justify-between">
-                        <span className="font-semibold text-foreground">Balance:</span>
-                        <span className={`font-bold ${
-                          balance.balance > 0 
-                            ? 'text-success' 
-                            : balance.balance < 0 
-                            ? 'text-destructive'
-                            : 'text-muted-foreground'
+                {balances.balances?.map(balance => {
+                  // Redondear el balance para evitar errores de punto flotante
+                  const balanceRedondeado = Math.round(parseFloat(balance.balance || 0));
+                  
+                  return (
+                    <div 
+                      key={balance.participante_id}
+                      className={`p-4 rounded-lg border ${
+                        balanceRedondeado > 0 
+                          ? 'bg-success/10 border-success/30' 
+                          : balanceRedondeado < 0 
+                          ? 'bg-destructive/10 border-destructive/30'
+                          : 'bg-muted/30 border-border'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          balance.es_usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
                         }`}>
-                          {balance.balance > 0 ? '+' : ''}${Math.round(parseFloat(balance.balance || 0)).toLocaleString('es-ES')}
-                        </span>
+                          {balance.nombre.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-foreground">{balance.nombre}</p>
+                          {balance.email && (
+                            <p className="text-xs text-muted-foreground">{balance.email}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Pagó:</span>
+                          <span className="font-medium text-foreground">
+                            ${Math.round(parseFloat(balance.total_pagado || 0)).toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Debe:</span>
+                          <span className="font-medium text-foreground">
+                            ${Math.round(parseFloat(balance.total_debe || 0)).toLocaleString('es-ES')}
+                          </span>
+                        </div>
+                        <div className="pt-2 border-t border-border/50 flex justify-between">
+                          <span className="font-semibold text-foreground">Balance:</span>
+                          <span className={`font-bold ${
+                            balanceRedondeado > 0 
+                              ? 'text-success' 
+                              : balanceRedondeado < 0 
+                              ? 'text-destructive'
+                              : 'text-muted-foreground'
+                          }`}>
+                            {balanceRedondeado > 0 ? '+' : ''}${balanceRedondeado.toLocaleString('es-ES')}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
