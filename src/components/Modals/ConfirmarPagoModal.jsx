@@ -44,19 +44,8 @@ function ConfirmarPagoModal({ isOpen, onClose, transaccion, onConfirm, loading }
           </div>
         </div>
 
-        <div className="bg-primary/10 border border-primary/30 rounded-lg p-4 mb-6">
-          <p className="text-sm text-foreground mb-2">
-            <strong>⚠️ Importante:</strong>
-          </p>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Esta acción no se puede deshacer automáticamente</li>
-            <li>• Solo marca este pago como realizado</li>
-            <li>• El balance del grupo se actualizará</li>
-          </ul>
-        </div>
-
         <p className="text-center text-foreground mb-6">
-          ¿Confirmas que <strong>{transaccion.de_nombre}</strong> ya pagó <strong>${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}</strong> a <strong>{transaccion.para_nombre}</strong>?
+          ¿Confirmas que {transaccion.de_nombre} ya pagó ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')} a {transaccion.para_nombre}?
         </p>
 
         <div className="flex gap-3">
