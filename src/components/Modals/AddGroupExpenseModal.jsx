@@ -1,44 +1,44 @@
-import BtnLoading from '../BtnLoading';
+import React from 'react';
 import IconSelector from '../IconSelector';
+import BtnLoading from '../BtnLoading';
 
-export default function EditGroupExpenseModal({
+export default function AddGroupExpenseModal({
     isOpen,
     onClose,
+    newExpenseIcon,
+    setNewExpenseIcon,
+    newExpenseDesc,
+    setNewExpenseDesc,
+    newExpenseMonto,
+    setNewExpenseMonto,
+    newExpenseFecha,
+    setNewExpenseFecha,
+    selectedPagador,
+    setSelectedPagador,
     participantes,
-    editExpenseDesc,
-    setEditExpenseDesc,
-    editExpenseMonto,
-    setEditExpenseMonto,
-    editExpenseFecha,
-    setEditExpenseFecha,
-    editExpenseIcon,
-    setEditExpenseIcon,
-    editSelectedPagador,
-    setEditSelectedPagador,
-    editSelectedParticipantes,
-    editLoading,
-    toggleEditParticipante,
-    handleUpdateExpense,
+    selectedParticipantes,
+    toggleParticipante,
+    handleAddExpense,
+    addExpenseLoading,
+    setIsAddExpenseOpen,
 }) {
-    if (!isOpen) return null;
-
-    return(
+    return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold text-foreground mb-4">Editar Gasto</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Nuevo Gasto Compartido</h2>
             <div className="space-y-4">
               <div className="flex gap-2 items-center">
               <IconSelector
-                selectedIcon={editExpenseIcon}
-                onSelectIcon={setEditExpenseIcon}
+                selectedIcon={newExpenseIcon}
+                onSelectIcon={setNewExpenseIcon}
               />
               <div>
                 <input
                   type="text"
-                  value={editExpenseDesc}
-                  onChange={e => setEditExpenseDesc(e.target.value)}
+                  value={newExpenseDesc}
+                  onChange={e => setNewExpenseDesc(e.target.value)}
                   className="w-full px-3 py-1 border border-border bg-input text-foreground rounded-md"
-                  placeholder="Ej: Cena en restaurante"
+                  placeholder="Título del gasto"
                 />
               </div>
               </div>
@@ -49,8 +49,8 @@ export default function EditGroupExpenseModal({
                 <input
                   type="number"
                   step="0.01"
-                  value={editExpenseMonto}
-                  onChange={e => setEditExpenseMonto(e.target.value)}
+                  value={newExpenseMonto}
+                  onChange={e => setNewExpenseMonto(e.target.value)}
                   className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
                   placeholder="0.00"
                 />
@@ -61,8 +61,8 @@ export default function EditGroupExpenseModal({
                 </label>
                 <input
                   type="date"
-                  value={editExpenseFecha}
-                  onChange={e => setEditExpenseFecha(e.target.value)}
+                  value={newExpenseFecha}
+                  onChange={e => setNewExpenseFecha(e.target.value)}
                   className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
                 />
               </div>
@@ -71,8 +71,8 @@ export default function EditGroupExpenseModal({
                   Pagado por *
                 </label>
                 <select
-                  value={editSelectedPagador}
-                  onChange={e => setEditSelectedPagador(e.target.value)}
+                  value={selectedPagador}
+                  onChange={e => setSelectedPagador(e.target.value)}
                   className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
                 >
                   <option value="">Seleccionar...</option>
@@ -85,15 +85,15 @@ export default function EditGroupExpenseModal({
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Dividir entre * ({editSelectedParticipantes.length} seleccionados)
+                  Dividir entre *
                 </label>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {participantes.map(p => (
                     <label key={p.id} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
-                        checked={editSelectedParticipantes.includes(p.id)}
-                        onChange={() => toggleEditParticipante(p.id)}
+                        checked={selectedParticipantes.includes(p.id)}
+                        onChange={() => toggleParticipante(p.id)}
                         className="w-4 h-4"
                       />
                       <span className="text-foreground">
@@ -106,16 +106,16 @@ export default function EditGroupExpenseModal({
             </div>
             <div className="flex gap-3 mt-6">
               <button
-                onClick={handleUpdateExpense}
-                disabled={editLoading}
+                onClick={handleAddExpense}
+                disabled={addExpenseLoading}
                 className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50"
               >
-                {editLoading ? <BtnLoading text="Guardando..." /> : 'Guardar Cambios'}
+                {addExpenseLoading ? <BtnLoading text="Guardando..." /> : 'Agregar Gasto'}
               </button>
               <button
-                onClick={onClose}
+                onClick={() => setIsAddExpenseOpen(false)}
                 className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
-                disabled={editLoading}
+                disabled={addExpenseLoading}
               >
                 Cancelar
               </button>
@@ -123,4 +123,4 @@ export default function EditGroupExpenseModal({
           </div>
         </div>
     )
-};
+}
