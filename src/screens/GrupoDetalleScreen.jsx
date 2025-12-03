@@ -422,23 +422,41 @@ function GrupoDetalleScreen({ user }) {
       return;
     }
 
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(associateEmail)) {
+      toast.error('Por favor ingresa un email válido');
+      return;
+    }
+
     setAssociateLoading(true);
     try {
-      await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
-      await invitacionGrupoService.enviarInvitacion(id, associateEmail);
+      // ✅ SOLO llamar a asociarEmail - el backend ya maneja la invitación
+      const response = await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
       
+      console.log('Respuesta completa:', response);
+      
+      // Cerrar modal y limpiar estados
       setIsAssociateEmailOpen(false);
       setSelectedParticipante(null);
       setAssociateEmail('');
       
-      await loadParticipantes();
-      await loadInvitacionesPendientes();
+      // Recargar datos
+      await Promise.all([
+        loadParticipantes(),
+        loadInvitacionesPendientes()
+      ]);
       
-      toast.success('Email asociado e invitación enviada correctamente');
+      toast.success(response.message || 'Email asociado e invitación enviada correctamente');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Error al asociar email');
+      console.error('Error:', err);
+      console.error('Response data:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.message || 'Error al asociar email';
+      toast.error(errorMessage);
+    } finally {
+      setAssociateLoading(false);
     }
-    setAssociateLoading(false);
   };
 
   const handleOpenConfirmarPago = (transaccion) => {
