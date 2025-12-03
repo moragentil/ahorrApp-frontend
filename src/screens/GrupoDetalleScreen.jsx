@@ -12,6 +12,7 @@ import ConfirmarPagoModal from '../components/Modals/ConfirmarPagoModal';
 import IconSelector from '../components/IconSelector';
 import { renderIcon } from '../utils/iconHelper';
 import { toast } from 'sonner';
+import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 
 
 function GrupoDetalleScreen({ user }) {
@@ -72,6 +73,14 @@ function GrupoDetalleScreen({ user }) {
   const [isConfirmarPagoOpen, setIsConfirmarPagoOpen] = useState(false);
   const [selectedTransaccion, setSelectedTransaccion] = useState(null);
   const [pagoLoading, setPagoLoading] = useState(false);
+
+  // Confirm delete modal
+  const [confirmDeleteModal, setConfirmDeleteModal] = useState({ 
+    isOpen: false, 
+    gastoId: null,
+    gastoNombre: ''
+  });
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
 
   useEffect(() => {
@@ -353,15 +362,39 @@ function GrupoDetalleScreen({ user }) {
     }
   };
 
-  const handleDeleteGasto = async (gastoId) => {
-    if (!confirm('¿Deseas eliminar este gasto?')) return;
+  const handleOpenConfirmDelete = (gasto) => {
+    setConfirmDeleteModal({ 
+      isOpen: true, 
+      gastoId: gasto.id,
+      gastoNombre: gasto.descripcion
+    });
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteModal.gastoId) return;
+
+    setDeleteLoading(true);
     try {
-      await gastoCompartidoService.delete(gastoId);
-      await loadGastos();
-      toast.success('Gasto eliminado');
+      await gastoCompartidoService.delete(confirmDeleteModal.gastoId);
+      
+      // Cerrar modal
+      setConfirmDeleteModal({ isOpen: false, gastoId: null, gastoNombre: '' });
+      
+      // Recargar datos
+      await Promise.all([
+        loadGastos(),
+        loadBalances()
+      ]);
+      
+      toast.success('Gasto eliminado correctamente');
     } catch (err) {
-      toast.error('Error al eliminar el gasto');
+      toast.error(err.response?.data?.message || 'Error al eliminar el gasto');
     }
+    setDeleteLoading(false);
+  };
+
+  const handleCloseConfirmDelete = () => {
+    setConfirmDeleteModal({ isOpen: false, gastoId: null, gastoNombre: '' });
   };
 
   const handleOpenDetalleGasto = (gasto) => {
@@ -734,6 +767,20 @@ function GrupoDetalleScreen({ user }) {
         />
       )}
 
+      {/* Confirm Delete Modal */}
+      <ConfirmDeleteModal
+        isOpen={confirmDeleteModal.isOpen}
+        onClose={handleCloseConfirmDelete}
+        onConfirm={handleConfirmDelete}
+        loading={deleteLoading}
+        accionTitulo="eliminación"
+        accion="eliminar"
+        pronombre="el"
+        entidad="gasto"
+        accionando="Eliminando"
+        nombreElemento={confirmDeleteModal.gastoNombre}
+      />
+
       {/* Associate Email Modal */}
       {isAssociateEmailOpen && selectedParticipante && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -938,7 +985,7 @@ function GrupoDetalleScreen({ user }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDeleteGasto(gasto.id);
+                        handleOpenConfirmDelete(gasto);
                       }}
                       className="text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
                     >
