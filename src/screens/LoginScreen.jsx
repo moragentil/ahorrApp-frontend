@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { PiggyBank } from 'lucide-react';
+import Logo from '../../public/logo-cerdo.png';
 
 function LoginScreen({ onLogin }) {
   const [formData, setFormData] = useState({
@@ -38,11 +39,11 @@ function LoginScreen({ onLogin }) {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-2">
-      <div className="max-w-md w-full bg-card rounded-lg shadow-xl border border-border p-4 sm:p-8">
-        <div className="text-center mb-8">
-          <PiggyBank className="w-14 h-14 text-primary bg-primary/10 rounded-full p-2 mx-auto mb-2" />
-          <h1 className="text-xl sm:text-3xl font-bold text-foreground">AhorrApp</h1>
-          <p className="text-primary mb-2 text-base sm:text-lg font-medium">Gestioná tus finanzas</p>
+      <div className="max-w-md w-full bg-card rounded-lg shadow-xl border border-border p-4 sm:px-8 sm:py-4">
+        <div className="text-center mb-4">
+          <img src={Logo} alt="AhorrApp Logo" className="w-36 mx-auto" />
+          <h1 className="text-xl sm:text-3xl font-bold text-primary">AhorrApp</h1>
+          <p className="text-foreground mb-1 text-sm sm:text-base font-medium">Gestioná tus finanzas</p>
           <p className="text-muted-foreground text-sm sm:text-base">Inicia sesión en tu cuenta</p>
         </div>
 
