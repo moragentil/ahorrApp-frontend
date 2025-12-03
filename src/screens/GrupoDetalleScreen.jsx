@@ -598,7 +598,11 @@ function GrupoDetalleScreen({ user }) {
       {isAddParticipanteOpen && (
         <AddParticipanteModal
           isOpen={isAddParticipanteOpen}
-          onClose={() => setIsAddParticipanteOpen(false)}
+          onClose={() => {
+            setIsAddParticipanteOpen(false);
+            setNewParticipanteNombre('');
+            setNewParticipanteEmail('');
+          }}
           newParticipanteNombre={newParticipanteNombre}
           setNewParticipanteNombre={setNewParticipanteNombre}
           newParticipanteEmail={newParticipanteEmail}
