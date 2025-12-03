@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
 import ConfirmDeleteModal from './Modals/ConfirmDeleteModal';
 import { useInvitacionesPendientes } from '../hooks/useInvitacionesPendientes';
+import Logo from '../../public/logo-cerdo.png';
 
 const menuItems = [
   { id: '/home', label: 'Dashboard', icon: Home },
@@ -65,7 +66,7 @@ function Navbar({ user, onLogout }) {
           {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
         <span className="font-bold text-primary text-2xl flex items-center">
-          <PiggyBank className="inline-block w-6 h-6 mr-1" />
+          <img src={Logo} alt="AhorrApp Logo" className="w-12" />
           AhorrApp
         </span>
         {/* Notification Badge for Mobile */}
@@ -106,9 +107,7 @@ function Navbar({ user, onLogout }) {
           {/* Logo */}
           <div className="p-4 lg:p-6 border-b border-border">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary rounded-full flex items-center justify-center">
-                <PiggyBank className="w-7 h-7 text-primary-foreground" />
-              </div>
+              <img src={Logo} alt="AhorrApp Logo" className='w-20' />
               <div>
                 <h1 className="text-xl font-bold text-primary">AhorrApp</h1>
                 <p className="text-sm text-muted-foreground">Gestor de finanzas</p>
