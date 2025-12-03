@@ -86,6 +86,9 @@ function GrupoDetalleScreen({ user }) {
   });
   const [confirmLoading, setConfirmLoading] = useState(false);
 
+  // Agregar estado para mostrar todas las invitaciones
+  const [showAllInvitations, setShowAllInvitations] = useState(false);
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -1047,9 +1050,34 @@ function GrupoDetalleScreen({ user }) {
               {/* Invitaciones Pendientes */}
               {invitacionesPendientes.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-sm font-semibold text-foreground mb-3">Invitaciones Activas</h4>
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-sm font-semibold text-foreground">
+                      Invitaciones Activas ({invitacionesPendientes.length})
+                    </h4>
+                    {invitacionesPendientes.length > 3 && (
+                      <button
+                        onClick={() => setShowAllInvitations(!showAllInvitations)}
+                        className="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1"
+                      >
+                        {showAllInvitations ? (
+                          <>
+                            Ver menos
+                            <ChevronRight className="w-4 h-4 rotate-90" />
+                          </>
+                        ) : (
+                          <>
+                            Ver todas
+                            <ChevronRight className="w-4 h-4 -rotate-90" />
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                   <div className="space-y-2">
-                    {invitacionesPendientes.map(inv => (
+                    {(showAllInvitations 
+                      ? invitacionesPendientes 
+                      : invitacionesPendientes.slice(0, 3)
+                    ).map(inv => (
                       <div key={inv.id} className="flex items-center justify-between p-3 bg-muted/30 border border-border rounded-lg">
                         <div className="flex-1">
                           {inv.es_enlace ? (
@@ -1075,7 +1103,7 @@ function GrupoDetalleScreen({ user }) {
                           )}
                         </div>
                         <button
-                          onClick={() => handleOpenConfirmCancelInvitacion(inv)} // ✅ Usar nueva función
+                          onClick={() => handleOpenConfirmCancelInvitacion(inv)}
                           className="text-destructive hover:bg-destructive/10 px-3 py-1 rounded-lg transition-colors text-sm"
                         >
                           Cancelar
@@ -1083,6 +1111,11 @@ function GrupoDetalleScreen({ user }) {
                       </div>
                     ))}
                   </div>
+                  {!showAllInvitations && invitacionesPendientes.length > 3 && (
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Mostrando 3 de {invitacionesPendientes.length} invitaciones
+                    </p>
+                  )}
                 </div>
               )}
             </div>
