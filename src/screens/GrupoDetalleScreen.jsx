@@ -78,12 +78,13 @@ function GrupoDetalleScreen({ user }) {
   const [pagoLoading, setPagoLoading] = useState(false);
 
   // Confirm delete modal
-  const [confirmDeleteModal, setConfirmDeleteModal] = useState({ 
-    isOpen: false, 
-    gastoId: null,
-    gastoNombre: ''
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    type: null, // 'deleteGasto', 'deleteParticipante', 'cancelInvitacion'
+    itemId: null,
+    itemName: '',
   });
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
 
   useEffect(() => {
@@ -318,17 +319,6 @@ function GrupoDetalleScreen({ user }) {
     setInviteLoading(false);
   };
 
-  const handleCancelarInvitacion = async (invitacionId) => {
-    if (!confirm('¿Deseas cancelar esta invitación?')) return;
-    try {
-      await invitacionGrupoService.cancelar(invitacionId);
-      await loadInvitacionesPendientes();
-      toast.success('Invitación cancelada');
-    } catch (err) {
-      toast.error('Error al cancelar la invitación');
-    }
-  };
-
   const handleAddParticipante = async () => {
     if (!newParticipanteNombre.trim()) {
       toast.error('El nombre es obligatorio');
@@ -354,50 +344,117 @@ function GrupoDetalleScreen({ user }) {
     setAddParticipanteLoading(false);
   };
 
-  const handleDeleteParticipante = async (participanteId) => {
-    if (!confirm('¿Deseas eliminar este participante?')) return;
-    try {
-      await participanteService.delete(participanteId);
-      await loadParticipantes();
-      toast.success('Participante eliminado');
-    } catch (err) {
-      toast.error('Error al eliminar el participante');
-    }
-  };
-
-  const handleOpenConfirmDelete = (gasto) => {
-    setConfirmDeleteModal({ 
-      isOpen: true, 
-      gastoId: gasto.id,
-      gastoNombre: gasto.descripcion
+  const handleOpenConfirmDeleteGasto = (gasto) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'deleteGasto',
+      itemId: gasto.id,
+      itemName: gasto.descripcion,
     });
   };
 
-  const handleConfirmDelete = async () => {
-    if (!confirmDeleteModal.gastoId) return;
-
-    setDeleteLoading(true);
-    try {
-      await gastoCompartidoService.delete(confirmDeleteModal.gastoId);
-      
-      // Cerrar modal
-      setConfirmDeleteModal({ isOpen: false, gastoId: null, gastoNombre: '' });
-      
-      // Recargar datos
-      await Promise.all([
-        loadGastos(),
-        loadBalances()
-      ]);
-      
-      toast.success('Gasto eliminado correctamente');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Error al eliminar el gasto');
-    }
-    setDeleteLoading(false);
+  const handleOpenConfirmDeleteParticipante = (participante) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'deleteParticipante',
+      itemId: participante.id,
+      itemName: participante.nombre,
+    });
   };
 
-  const handleCloseConfirmDelete = () => {
-    setConfirmDeleteModal({ isOpen: false, gastoId: null, gastoNombre: '' });
+  const handleOpenConfirmCancelInvitacion = (invitacion) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'cancelInvitacion',
+      itemId: invitacion.id,
+      itemName: invitacion.email || 'Enlace de invitación',
+    });
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal.itemId || !confirmModal.type) return;
+
+    setConfirmLoading(true);
+    try {
+      switch (confirmModal.type) {
+        case 'deleteGasto':
+          await gastoCompartidoService.delete(confirmModal.itemId);
+          await Promise.all([loadGastos(), loadBalances()]);
+          toast.success('Gasto eliminado correctamente');
+          break;
+
+        case 'deleteParticipante':
+          await participanteService.delete(confirmModal.itemId);
+          await loadParticipantes();
+          toast.success('Participante eliminado correctamente');
+          break;
+
+        case 'cancelInvitacion':
+          await invitacionGrupoService.cancelar(confirmModal.itemId);
+          await loadInvitacionesPendientes();
+          toast.success('Invitación cancelada correctamente');
+          break;
+
+        default:
+          break;
+      }
+
+      handleCloseConfirmModal();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Error al realizar la acción');
+    }
+    setConfirmLoading(false);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setConfirmModal({
+      isOpen: false,
+      type: null,
+      itemId: null,
+      itemName: '',
+    });
+  };
+
+  // Configuración dinámica del modal según el tipo
+  const getConfirmModalProps = () => {
+    switch (confirmModal.type) {
+      case 'deleteGasto':
+        return {
+          accionTitulo: 'eliminación',
+          accion: 'eliminar',
+          pronombre: 'el',
+          entidad: 'gasto',
+          accionando: 'Eliminando',
+          nombreElemento: confirmModal.itemName,
+        };
+      case 'deleteParticipante':
+        return {
+          accionTitulo: 'eliminación',
+          accion: 'eliminar',
+          pronombre: 'el',
+          entidad: 'participante',
+          accionando: 'Eliminando',
+          nombreElemento: confirmModal.itemName,
+          advertencia: 'Se eliminarán también sus aportes en los gastos.',
+        };
+      case 'cancelInvitacion':
+        return {
+          accionTitulo: 'cancelación',
+          accion: 'cancelar',
+          pronombre: 'la',
+          entidad: 'invitación',
+          accionando: 'Cancelando',
+          nombreElemento: confirmModal.itemName,
+        };
+      default:
+        return {
+          accionTitulo: 'confirmación',
+          accion: 'confirmar',
+          pronombre: '',
+          entidad: 'acción',
+          accionando: 'Procesando',
+        };
+    }
   };
 
   const handleOpenDetalleGasto = (gasto) => {
@@ -431,10 +488,10 @@ function GrupoDetalleScreen({ user }) {
 
     setAssociateLoading(true);
     try {
-      // ✅ SOLO llamar a asociarEmail - el backend ya maneja la invitación
+      // Solo llamar a asociarEmail - el backend se encarga de la invitación
       const response = await participanteService.asociarEmail(selectedParticipante.id, associateEmail);
       
-      console.log('Respuesta completa:', response);
+      console.log('Respuesta:', response);
       
       // Cerrar modal y limpiar estados
       setIsAssociateEmailOpen(false);
@@ -449,10 +506,10 @@ function GrupoDetalleScreen({ user }) {
       
       toast.success(response.message || 'Email asociado e invitación enviada correctamente');
     } catch (err) {
-      console.error('Error:', err);
-      console.error('Response data:', err.response?.data);
+      console.error('Error completo:', err);
+      console.error('Response:', err.response);
       
-      const errorMessage = err.response?.data?.message || 'Error al asociar email';
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || 'Error al asociar email';
       toast.error(errorMessage);
     } finally {
       setAssociateLoading(false);
@@ -478,10 +535,7 @@ function GrupoDetalleScreen({ user }) {
       setIsConfirmarPagoOpen(false);
       setSelectedTransaccion(null);
       
-      await Promise.all([
-        loadBalances(),
-        loadGastos()
-      ]);
+      await Promise.all([loadBalances(), loadGastos()]);
       
       toast.success('Pago registrado correctamente');
     } catch (err) {
@@ -489,6 +543,8 @@ function GrupoDetalleScreen({ user }) {
     }
     setPagoLoading(false);
   };
+
+  // ...existing functions (handleAddExpense, handleEditGasto, etc.)...
 
   if (loading) {
     return (
@@ -586,16 +642,11 @@ function GrupoDetalleScreen({ user }) {
 
       {/* Confirm Delete Modal */}
       <ConfirmDeleteModal
-        isOpen={confirmDeleteModal.isOpen}
-        onClose={handleCloseConfirmDelete}
-        onConfirm={handleConfirmDelete}
-        loading={deleteLoading}
-        accionTitulo="eliminación"
-        accion="eliminar"
-        pronombre="el"
-        entidad="gasto"
-        accionando="Eliminando"
-        nombreElemento={confirmDeleteModal.gastoNombre}
+        isOpen={confirmModal.isOpen}
+        onClose={handleCloseConfirmModal}
+        onConfirm={handleConfirmAction}
+        loading={confirmLoading}
+        {...getConfirmModalProps()}
       />
 
       {/* Associate Email Modal */}
@@ -802,7 +853,7 @@ function GrupoDetalleScreen({ user }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleOpenConfirmDelete(gasto);
+                        handleOpenConfirmDeleteGasto(gasto); // ✅ Usar nueva función
                       }}
                       className="text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
                     >
@@ -1020,7 +1071,7 @@ function GrupoDetalleScreen({ user }) {
                           )}
                         </div>
                         <button
-                          onClick={() => handleCancelarInvitacion(inv.id)}
+                          onClick={() => handleOpenConfirmCancelInvitacion(inv)} // ✅ Usar nueva función
                           className="text-destructive hover:bg-destructive/10 px-3 py-1 rounded-lg transition-colors text-sm"
                         >
                           Cancelar
@@ -1089,7 +1140,7 @@ function GrupoDetalleScreen({ user }) {
                           </div>
                         </div>
                         <button
-                          onClick={() => handleDeleteParticipante(p.id)}
+                          onClick={() => handleOpenConfirmDeleteParticipante(p)} // ✅ Usar nueva función
                           className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
                           title="Eliminar participante"
                         >
