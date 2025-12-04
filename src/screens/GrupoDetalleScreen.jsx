@@ -16,6 +16,7 @@ import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 import AddGroupExpenseModal from '../components/Modals/AddGroupExpenseModal';
 import InviteLinkModal from '../components/Modals/InviteLinkModal';
 import AddParticipanteModal from '../components/Modals/AddParticipanteModal';
+import AssociateEmailModal from '../components/Modals/AssociateEmailModal';
 
 
 function GrupoDetalleScreen({ user }) {
@@ -443,11 +444,10 @@ function GrupoDetalleScreen({ user }) {
       case 'cancelInvitacion':
         return {
           accionTitulo: 'cancelación',
-          accion: 'cancelar',
-          pronombre: 'la',
+          accion: 'confirmar',
+          pronombre: 'la cancelación de la',
           entidad: 'invitación',
           accionando: 'Cancelando',
-          nombreElemento: confirmModal.itemName,
         };
       default:
         return {
@@ -658,63 +658,21 @@ function GrupoDetalleScreen({ user }) {
 
       {/* Associate Email Modal */}
       {isAssociateEmailOpen && selectedParticipante && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Asociar Email a Participante</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              Asocia un email a <span className="font-semibold">{selectedParticipante.nombre}</span> para invitarlo al grupo como usuario registrado
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-1">
-                  Email del usuario
-                </label>
-                <input
-                  type="email"
-                  value={associateEmail}
-                  onChange={e => setAssociateEmail(e.target.value)}
-                  className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md"
-                  placeholder="usuario@ejemplo.com"
-                />
-              </div>
-              <div className="bg-primary/10 border border-primary/30 rounded-lg p-3">
-                <p className="text-xs text-foreground">
-                  💡 <strong>¿Qué sucederá?</strong>
-                </p>
-                <ul className="text-xs text-muted-foreground mt-2 space-y-1 ml-4">
-                  <li>• Se actualizará el email del participante</li>
-                  <li>• Se enviará una invitación al email indicado</li>
-                  <li>• Al aceptar, se vincularán todos los gastos existentes</li>
-                </ul>
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleAssociateEmail}
-                disabled={!associateEmail.trim() || associateLoading}
-                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {associateLoading ? <BtnLoading text="Enviando..." /> : (
-                  <>
-                    <Mail className="w-4 h-4" />
-                    Asociar y Enviar Invitación
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  setIsAssociateEmailOpen(false);
-                  setSelectedParticipante(null);
-                  setAssociateEmail('');
-                }}
-                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
-                disabled={associateLoading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <AssociateEmailModal
+          isOpen={isAssociateEmailOpen}
+          onClose={() => {
+            setIsAssociateEmailOpen(false);
+            setSelectedParticipante(null);
+            setAssociateEmail('');
+          }}
+          setIsAssociateEmailOpen={setIsAssociateEmailOpen}
+          selectedParticipante={selectedParticipante}
+          setSelectedParticipante={setSelectedParticipante}
+          associateEmail={associateEmail}
+          setAssociateEmail={setAssociateEmail}
+          associateLoading={associateLoading}
+          handleAssociateEmail={handleAssociateEmail}
+        />
       )}
 
       {/* Confirmar Pago Modal */}
@@ -1190,7 +1148,7 @@ function GrupoDetalleScreen({ user }) {
                         <div className="border-t border-border px-3 py-2 bg-muted/10">
                           <button
                             onClick={() => handleOpenAssociateEmail(p)}
-                            className="w-full text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                            className="w-full text-primary hover:bg-primary/10 px-3 py-1 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
                           >
                             <Mail className="w-4 h-4" />
                             {p.email ? 'Actualizar email e invitar' : 'Asociar email e invitar'}

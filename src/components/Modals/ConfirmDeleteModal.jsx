@@ -42,14 +42,14 @@ export default function ConfirmDeleteModal({
         <div className="flex mt-6 justify-end gap-3">
           <button
             onClick={onClose}
-            className="lg:text-base text-sm px-3 py-2 bg-muted text-foreground rounded hover:bg-muted/80 transition-colors"
+            className="lg:text-base text-sm px-3 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className={`lg:text-base text-sm px-3 py-2 capitalize text-foreground rounded flex items-center justify-center gap-2 transition-colors ${
+            className={`lg:text-base text-sm px-3 py-2 capitalize text-foreground rounded-md flex items-center justify-center gap-2 transition-colors ${
               loading ? 'bg-primary/50 cursor-not-allowed' : 'bg-primary hover:bg-primary/90'
             }`}
           >

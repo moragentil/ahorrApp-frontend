@@ -15,7 +15,7 @@ export default function InviteLinkModal({
     return(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Invitar al Grupo</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">Invitar al Grupo</h2>
             <p className="text-sm text-muted-foreground mb-4">
               Comparte este enlace con usuarios registrados para que puedan unirse al grupo
             </p>
@@ -39,7 +39,7 @@ export default function InviteLinkModal({
                     />
                     <button
                       onClick={handleCopyLink}
-                      className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 whitespace-nowrap"
+                      className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 flex items-center gap-2 whitespace-nowrap"
                     >
                       {linkCopied ? (
                         <>
@@ -65,7 +65,7 @@ export default function InviteLinkModal({
                     onClick={() => {
                       window.open(`https://wa.me/?text=${encodeURIComponent('¡Únete a nuestro grupo de gastos! ' + inviteLink)}`, '_blank');
                     }}
-                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
+                    className="flex-1 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center justify-center gap-2"
                   >
                     <MessageCircle className="w-4 h-4" />
                     WhatsApp
@@ -74,7 +74,7 @@ export default function InviteLinkModal({
                     onClick={() => {
                       window.open(`mailto:?subject=Invitación al grupo ${grupo.nombre}&body=${encodeURIComponent('Te invito a unirte a nuestro grupo de gastos compartidos:\n\n' + inviteLink)}`, '_blank');
                     }}
-                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                    className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center gap-2"
                   >
                     <Mail className="w-4 h-4" />
                     Email
@@ -90,7 +90,7 @@ export default function InviteLinkModal({
                   setInviteLink('');
                   setLinkCopied(false);
                 }}
-                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80"
+                className="flex-1 bg-muted text-foreground py-2 rounded-md hover:bg-muted/80"
               >
                 Cerrar
               </button>
