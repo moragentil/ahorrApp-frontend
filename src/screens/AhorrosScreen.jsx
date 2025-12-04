@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { PiggyBank, Plus, Edit, Trash2, Save, X, TrendingUp, Eye, EyeOff, CheckCircle2, PiggyBankIcon } from 'lucide-react';
 import { ahorroService } from '../services/ahorroService';
 import BtnLoading from '../components/BtnLoading';
 import AddGoalModal from '../components/Modals/AddGoalModal';
@@ -354,8 +354,8 @@ function AhorrosScreen({ user }) {
 
         {/* Empty State */}
         {filteredGoals.length === 0 && (
-          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
-            <div className="text-6xl mb-4">🐷</div>
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center items-center justify-center flex flex-col">
+            <div className="text-muted-foreground mb-4"><PiggyBankIcon size={52} strokeWidth={1.5}/></div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No tienes objetivos de ahorro</h3>
             <p className="text-muted-foreground mb-4">
               Crea tu primer objetivo para empezar a ahorrar

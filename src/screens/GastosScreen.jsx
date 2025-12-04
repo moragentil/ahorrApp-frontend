@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Filter, Plus, Edit, Trash2, Calendar, X } from 'lucide-react';
+import { Search, Filter, Plus, Edit, Trash2, Calendar, X, BanknoteArrowDown } from 'lucide-react';
 import { gastosService } from '../services/gastosService';
 import BtnLoading from '../components/BtnLoading';
 import EditExpenseModal from '../components/Modals/EditExpenseModal';
@@ -369,8 +369,8 @@ function GastosScreen({ user, onLogout }) {
         )}
 
         {filteredExpenses.length === 0 && (
-          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
-            <div className="text-6xl mb-4">💸</div>
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center items-center justify-center flex flex-col">
+            <div className="text-muted-foreground mb-4"><BanknoteArrowDown size={52} strokeWidth={1.5} /></div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No se encontraron gastos</h3>
             <p className="text-muted-foreground mb-4">Intenta ajustar los filtros o agregar un nuevo gasto</p>
             <button 

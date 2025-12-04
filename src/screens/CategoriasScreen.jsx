@@ -365,8 +365,8 @@ function CategoriasScreen({ user, onLogout }) {
 
         {/* Empty State */}
         {categories.length === 0 && (
-          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
-            <div className="text-6xl mb-4">🏷️</div>
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center items-center justify-center flex flex-col">
+            <div className="text-muted-foreground mb-4"><Tag size={52} strokeWidth={1.5} /></div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No hay categorías</h3>
             <p className="text-muted-foreground mb-4">
               Crea tu primera categoría para comenzar a organizar tus gastos e ingresos

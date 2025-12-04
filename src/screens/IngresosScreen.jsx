@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Calendar, Search } from 'lucide-react';
+import { Plus, Edit, Trash2, Calendar, Search, BanknoteArrowUp } from 'lucide-react';
 import { ingresosService } from '../services/ingresosService';
 import { categoriasService } from '../services/categoriasService';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
@@ -491,8 +491,8 @@ function IngresosScreen({ user }) {
 
         {/* Empty State */}
         {filteredIncomes.length === 0 && (
-          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
-            <div className="text-6xl mb-4 text-muted-foreground">💰</div>
+          <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center items-center justify-center flex flex-col">
+            <div className="text-muted-foreground mb-4"><BanknoteArrowUp size={52} strokeWidth={1.5} /></div>
             <h3 className="text-lg font-semibold text-foreground mb-2">No se encontraron ingresos</h3>
             <p className="text-muted-foreground mb-4">Intenta ajustar los filtros o agregar un nuevo ingreso</p>
             <button
