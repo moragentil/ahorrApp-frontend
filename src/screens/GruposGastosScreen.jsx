@@ -379,8 +379,8 @@ function GruposGastosScreen({ user }) {
         <div>
           <h2 className="text-lg font-semibold text-foreground mb-4">Mis Grupos</h2>
           {grupos.length === 0 ? (
-            <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center">
-              <div className="text-6xl mb-4">👥</div>
+            <div className="bg-card border border-border rounded-lg shadow-sm p-8 text-center flex flex-col items-center justify-center">
+              <div className="text-6xl mb-4 text-center"><Users /></div>
               <h3 className="text-lg font-semibold text-foreground mb-2">No tienes grupos</h3>
               <p className="text-muted-foreground mb-4">Crea un grupo para empezar a compartir gastos</p>
               <button
