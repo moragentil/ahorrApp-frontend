@@ -357,7 +357,18 @@ function GrupoDetalleScreen({ user }) {
     });
   };
 
+  // handleOpenConfirmDeleteParticipante
   const handleOpenConfirmDeleteParticipante = (participante) => {
+    const esUsuarioActual =
+      participante.usuario?.id === user?.id ||
+      participante.user_id === user?.id ||
+      participante.usuario_id === user?.id;
+
+    if (esUsuarioActual) {
+      toast.info('No podés eliminarte del grupo.');
+      return;
+    }
+
     setConfirmModal({
       isOpen: true,
       type: 'deleteParticipante',
@@ -1110,53 +1121,62 @@ function GrupoDetalleScreen({ user }) {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {participantes.map(p => (
-                    <div key={p.id} className="bg-muted/30 border border-border rounded-lg hover:bg-muted/40 transition-colors">
-                      <div className="flex items-center justify-between p-3">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                            p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                          }`}>
-                            {p.nombre.charAt(0).toUpperCase()}
+                  {participantes.map(p => {
+                    const esPropio =
+                      p.usuario?.id === user?.id ||
+                      p.user_id === user?.id ||
+                      p.usuario_id === user?.id;
+
+                    return (
+                      <div key={p.id} className="bg-muted/30 border border-border rounded-lg hover:bg-muted/40 transition-colors">
+                        <div className="flex items-center justify-between p-3">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                              p.usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                            }`}>
+                              {p.nombre.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-foreground truncate">{p.nombre}</p>
+                              {p.email ? (
+                                <p className="text-sm text-muted-foreground truncate">{p.email}</p>
+                              ) : (
+                                <p className="text-xs text-muted-foreground italic">Sin email asociado</p>
+                              )}
+                              {p.usuario && (
+                                <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mt-1">
+                                  <Shield className="w-3 h-3" />
+                                  Usuario del sistema
+                                </span>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-foreground truncate">{p.nombre}</p>
-                            {p.email ? (
-                              <p className="text-sm text-muted-foreground truncate">{p.email}</p>
-                            ) : (
-                              <p className="text-xs text-muted-foreground italic">Sin email asociado</p>
-                            )}
-                            {p.usuario && (
-                              <span className="inline-flex items-center gap-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded mt-1">
-                                <Shield className="w-3 h-3" />
-                                Usuario del sistema
-                              </span>
-                            )}
-                          </div>
+                          {!esPropio && (
+                            <button
+                              onClick={() => handleOpenConfirmDeleteParticipante(p)}
+                              className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
+                              title="Eliminar participante"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
                         </div>
-                        <button
-                          onClick={() => handleOpenConfirmDeleteParticipante(p)} // ✅ Usar nueva función
-                          className="text-destructive hover:bg-destructive/10 p-2 rounded-lg transition-colors ml-2"
-                          title="Eliminar participante"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        
+                        {/* Botón de asociar email - solo si NO tiene usuario vinculado */}
+                        {!p.usuario && (
+                          <div className="border-t border-border px-3 py-2 bg-muted/10">
+                            <button
+                              onClick={() => handleOpenAssociateEmail(p)}
+                              className="w-full text-primary hover:bg-primary/10 px-3 py-1 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                            >
+                              <Mail className="w-4 h-4" />
+                              {p.email ? 'Actualizar email e invitar' : 'Asociar email e invitar'}
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      
-                      {/* Botón de asociar email - solo si NO tiene usuario vinculado */}
-                      {!p.usuario && (
-                        <div className="border-t border-border px-3 py-2 bg-muted/10">
-                          <button
-                            onClick={() => handleOpenAssociateEmail(p)}
-                            className="w-full text-primary hover:bg-primary/10 px-3 py-1 rounded-lg transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                          >
-                            <Mail className="w-4 h-4" />
-                            {p.email ? 'Actualizar email e invitar' : 'Asociar email e invitar'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
