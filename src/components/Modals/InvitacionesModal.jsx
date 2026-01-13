@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Mail, X, Check, Clock, Link } from 'lucide-react';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import BtnLoading from '../BtnLoading';
+import { toast } from 'sonner';
 
 function InvitacionesModal({ isOpen, onClose, onInvitacionAceptada }) {
   const [invitaciones, setInvitaciones] = useState([]);
@@ -28,7 +29,7 @@ function InvitacionesModal({ isOpen, onClose, onInvitacionAceptada }) {
       setInvitaciones(invitaciones.filter(inv => inv.token !== token));
       if (onInvitacionAceptada) onInvitacionAceptada();
     } catch (err) {
-      alert('Error al aceptar la invitación');
+      toast.error('Error al aceptar la invitación');
     }
     setActionLoading(null);
   };
@@ -39,7 +40,7 @@ function InvitacionesModal({ isOpen, onClose, onInvitacionAceptada }) {
       await invitacionGrupoService.rechazar(token);
       setInvitaciones(invitaciones.filter(inv => inv.token !== token));
     } catch (err) {
-      alert('Error al rechazar la invitación');
+      toast.error('Error al rechazar la invitación');
     }
     setActionLoading(null);
   };
