@@ -21,6 +21,9 @@ function GruposGastosScreen({ user }) {
   const [nuevoParticipante, setNuevoParticipante] = useState('');
   const [addLoading, setAddLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(null);
+  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+  const [joinLink, setJoinLink] = useState('');
+  const [joinLoading, setJoinLoading] = useState(false);
 
   useEffect(() => {
     loadGrupos();
@@ -113,6 +116,23 @@ function GruposGastosScreen({ user }) {
     setActionLoading(null);
   };
 
+  const handleJoinByLink = async () => {
+    const trimmed = joinLink.trim();
+    if (!trimmed) return alert('Pegá el enlace o token de invitación');
+    const token = trimmed.split('/').filter(Boolean).pop();
+    setJoinLoading(true);
+    try {
+      await invitacionGrupoService.aceptar(token);
+      await loadGrupos();
+      setIsJoinDialogOpen(false);
+      setJoinLink('');
+      alert('¡Te has unido al grupo exitosamente!');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Enlace o token inválido');
+    }
+    setJoinLoading(false);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -135,6 +155,41 @@ function GruposGastosScreen({ user }) {
         accionando="Eliminando"
         nombreElemento={grupos.find(g => g.id === deleteGrupoId)?.nombre}
       />
+
+      {/* Join Group Modal */}
+      {isJoinDialogOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-foreground mb-4">Unirme a un grupo</h2>
+            <p className="text-sm text-muted-foreground mb-3">
+              Pegá el enlace o token de invitación compartido por un integrante del grupo.
+            </p>
+            <input
+              type="text"
+              value={joinLink}
+              onChange={e => setJoinLink(e.target.value)}
+              className="w-full px-3 py-2 border border-border bg-input text-foreground rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="https://app.com/invitaciones/abcdef123 o solo el token"
+            />
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleJoinByLink}
+                disabled={joinLoading}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+              >
+                {joinLoading ? <BtnLoading text="Uniendo..." /> : 'Unirme'}
+              </button>
+              <button
+                onClick={() => { setIsJoinDialogOpen(false); setJoinLink(''); }}
+                className="flex-1 bg-muted text-foreground py-2 rounded-lg hover:bg-muted/80 transition-colors"
+                disabled={joinLoading}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Group Modal */}
       {isAddDialogOpen && (
@@ -295,13 +350,22 @@ function GruposGastosScreen({ user }) {
               Gestiona gastos con amigos y familia
             </p>
           </div>
-          <button
-            onClick={() => setIsAddDialogOpen(true)}
-            className="text-sm lg:text-base bg-primary text-primary-foreground px-2 text-center justify-center lg:px-4 py-2 w-1/2 md:w-fit rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo Grupo
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-fit">
+            <button
+              onClick={() => setIsJoinDialogOpen(true)}
+              className="text-sm lg:text-base bg-secondary text-secondary-foreground px-2 lg:px-4 py-2 rounded-lg hover:bg-secondary/90 flex items-center gap-2 transition-colors"
+            >
+              <UserPlus className="w-4 h-4" />
+              Unirme a un grupo
+            </button>
+            <button
+              onClick={() => setIsAddDialogOpen(true)}
+              className="text-sm lg:text-base bg-primary text-primary-foreground px-2 text-center justify-center lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo Grupo
+            </button>
+          </div>
         </div>
 
         {/* Invitaciones Pendientes */}
