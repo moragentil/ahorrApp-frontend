@@ -357,7 +357,7 @@ function GruposGastosScreen({ user }) {
           <div className="flex flex-col sm:flex-row gap-2 w-full md:w-fit">
             <button
               onClick={() => setIsJoinDialogOpen(true)}
-              className="text-sm lg:text-base bg-secondary text-secondary-foreground px-2 lg:px-4 py-2 rounded-lg hover:bg-secondary/90 flex items-center gap-2 transition-colors"
+              className="text-sm lg:text-base bg-secondary text-secondary-foreground px-2 lg:px-4 py-2 justify-center rounded-lg hover:bg-secondary/90 flex items-center gap-2 transition-colors text-center"
             >
               <UserPlus className="w-4 h-4" />
               Unirme a un grupo

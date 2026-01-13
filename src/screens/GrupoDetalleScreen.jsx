@@ -988,7 +988,7 @@ function GrupoDetalleScreen({ user }) {
                   className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm"
                 >
                   <Link className="w-4 h-4" />
-                  Obtener Enlace
+                  <span className='hidden sm:inline'>Obtener Enlace</span>
                 </button>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
@@ -1101,7 +1101,7 @@ function GrupoDetalleScreen({ user }) {
                   className="bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 text-sm"
                 >
                   <UserPlus className="w-4 h-4" />
-                  Agregar Participante
+                  Agregar <span className='hidden sm:inline'>Participante</span>
                 </button>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
