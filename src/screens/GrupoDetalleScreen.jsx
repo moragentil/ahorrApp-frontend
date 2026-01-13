@@ -859,30 +859,30 @@ function GrupoDetalleScreen({ user }) {
                     <button
                       key={index}
                       onClick={() => handleOpenConfirmarPago(transaccion)}
-                      className="w-full flex items-center gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border hover:border-primary/50"
+                      className="w-full flex flex-col sm:flex-row sm:items-center items-start gap-3 sm:gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border hover:border-primary/50"
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0 w-full sm:w-auto">
+                        <div className="flex items-center gap-2 min-w-0">
                           <div className="w-8 h-8 rounded-full bg-destructive/20 text-destructive flex items-center justify-center text-sm font-medium">
                             {transaccion.de_nombre.charAt(0).toUpperCase()}
                           </div>
-                          <span className="font-medium text-foreground">
+                          <span className="font-medium text-foreground truncate">
                             {transaccion.de_nombre}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between sm:justify-center gap-2 w-full sm:w-auto">
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold">
+                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold whitespace-nowrap">
                           ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
                         </div>
                         <ArrowRight className="w-5 h-5 text-muted-foreground" />
                       </div>
 
-                      <div className="flex-1 flex justify-end">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-foreground">
+                      <div className="flex-1 min-w-0 w-full sm:w-auto flex sm:justify-end">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="font-medium text-foreground truncate">
                             {transaccion.para_nombre}
                           </span>
                           <div className="w-8 h-8 rounded-full bg-success/20 text-success flex items-center justify-center text-sm font-medium">
@@ -916,26 +916,26 @@ function GrupoDetalleScreen({ user }) {
                   const balanceRedondeado = Math.round(parseFloat(balance.balance || 0));
                   
                   return (
-                    <div 
+                    <div
                       key={balance.participante_id}
-                      className={`p-4 rounded-lg border ${
-                        balanceRedondeado > 0 
-                          ? 'bg-success/10 border-success/30' 
-                          : balanceRedondeado < 0 
+                      className={`p-4 rounded-lg border min-w-0 ${
+                        balanceRedondeado > 0
+                          ? 'bg-success/10 border-success/30'
+                          : balanceRedondeado < 0
                           ? 'bg-destructive/10 border-destructive/30'
                           : 'bg-muted/30 border-border'
                       }`}
                     >
-                      <div className="flex items-center gap-3 mb-3">
+                      <div className="flex items-center gap-3 mb-3 min-w-0">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                           balance.es_usuario ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
                         }`}>
                           {balance.nombre.charAt(0).toUpperCase()}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium text-foreground">{balance.nombre}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground truncate">{balance.nombre}</p>
                           {balance.email && (
-                            <p className="text-xs text-muted-foreground">{balance.email}</p>
+                            <p className="text-xs text-muted-foreground truncate">{balance.email}</p>
                           )}
                         </div>
                       </div>
