@@ -5,6 +5,7 @@ import { gastosService } from '../services/gastosService';
 import { categoriasService } from '../services/categoriasService';
 import BtnLoading from '../components/BtnLoading';
 import AddCategoryModal from '../components/Modals/AddCategoryModal';
+import { toast } from 'sonner';
 
 function NuevoGastoScreen({ user, onLogout }) {
   const navigate = useNavigate();
@@ -47,7 +48,7 @@ function NuevoGastoScreen({ user, onLogout }) {
     setLoadingSave(true);
     const categoriaObj = categorias.find(c => c.nombre === category);
     if (!categoriaObj) {
-      alert('Selecciona una categoría válida');
+      toast.error('Selecciona una categoría válida');
       setLoadingSave(false);
       return;
     }
@@ -61,7 +62,7 @@ function NuevoGastoScreen({ user, onLogout }) {
       });
       navigate('/gastos');
     } catch (err) {
-      alert('Error al guardar el gasto');
+      toast.error('Error al guardar el gasto');
       setLoadingSave(false);
     }
   };
@@ -105,7 +106,7 @@ function NuevoGastoScreen({ user, onLogout }) {
       setNewCategoryColor('#3b82f6');
     } catch (err) {
       console.error('Error al crear la categoría:', err);
-      alert('Error al crear la categoría');
+      toast.error('Error al crear la categoría');
     }
     setLoadingAddCategory(false);
   };

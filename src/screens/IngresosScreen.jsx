@@ -8,6 +8,7 @@ import AddIncomeModal from '../components/Modals/AddIncomeModal';
 import EditIncomeModal from '../components/Modals/EditIncomeModal';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
 import AddCategoryModal from '../components/Modals/AddCategoryModal';
+import { toast } from 'sonner';
 
 function IngresosScreen({ user }) {
   const [incomes, setIncomes] = useState([]);
@@ -148,7 +149,7 @@ function IngresosScreen({ user }) {
       setNewCategoryType('ingreso');
       setNewCategoryColor('#3b82f6');
     } catch (err) {
-      alert('Error al crear la categoría');
+      toast.error('Error al crear la categoría');
     }
     setLoadingAddCategory(false);
   };
