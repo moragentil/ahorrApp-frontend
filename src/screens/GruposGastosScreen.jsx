@@ -5,6 +5,7 @@ import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import BtnLoading from '../components/BtnLoading';
 import ConfirmDeleteModal from '../components/Modals/ConfirmDeleteModal';
+import { toast } from 'sonner';
 
 function GruposGastosScreen({ user }) {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ function GruposGastosScreen({ user }) {
 
   const handleAddGrupo = async () => {
     if (!newGrupoNombre.trim()) {
-      alert('El nombre del grupo es obligatorio');
+      toast.error('El nombre del grupo es obligatorio');
       return;
     }
     
@@ -77,9 +78,9 @@ function GruposGastosScreen({ user }) {
       setNewGrupoNombre('');
       setNewGrupoDesc('');
       setParticipantesExternos([]);
-      alert('Grupo creado correctamente');
+      toast.success('Grupo creado correctamente');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al crear el grupo');
+      toast.error(err.response?.data?.message || 'Error al crear el grupo');
     }
     setAddLoading(false);
   };
@@ -98,9 +99,9 @@ function GruposGastosScreen({ user }) {
       await invitacionGrupoService.aceptar(token);
       setInvitaciones(invitaciones.filter(inv => inv.token !== token));
       await loadGrupos();
-      alert('¡Te has unido al grupo exitosamente!');
+      toast.success('¡Te has unido al grupo exitosamente!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error al aceptar la invitación');
+      toast.error(err.response?.data?.message || 'Error al aceptar la invitación');
     }
     setActionLoading(null);
   };
@@ -111,14 +112,17 @@ function GruposGastosScreen({ user }) {
       await invitacionGrupoService.rechazar(token);
       setInvitaciones(invitaciones.filter(inv => inv.token !== token));
     } catch (err) {
-      alert('Error al rechazar la invitación');
+      toast.error('Error al rechazar la invitación');
     }
     setActionLoading(null);
   };
 
   const handleJoinByLink = async () => {
     const trimmed = joinLink.trim();
-    if (!trimmed) return alert('Pegá el enlace o token de invitación');
+    if (!trimmed) {
+      toast.error('Pegá el enlace o token de invitación');
+      return;
+    }
     const token = trimmed.split('/').filter(Boolean).pop();
     setJoinLoading(true);
     try {
@@ -126,9 +130,9 @@ function GruposGastosScreen({ user }) {
       await loadGrupos();
       setIsJoinDialogOpen(false);
       setJoinLink('');
-      alert('¡Te has unido al grupo exitosamente!');
+      toast.success('¡Te has unido al grupo exitosamente!');
     } catch (err) {
-      alert(err.response?.data?.message || 'Enlace o token inválido');
+      toast.error(err.response?.data?.message || 'Enlace o token inválido');
     }
     setJoinLoading(false);
   };
