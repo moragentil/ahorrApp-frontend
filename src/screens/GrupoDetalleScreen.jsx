@@ -852,45 +852,33 @@ function GrupoDetalleScreen({ user }) {
                   Transacciones para Equilibrar
                 </h3>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Estas son las transferencias mínimas necesarias para saldar todas las deudas. Toca una transacción para marcarla como pagada.
-                </p>
+                  Estas son las transferencias mínimas necesarias para saldar todas las deudas.                </p>
                 <div className="space-y-3">
                   {balances.transacciones.map((transaccion, index) => (
-                    <button
+                    <div
                       key={index}
-                      onClick={() => handleOpenConfirmarPago(transaccion)}
-                      className="w-full flex flex-col sm:flex-row sm:items-center items-start gap-3 sm:gap-4 p-4 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer border border-border hover:border-primary/50"
+                      className="w-full bg-muted/40 border border-border rounded-xl p-4 shadow-sm space-y-3"
                     >
-                      <div className="flex-1 min-w-0 w-full sm:w-auto">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-destructive/20 text-destructive flex items-center justify-center text-sm font-medium">
-                            {transaccion.de_nombre.charAt(0).toUpperCase()}
-                          </div>
-                          <span className="font-medium text-foreground truncate">
-                            {transaccion.de_nombre}
-                          </span>
-                        </div>
+                      <div className="flex items-center justify-center text-sm text-muted-foreground gap-1 flex-wrap">
+                        <span className="font-semibold text-foreground">{transaccion.de_nombre}</span>
+                        <span>debe a</span>
+                        <span className="font-semibold text-foreground">{transaccion.para_nombre}</span>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-center gap-2 w-full sm:w-auto">
-                        <ArrowRight className="w-5 h-5 text-muted-foreground" />
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full font-bold whitespace-nowrap">
-                          ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                      <div className="text-center text-2xl font-bold text-foreground">
+                        ${Math.round(parseFloat(transaccion.monto || 0)).toLocaleString('es-ES')}
                       </div>
 
-                      <div className="flex-1 min-w-0 w-full sm:w-auto flex sm:justify-end">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-medium text-foreground truncate">
-                            {transaccion.para_nombre}
-                          </span>
-                          <div className="w-8 h-8 rounded-full bg-success/20 text-success flex items-center justify-center text-sm font-medium">
-                            {transaccion.para_nombre.charAt(0).toUpperCase()}
-                          </div>
-                        </div>
+                      <div className="flex w-full">
+                        <button
+                          onClick={() => handleOpenConfirmarPago(transaccion)}
+                          className="w-full flex items-center  justify-center gap-2 bg-primary text-primary-foreground rounded-lg px-3 py-2 text-sm font-semibold hover:bg-primary/90 transition-colors"
+                        >
+                          <Check className="w-4 h-4" />
+                          ¡Está pagado!
+                        </button>
                       </div>
-                    </button>
+                    </div>
                   ))}
                 </div>
               </div>
