@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield, Copy, Check, MessageCircle, Link, CheckCheck } from 'lucide-react';
+import { ArrowLeft, Plus, UserPlus, ChevronRight, Mail, Trash2, Users as UsersIcon, User, TrendingUp, ArrowRight, Edit, Shield, Copy, Check, MessageCircle, Link, CheckCheck, Coins } from 'lucide-react';
 import { grupoGastoService } from '../services/grupoGastoService';
 import { invitacionGrupoService } from '../services/invitacionGrupoService';
 import { participanteService } from '../services/participanteService';
@@ -90,6 +90,12 @@ function GrupoDetalleScreen({ user }) {
   // Agregar estado para mostrar todas las invitaciones
   const [showAllInvitations, setShowAllInvitations] = useState(false);
 
+  // Estadísticas
+  const [estadisticas, setEstadisticas] = useState({
+    total_gastos_grupo: 0,
+    total_pagado_usuario: 0
+  });
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -117,6 +123,13 @@ function GrupoDetalleScreen({ user }) {
       loadInvitacionesPendientes();
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    loadGrupo();
+    loadParticipantes();
+    loadInvitacionesPendientes();
+    loadEstadisticas(); 
+  }, [id]);
 
   const loadGrupo = async () => {
     const data = await grupoGastoService.getById(id);
@@ -161,12 +174,36 @@ function GrupoDetalleScreen({ user }) {
     }
   }, [activeTab, gastosCompartidos]);
 
+  // 🔄 Recargar estadísticas cuando cambian los gastos
+  useEffect(() => {
+    if (gastosCompartidos.length >= 0) {
+      loadEstadisticas();
+    }
+  }, [gastosCompartidos]);
+
   const loadInvitacionesPendientes = async () => {
     try {
       const data = await invitacionGrupoService.invitacionesPendientes(id);
       setInvitacionesPendientes(data);
     } catch (err) {
       console.error('Error al cargar invitaciones:', err);
+    }
+  };
+
+  const loadEstadisticas = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/grupos-gastos/${id}/estadisticas`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Accept': 'application/json',
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setEstadisticas(data);
+      }
+    } catch (error) {
+      console.error('Error al cargar estadísticas:', error);
     }
   };
 
@@ -195,6 +232,8 @@ function GrupoDetalleScreen({ user }) {
       setSelectedPagador('');
       setNewExpenseFecha(new Date().toISOString().split('T')[0]);
       await loadGastos();
+      await loadBalances();
+      await loadEstadisticas(); // 🔄 refrescar stats
       toast.success('Gasto agregado correctamente');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al agregar el gasto');
@@ -247,6 +286,7 @@ function GrupoDetalleScreen({ user }) {
       
       await loadGastos();
       await loadBalances();
+      await loadEstadisticas(); // 🔄 refrescar stats
       toast.success('Gasto actualizado correctamente');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al actualizar el gasto');
@@ -394,7 +434,7 @@ function GrupoDetalleScreen({ user }) {
       switch (confirmModal.type) {
         case 'deleteGasto':
           await gastoCompartidoService.delete(confirmModal.itemId);
-          await Promise.all([loadGastos(), loadBalances()]);
+          await Promise.all([loadGastos(), loadBalances(), loadEstadisticas()]); // 🔄 refrescar stats
           toast.success('Gasto eliminado correctamente');
           break;
 
@@ -758,9 +798,31 @@ function GrupoDetalleScreen({ user }) {
             </div>
           </button>
         </div>
+        
 
         {/* Content */}
         {activeTab === 'gastos' && (
+          <div className='flex flex-col gap-4'>
+          {/* Estadísticas de Gastos */}
+        <div className="flex justify-between items-center gap-4">
+          <div className=" px-2 pb-2 flex justify-center text-center items-center gap-3">
+            <div>
+              <p className="text-sm text-muted-foreground">Mis Gastos</p>
+              <p className="text-2xl font-bold text-foreground">
+                ${Math.round(estadisticas.total_pagado_usuario || 0).toLocaleString('es-ES')}
+              </p>
+            </div>
+          </div>
+          
+          <div className="px-2 pb-2 flex justify-center text-center items-center gap-3">
+            <div>
+              <p className="text-sm text-muted-foreground">Gastos</p>
+              <p className="text-2xl font-bold text-foreground">
+                ${Math.round(estadisticas.total_gastos_grupo || 0).toLocaleString('es-ES')}
+              </p>
+            </div>
+          </div>
+        </div>
           <div className="space-y-3">
             {gastosCompartidos.length === 0 ? (
               <div className="bg-card border border-border rounded-lg p-8 text-center">
@@ -840,6 +902,7 @@ function GrupoDetalleScreen({ user }) {
                 </div>
               ))
             )}
+          </div>
           </div>
         )}
 
@@ -1170,6 +1233,8 @@ function GrupoDetalleScreen({ user }) {
             </div>
           </div>
         )}
+
+        
       </main>
 
       {/* Modals */}
