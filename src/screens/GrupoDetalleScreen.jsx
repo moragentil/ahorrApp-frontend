@@ -142,7 +142,18 @@ function GrupoDetalleScreen({ user }) {
       setParticipantes(data);
       // Seleccionar todos por defecto
       if (data && data.length > 0) {
-        setSelectedParticipantes(data.map(p => p.id));
+        const ids = data.map(p => p.id);
+        setSelectedParticipantes(ids);
+        // ✅ Preseleccionar al usuario actual como pagador si existe en participantes
+        const participanteActual = data.find(
+          p =>
+            p.usuario?.id === user?.id ||
+            p.user_id === user?.id ||
+            p.usuario_id === user?.id
+        );
+        if (participanteActual) {
+          setSelectedPagador(participanteActual.id);
+        }
       }
     } catch (err) {
       console.error('Error al cargar participantes:', err);
@@ -754,7 +765,18 @@ function GrupoDetalleScreen({ user }) {
             )}
           </div>
           <button
-            onClick={() => setIsAddExpenseOpen(true)}
+            onClick={() => {
+              const participanteActual = participantes.find(
+                p =>
+                  p.usuario?.id === user?.id ||
+                  p.user_id === user?.id ||
+                  p.usuario_id === user?.id
+              );
+              if (participanteActual) {
+                setSelectedPagador(participanteActual.id);
+              }
+              setIsAddExpenseOpen(true);
+            }}
             className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
