@@ -63,6 +63,12 @@ export const grupoGastoService = {
     return res.data;
   },
 
+  // Obtener estadísticas del grupo
+  getEstadisticas: async (grupoId) => {
+    const res = await api.get(`/grupos-gastos/${grupoId}/estadisticas`);
+    return res.data;
+  },
+
   // Marcar pago como completado
   completarPago: async (pagoId) => {
     const res = await api.put(`/pagos-grupos/${pagoId}/completar`);

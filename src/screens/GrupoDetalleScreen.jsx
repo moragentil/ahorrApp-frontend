@@ -203,16 +203,8 @@ function GrupoDetalleScreen({ user }) {
 
   const loadEstadisticas = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/grupos-gastos/${id}/estadisticas`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Accept': 'application/json',
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setEstadisticas(data);
-      }
+      const data = await grupoGastoService.getEstadisticas(id);
+      setEstadisticas(data);
     } catch (error) {
       console.error('Error al cargar estadísticas:', error);
     }

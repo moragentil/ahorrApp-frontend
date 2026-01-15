@@ -240,35 +240,37 @@ function IngresosScreen({ user }) {
             <h1 className="text-xl lg:text-3xl font-bold text-foreground mb-1 lg:mb-2">Mis Ingresos</h1>
             <p className="text-sm lg:text-base text-muted-foreground">Gestiona y analiza todos tus ingresos mensuales</p>
           </div>
+        </div>
+
+        {/* Selector de mes y año */}
+        <div className="mb-4 flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedMonth}
+              onChange={e => setSelectedMonth(Number(e.target.value))}
+              className="lg:text-base text-sm border border-border rounded-md px-2 py-2 bg-input text-foreground"
+            >
+              {months.map((m, idx) => (
+                <option key={m} value={idx}>{m}</option>
+              ))}
+            </select>
+            <select
+              value={selectedYear}
+              onChange={e => setSelectedYear(Number(e.target.value))}
+              className="lg:text-base text-sm border border-border rounded-md px-2 py-2 bg-input text-foreground"
+            >
+              {[2023, 2024, 2025].map(y => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
+          </div>
           <button
-            className="text-sm lg:text-base bg-primary text-primary-foreground px-2 text-center justify-center lg:px-4 py-2 w-1/2 md:w-fit rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
+            className="ml-auto text-sm lg:text-base bg-primary text-primary-foreground px-3 lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 justify-center transition-colors"
             onClick={() => setIsAddDialogOpen(true)}
           >
             <Plus className="w-4 h-4" />
             Nuevo Ingreso
           </button>
-        </div>
-
-        {/* Selector de mes y año */}
-        <div className="mb-4 flex gap-2 items-center">
-          <select
-            value={selectedMonth}
-            onChange={e => setSelectedMonth(Number(e.target.value))}
-            className="lg:text-base text-sm border border-border rounded-md px-2 py-1 bg-input text-foreground"
-          >
-            {months.map((m, idx) => (
-              <option key={m} value={idx}>{m}</option>
-            ))}
-          </select>
-          <select
-            value={selectedYear}
-            onChange={e => setSelectedYear(Number(e.target.value))}
-            className="lg:text-base text-sm border border-border rounded-md px-2 py-1 bg-input text-foreground"
-          >
-            {[2023, 2024, 2025].map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
         </div>
 
         {/* Summary Stats */}

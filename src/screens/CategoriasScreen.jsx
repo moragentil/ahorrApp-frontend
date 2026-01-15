@@ -172,14 +172,7 @@ function CategoriasScreen({ user, onLogout }) {
             <h1 className="text-xl lg:text-3xl font-bold text-foreground mb-1 lg:mb-2">Gestión de Categorías</h1>
             <p className="text-sm lg:text-base text-muted-foreground">Organiza y personaliza tus categorías de gastos e ingresos</p>
           </div>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setIsAddDialogOpen(true)}
-              className="text-sm lg:text-base bg-primary text-primary-foreground px-2 lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Nueva Categoría
-            </button>
+          <div className="flex gap-2 items-center flex-wrap">
             {isMd && (
               <>
                 <button
@@ -196,6 +189,13 @@ function CategoriasScreen({ user, onLogout }) {
                 </button>
               </>
             )}
+            <button 
+              onClick={() => setIsAddDialogOpen(true)}
+              className="ml-auto text-sm lg:text-base bg-primary text-primary-foreground px-3 lg:px-4 py-2 rounded-lg hover:bg-primary/90 flex items-center gap-2 justify-center transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Nueva Categoría
+            </button>
           </div>
         </div>
 
