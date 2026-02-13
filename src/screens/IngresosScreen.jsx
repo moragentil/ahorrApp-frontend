@@ -164,6 +164,9 @@ function IngresosScreen({ user }) {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
+
   function formatFecha(fechaStr) {
     if (!fechaStr) return '';
     const [datePart] = fechaStr.split('T');
@@ -259,7 +262,7 @@ function IngresosScreen({ user }) {
               onChange={e => setSelectedYear(Number(e.target.value))}
               className="lg:text-base text-sm border border-border rounded-md px-2 py-2 bg-input text-foreground"
             >
-              {[2023, 2024, 2025].map(y => (
+              {years.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>

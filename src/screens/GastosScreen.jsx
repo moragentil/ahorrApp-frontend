@@ -46,6 +46,9 @@ function GastosScreen({ user, onLogout }) {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
+
   const categories = ["Todas", ...Array.from(new Set(expenses.map(e => e.category || e.categoria?.nombre)))];
 
   const getCategoryColor = (category) => {
@@ -193,7 +196,7 @@ function GastosScreen({ user, onLogout }) {
               onChange={e => setSelectedYear(Number(e.target.value))}
               className="lg:text-base text-sm border border-border rounded-md px-2 py-2 bg-input text-foreground"
             >
-              {[2023, 2024, 2025].map(y => (
+              {years.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>

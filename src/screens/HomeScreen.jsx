@@ -20,6 +20,9 @@ function HomeScreen({ user, onLogout }) {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
   ];
 
+  const currentYear = new Date().getFullYear();
+  const years = Array.from({ length: 11 }, (_, i) => currentYear - i);
+
   const handleLogout = () => {
     authService.logout();
     onLogout();
@@ -48,6 +51,32 @@ function HomeScreen({ user, onLogout }) {
   const savingsGoalPercent = dashboard.meta_ahorro.porcentaje;
   const savingsCurrent = dashboard.meta_ahorro.total_ahorrado;
   const savingsTarget = dashboard.meta_ahorro.total_objetivo;
+  
+  // Helper para renderizar porcentajes seguramente
+  const renderPercentage = (percent, inverse = false) => {
+    if (percent === null || percent === undefined || isNaN(percent) || !isFinite(percent)) {
+        return <span className="text-xs text-muted-foreground mt-1 block">Sin datos comparativos</span>;
+    }
+    
+    const isPositive = percent > 0;
+    const isZero = percent === 0;
+    
+    // Si inverse es true (gastos), positivo es malo (rojo)
+    // Si inverse es false (balance), positivo es bueno (verde)
+    const isGood = inverse ? !isPositive : isPositive;
+    const colorClass = isZero ? "text-muted-foreground" : (isGood ? "text-success" : "text-destructive");
+    const Icon = isPositive ? TrendingUp : TrendingDown;
+
+    return (
+      <p className="text-sm text-muted-foreground flex items-center mt-1">
+        {!isZero && <Icon className={`w-3 h-3 mr-1 ${colorClass}`} />}
+        <span className={colorClass}>
+            {isPositive ? "+" : ""}{percent}% vs mes anterior
+        </span>
+      </p>
+    );
+  };
+
   const expenseData = dashboard.distribucion_categoria.map(cat => ({
     name: cat.categoria,
     value: cat.porcentaje,
@@ -92,7 +121,7 @@ function HomeScreen({ user, onLogout }) {
               onChange={e => setSelectedYear(Number(e.target.value))}
               className="lg:text-base text-sm border border-border rounded-md px-2 py-1 bg-input text-foreground"
             >
-              {[2023, 2024, 2025].map(y => (
+              {years.map(y => (
                 <option key={y} value={y}>{y}</option>
               ))}
             </select>
@@ -119,15 +148,7 @@ function HomeScreen({ user, onLogout }) {
               <div className={`text-xl lg:text-2xl font-bold mb-2 ${balance >= 0 ? "text-success" : "text-destructive"}`}>
                 ${balance.toLocaleString()}
               </div>
-              <p className="text-sm text-muted-foreground flex items-center mt-1">
-                {balance >= 0 ? (
-                  <TrendingUp className="w-3 h-3 mr-1 text-success" />
-                ) : (
-                  <TrendingDown className="w-3 h-3 mr-1 text-destructive" />
-                )}
-                {balance >= 0 ? "+" : ""}
-                {((balance / monthlyIncome) * 100).toFixed(1)}% vs mes anterior
-              </p>
+              {renderPercentage(balancePercent)}
             </div>
           </div>
 
@@ -139,10 +160,7 @@ function HomeScreen({ user, onLogout }) {
             </div>
             <div>
               <div className="text-xl lg:text-2xl mb-2 font-bold text-foreground">${totalExpenses.toLocaleString()}</div>
-              <p className="text-sm text-muted-foreground flex items-center mt-1">
-                <TrendingUp className="w-3 h-3 mr-1 text-destructive" />
-                +12.5% vs mes anterior
-              </p>
+              {renderPercentage(expensesPercent, true)}
             </div>
           </div>
 
@@ -153,10 +171,10 @@ function HomeScreen({ user, onLogout }) {
               <TrendingUp className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <div className="text-xl lg:text-2xl font-bold mb-2 text-foreground">${monthlyIncome.toLocaleString()}</div>
+              <div className="text-xl lg:text-2xl font-bold mb-2 text-foreground">${monthlyIncome ? monthlyIncome.toLocaleString() : "0"}</div>
               <p className="text-sm text-muted-foreground flex items-center mt-1">
                 <TrendingUp className="w-3 h-3 mr-1 text-success" />
-                Estable
+                Registrados este mes
               </p>
             </div>
           </div>
@@ -168,10 +186,19 @@ function HomeScreen({ user, onLogout }) {
               <Target className="h-4 w-4 text-primary" />
             </div>
             <div>
-              <div className="text-xl lg:text-2xl font-bold mb-2 text-foreground">{savingsGoalPercent}%</div>
-              <p className="text-sm text-muted-foreground">
-                ${savingsCurrent} de ${savingsTarget} objetivo
-              </p>
+              {savingsTarget > 0 ? (
+                <>
+                  <div className="text-xl lg:text-2xl font-bold mb-2 text-foreground">{savingsGoalPercent}%</div>
+                  <p className="text-sm text-muted-foreground">
+                    ${savingsCurrent.toLocaleString()} de ${savingsTarget.toLocaleString()} objetivo
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-xl lg:text-2xl font-bold mb-2 text-muted-foreground">-</div>
+                  <p className="text-sm text-muted-foreground">No hay meta definida</p>
+                </>
+              )}
             </div>
           </div>
         </div>
